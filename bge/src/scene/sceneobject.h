@@ -79,11 +79,9 @@ class SceneObject
       return m_transformModified;
     }
 
-    virtual void render(Rendering::Renderer* renderer) {}
-
   protected:
-    virtual void calculateTransforms()
-    {}
+    virtual inline void render(Rendering::Renderer* renderer) {}
+    virtual inline void calculateTransforms() {}
 
   private:
     void prepareTransforms(Rendering::Renderer* renderer);
@@ -98,7 +96,9 @@ class SceneObject
     SceneObject* m_parent;
     bool m_transformModified;
 
+    /* Be very careful in these classes!!! */
     friend class BGE::Canvas;
+    friend class BGE::Rendering::Renderer;
 };
 
 }

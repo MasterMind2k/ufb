@@ -40,6 +40,8 @@ class Renderer
     virtual void renderScene() = 0;
 
   protected:
+    void render(Scene::SceneObject* object);
+
     QQueue<Scene::SceneObject*> m_renderQueue;
 };
 

@@ -14,10 +14,17 @@
  ***************************************************************************/
 #include "rendering/renderer.h"
 
+#include "scene/sceneobject.h"
+
 using namespace BGE;
 using namespace BGE::Rendering;
 
 void Renderer::enqueueObject(Scene::SceneObject* object)
 {
   m_renderQueue.enqueue(object);
+}
+
+void Renderer::render(Scene::SceneObject* object)
+{
+  object->render(this);
 }
