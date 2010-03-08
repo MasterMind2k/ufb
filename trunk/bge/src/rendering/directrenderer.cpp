@@ -39,6 +39,6 @@ void DirectRenderer::renderScene()
     Scene::SceneObject* object = m_renderQueue.dequeue();
     glLoadMatrixf(object->globalTransform().data());
 
-    object->render(this);
+    render(object);
   }
 }
