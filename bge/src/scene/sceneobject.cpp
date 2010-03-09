@@ -21,8 +21,6 @@
 using namespace BGE;
 using namespace BGE::Scene;
 
-#include <QtDebug>
-
 SceneObject::SceneObject()
 {
   m_transform.setIdentity();
@@ -39,31 +37,30 @@ void SceneObject::move(Vector3f direction)
 {
   m_globalPosition += direction;
   m_position += direction;
-  m_transform.translate(direction);
   m_transformModified = true;
 }
 
 void SceneObject::rotateX(qreal angle)
 {
   AngleAxisf rotation(angle, Vector3f::UnitX());
+  m_orientation = m_orientation * rotation;
   m_globalOrientation = m_globalOrientation * rotation;
-  m_transform.rotate<AngleAxisf>(rotation);
   m_transformModified = true;
 }
 
 void SceneObject::rotateY(qreal angle)
 {
   AngleAxisf rotation(angle, Vector3f::UnitY());
+  m_orientation = m_orientation * rotation;
   m_globalOrientation = m_globalOrientation * rotation;
-  m_transform.rotate<AngleAxisf>(rotation);
   m_transformModified = true;
 }
 
 void SceneObject::rotateZ(qreal angle)
 {
   AngleAxisf rotation(angle, Vector3f::UnitZ());
+  m_orientation = m_orientation * rotation;
   m_globalOrientation = m_globalOrientation * rotation;
-  m_transform.rotate<AngleAxisf>(rotation);
   m_transformModified = true;
 }
 
@@ -92,26 +89,29 @@ Quaternionf SceneObject::orientation() const
   return m_orientation;
 }
 
-void SceneObject::prepareTransforms(Rendering::Renderer* renderer)
+void SceneObject::prepareTransforms()
 {
   calculateTransforms();
   if (isTransformModified()) {
-    if (parent())
+    m_transform = Transform3f::Identity();
+    m_transform.translate(m_position);
+    m_transform *= m_orientation;
+    if (parent()) {
+      m_globalPosition = parent()->globalPosition() + position();
+      m_globalOrientation = parent()->globalOrientation() * orientation();
       m_globalTransform = parent()->globalTransform() * transform();
-    else
+    } else {
       m_globalTransform = transform();
+      m_globalPosition = m_position;
+      m_globalOrientation = m_orientation;
+    }
   }
-
-  renderer->enqueueObject(this);
 
   foreach (SceneObject* child, m_childs) {
     // Propagate changes downwards
-    if (isTransformModified()) {
-      child->m_globalPosition = globalPosition() + child->position();
-      child->m_globalOrientation = globalOrientation() * child->orientation();
+    if (isTransformModified())
       child->m_transformModified = true;
-    }
-    child->prepareTransforms(renderer);
+    child->prepareTransforms();
   }
   m_transformModified = false;
 }

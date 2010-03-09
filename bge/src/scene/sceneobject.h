@@ -79,12 +79,17 @@ class SceneObject
       return m_transformModified;
     }
 
+    inline const QList<SceneObject*>& childs() const
+    {
+      return m_childs;
+    }
+
   protected:
     virtual inline void render(Rendering::Renderer* renderer) {}
     virtual inline void calculateTransforms() {}
 
   private:
-    void prepareTransforms(Rendering::Renderer* renderer);
+    void prepareTransforms();
 
     Transform3f m_transform;
     Transform3f m_globalTransform;

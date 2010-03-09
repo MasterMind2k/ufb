@@ -23,11 +23,12 @@
 using namespace BGE;
 using namespace BGE::Rendering;
 
-void DirectRenderer::drawRectangle(const QList< Vector3f >& vertices)
+void DirectRenderer::drawQuads(const QList<Vector3f>& vertices)
 {
   glBegin(GL_QUADS);
   foreach(Vector3f vertex, vertices)
-    glVertex3f(vertex[0], vertex[1], vertex[2]);
+    glVertex3fv(vertex.data());
+
   glEnd();
 }
 
