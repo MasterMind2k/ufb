@@ -19,6 +19,8 @@
 #include <QtCore/QTimer>
 #include <QtGui/QKeyEvent>
 
+#include <QtGui/QMatrix4x4>
+
 #include "scene/sceneobject.h"
 
 #include "abstractcontroller.h"
@@ -60,12 +62,24 @@ void Canvas::initializeGL()
   glClearColor(0, 0, 0, 0);
   glShadeModel(GL_SMOOTH);
   glEnable(GL_DEPTH_TEST);
-  glMatrixMode (GL_MODELVIEW);
+
+  glEnable(GL_LIGHTING);
+  glEnable(GL_LIGHT0);
+  glEnable(GL_COLOR_MATERIAL);
+  glEnable(GL_CULL_FACE);
 }
 
 void Canvas::resizeGL(int w, int h)
 {
   glViewport(0, 0, w, h);
+
+  // Default perspective setup
+  QMatrix4x4 perspective;
+  perspective.perspective(45, (qreal) w / (qreal) h, 0.1, 1000.0);
+  perspective.translate(0, 0, -5);
+  glMatrixMode(GL_PROJECTION);
+  glLoadMatrixd(perspective.data());
+  glMatrixMode(GL_MODELVIEW);
 }
 
 void Canvas::paintGL()
@@ -74,7 +88,16 @@ void Canvas::paintGL()
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
 
-  m_scene->prepareTransforms(m_renderer);
+  m_scene->prepareTransforms();
+
+  /* Culling comes here :D */
+  QQueue<Scene::SceneObject*> list;
+  list.enqueue(m_scene);
+  while (!list.isEmpty()) {
+    Scene::SceneObject* object = list.dequeue();
+    m_renderer->enqueueObject(object);
+    list.append(object->childs());
+  }
 
   m_renderer->renderScene();
 }

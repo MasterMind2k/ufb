@@ -25,7 +25,7 @@ namespace Rendering
 class DirectRenderer : public Renderer
 {
   public:
-    void drawRectangle(const QList<Vector3f>& vertices);
+    void drawQuads(const QList<Vector3f>& vertices);
 
     void renderScene();
 };

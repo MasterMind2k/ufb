@@ -27,51 +27,39 @@ class Cube : public BGE::Scene::SceneObject
   public:
     Cube(float a)
     {
-      float half = a/2;
-      m_vertices << Vector3f(-half, -half, -half);
-      m_vertices << Vector3f(-half, half, -half);
-      m_vertices << Vector3f(half, half, -half);
-      m_vertices << Vector3f(half, -half, -half);
-
-      m_vertices << Vector3f(-half, -half, half);
-      m_vertices << Vector3f(-half, half, half);
-      m_vertices << Vector3f(half, half, half);
-      m_vertices << Vector3f(half, -half, half);
-
-      m_vertices << Vector3f(-half, half, -half);
-      m_vertices << Vector3f(-half, half, half);
-      m_vertices << Vector3f(half, half, half);
-      m_vertices << Vector3f(half, half, -half);
-
-      m_vertices << Vector3f(half, -half, -half);
-      m_vertices << Vector3f(half, -half, half);
-      m_vertices << Vector3f(-half, -half, half);
-      m_vertices << Vector3f(-half, -half, -half);
-
-      m_vertices << Vector3f(half, -half, -half);
-      m_vertices << Vector3f(half, -half, half);
-      m_vertices << Vector3f(half, half, half);
-      m_vertices << Vector3f(half, half, -half);
-
-      m_vertices << Vector3f(-half, half, -half);
-      m_vertices << Vector3f(-half, half, half);
-      m_vertices << Vector3f(-half, -half, half);
-      m_vertices << Vector3f(-half, -half, -half);
+      m_a = a;
     }
 
   protected:
     void render(BGE::Rendering::Renderer* renderer)
     {
-      renderer->drawRectangle(m_vertices.mid(0, 4));
-      renderer->drawRectangle(m_vertices.mid(4, 4));
-      renderer->drawRectangle(m_vertices.mid(8, 4));
-      renderer->drawRectangle(m_vertices.mid(12, 4));
-      renderer->drawRectangle(m_vertices.mid(16, 4));
-      renderer->drawRectangle(m_vertices.mid(20, 4));
+      float half = m_a /2;
+      Vector3f bottomFrontLeft(-half, -half, half);
+      Vector3f bottomFrontRight(half, -half, half);
+      Vector3f topFrontLeft(-half, half, half);
+      Vector3f topFrontRight(half, half, half);
+
+      Vector3f bottomBehindLeft(-half, -half, -half);
+      Vector3f bottomBehindRight(half, -half, -half);
+      Vector3f topBehindLeft(-half, half, -half);
+      Vector3f topBehindRight(half, half, -half);
+
+      // Front
+      renderer->drawRectangle(bottomFrontLeft, bottomFrontRight, topFrontLeft, topFrontRight);
+      // Right side
+      renderer->drawRectangle(bottomFrontRight, bottomBehindRight, topFrontRight, topBehindRight);
+      // Left side
+      renderer->drawRectangle(bottomBehindLeft, bottomFrontLeft, topBehindLeft, topFrontLeft);
+      // Bottom
+      renderer->drawRectangle(bottomBehindLeft, bottomBehindRight, bottomFrontLeft, bottomFrontRight);
+      // Behind
+      renderer->drawRectangle(topBehindLeft, topBehindRight, bottomBehindLeft, bottomBehindRight);
+      // Top
+      renderer->drawRectangle(topFrontLeft, topFrontRight, topBehindLeft, topBehindRight);
     }
 
   private:
-    QList<Vector3f> m_vertices;
+    float m_a;
 };
 
 // Our little testing controller :)
@@ -105,16 +93,16 @@ class Controller : public BGE::AbstractController
           m_controlled->move(Vector3f(0, 0, -0.1));
           break;
         case Qt::Key_A:
-          m_controlled->rotateX(50);
+          m_controlled->rotateX(M_PI/150);
           break;
         case Qt::Key_S:
-          m_controlled->rotateX(-50);
+          m_controlled->rotateX(-M_PI/150);
           break;
         case Qt::Key_W:
-          m_controlled->rotateY(50);
+          m_controlled->rotateY(M_PI/150);
           break;
         case Qt::Key_E:
-          m_controlled->rotateY(-50);
+          m_controlled->rotateY(-M_PI/150);
           break;
       }
     }

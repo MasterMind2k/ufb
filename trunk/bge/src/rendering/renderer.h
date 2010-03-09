@@ -35,7 +35,9 @@ class Renderer
   public:
     void enqueueObject(Scene::SceneObject* object);
 
-    virtual void drawRectangle(const QList<Vector3f>& vertexes) = 0;
+    void drawRectangle(const Vector3f& bottomLeft, const Vector3f& bottomRight, const Vector3f& upperLeft, const Vector3f& upperRight);
+
+    virtual void drawQuads(const QList<Vector3f>& vertexes) = 0;
 
     virtual void renderScene() = 0;
 
