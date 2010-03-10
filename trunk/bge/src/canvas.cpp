@@ -17,11 +17,12 @@
 #include "rendering/directrenderer.h"
 
 #include <QtCore/QTimer>
-#include <QtGui/QKeyEvent>
 
+#include <QtGui/QKeyEvent>
 #include <QtGui/QMatrix4x4>
 
 #include "scene/sceneobject.h"
+#include "scene/camera.h"
 
 #include "abstractcontroller.h"
 
@@ -40,6 +41,7 @@ Canvas::Canvas()
   timer->start();
 
   m_scene = new Scene::SceneObject;
+  m_activeCamera = 0l;
 
   connect(timer, SIGNAL(timeout()), SLOT(updateGL()));
 }
@@ -75,8 +77,7 @@ void Canvas::resizeGL(int w, int h)
 
   // Default perspective setup
   QMatrix4x4 perspective;
-  perspective.perspective(45, (qreal) w / (qreal) h, 0.1, 1000.0);
-  perspective.translate(0, 0, -5);
+  perspective.perspective(80, (qreal) w / (qreal) h, 0.1, 1000.0);
   glMatrixMode(GL_PROJECTION);
   glLoadMatrixd(perspective.data());
   glMatrixMode(GL_MODELVIEW);
@@ -105,6 +106,35 @@ void Canvas::paintGL()
 void Canvas::setController(AbstractController* controller)
 {
   m_controller = controller;
+}
+
+Scene::Camera* Canvas::createCamera(const QString &name)
+{
+  if (m_cameras.contains(name))
+    return 0l;
+
+  Scene::Camera* camera = new Scene::Camera(name);
+  m_cameras.insert(name, camera);
+  return camera;
+}
+
+bool Canvas::activateCamera(const QString& name)
+{
+  if (!m_cameras.contains(name))
+    return false;
+
+  m_activeCamera = m_cameras.value(name);
+  return true;
+}
+
+bool Canvas::removeCamera(const QString& name)
+{
+  if (!m_cameras.contains(name))
+    return false;
+
+  Scene::Camera* camera = m_cameras.value(name);
+  m_cameras.remove(name);
+  delete camera;
 }
 
 void Canvas::keyPressEvent(QKeyEvent* event)

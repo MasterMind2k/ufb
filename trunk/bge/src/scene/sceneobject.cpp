@@ -40,28 +40,31 @@ void SceneObject::move(Vector3f direction)
   m_transformModified = true;
 }
 
+void SceneObject::rotate(AngleAxisf rotation)
+{
+  m_orientation = m_orientation * rotation;
+  m_orientation.normalize();
+  m_globalOrientation = m_globalOrientation * rotation;
+  m_globalOrientation.normalize();
+  m_transformModified = true;
+}
+
 void SceneObject::rotateX(qreal angle)
 {
   AngleAxisf rotation(angle, Vector3f::UnitX());
-  m_orientation = m_orientation * rotation;
-  m_globalOrientation = m_globalOrientation * rotation;
-  m_transformModified = true;
+  rotate(rotation);
 }
 
 void SceneObject::rotateY(qreal angle)
 {
   AngleAxisf rotation(angle, Vector3f::UnitY());
-  m_orientation = m_orientation * rotation;
-  m_globalOrientation = m_globalOrientation * rotation;
-  m_transformModified = true;
+  rotate(rotation);
 }
 
 void SceneObject::rotateZ(qreal angle)
 {
   AngleAxisf rotation(angle, Vector3f::UnitZ());
-  m_orientation = m_orientation * rotation;
-  m_globalOrientation = m_globalOrientation * rotation;
-  m_transformModified = true;
+  rotate(rotation);
 }
 
 Transform3f SceneObject::transform() const
@@ -97,11 +100,11 @@ void SceneObject::prepareTransforms()
     m_transform.translate(m_position);
     m_transform *= m_orientation;
     if (parent()) {
-      m_globalPosition = parent()->globalPosition() + position();
-      m_globalOrientation = parent()->globalOrientation() * orientation();
-      m_globalTransform = parent()->globalTransform() * transform();
+      m_globalPosition = parent()->m_globalPosition + m_position;
+      m_globalOrientation = parent()->m_globalOrientation * m_orientation;
+      m_globalTransform = parent()->m_globalTransform * m_transform;
     } else {
-      m_globalTransform = transform();
+      m_globalTransform = m_transform;
       m_globalPosition = m_position;
       m_globalOrientation = m_orientation;
     }

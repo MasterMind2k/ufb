@@ -20,6 +20,7 @@
 #include "rendering/renderer.h"
 
 #include "scene/sceneobject.h"
+#include "scene/camera.h"
 
 // Our little testing cube :D
 class Cube : public BGE::Scene::SceneObject
@@ -104,6 +105,12 @@ class Controller : public BGE::AbstractController
         case Qt::Key_E:
           m_controlled->rotateY(-M_PI/150);
           break;
+        case Qt::Key_Space:
+          if (BGE::Canvas::canvas()->activeCamera() != BGE::Canvas::canvas()->camera("First camera"))
+            BGE::Canvas::canvas()->activateCamera("First camera");
+          else
+            BGE::Canvas::canvas()->activateCamera("Second camera");
+          break;
       }
     }
 
@@ -120,11 +127,27 @@ int main(int argc, char** argv)
 
   Cube* object = new Cube(1);
   object->addChild(new Cube(0.5));
-  object->child(0)->move(Vector3f(0.5, 0.5, 0));
+  object->addChild(new Cube(0.1));
+  object->child(0)->move(0.5, 0.5, 0);
+  object->child(1)->move(0, 0, 3);
 
+  BGE::Scene::Camera* camera = canvas->createCamera("First camera");
+  object->addChild(camera);
+  camera->move(0, 0, 3);
+
+  canvas->addSceneObject(canvas->createCamera("Second camera"));
+  canvas->camera("Second camera")->move(0, 20, 5);
+
+  canvas->camera("Second camera")->rotateX(-M_PI / 2);
+
+  canvas->activateCamera("First camera");
   Controller controller(object);
   canvas->setController(&controller);
 
+  canvas->addSceneObject(object);
+
+  object = new Cube(2);
+  object->move(0, 0, 10);
   canvas->addSceneObject(object);
 
   return app.exec();

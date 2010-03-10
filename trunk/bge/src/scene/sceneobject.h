@@ -37,7 +37,13 @@ class SceneObject
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     SceneObject();
 
+    inline void move(qreal x, qreal y, qreal z)
+    {
+      move(Vector3f(x, y, z));
+    }
+
     void move(Vector3f direction);
+    void rotate(AngleAxisf rotation);
     void rotateX(qreal angle);
     void rotateY(qreal angle);
     void rotateZ(qreal angle);

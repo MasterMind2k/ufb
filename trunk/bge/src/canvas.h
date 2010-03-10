@@ -15,6 +15,8 @@
 #ifndef __BGE_CANVAS_H
 #define __BGE_CANVAS_H
 
+#include <QtCore/QHash>
+
 #include <QtOpenGL/QGLWidget>
 
 namespace BGE
@@ -24,6 +26,7 @@ class AbstractController;
 namespace Scene
 {
 class SceneObject;
+class Camera;
 }
 namespace Rendering
 {
@@ -35,10 +38,26 @@ class Canvas : public QGLWidget
   Q_OBJECT
   public:
     void addSceneObject(Scene::SceneObject* object);
+    inline Scene::SceneObject* scene() const
+    {
+      return m_scene;
+    }
 
     static Canvas* canvas();
 
     void setController(AbstractController* controller);
+
+    Scene::Camera* createCamera(const QString& name);
+    inline Scene::Camera* camera(const QString& name) const
+    {
+      return m_cameras.value(name);
+    }
+    bool activateCamera(const QString& name);
+    bool removeCamera(const QString& name);
+    inline Scene::Camera* activeCamera()
+    {
+      return m_activeCamera;
+    }
 
   protected:
     void initializeGL();
@@ -55,6 +74,10 @@ class Canvas : public QGLWidget
     Scene::SceneObject* m_scene;
     Rendering::Renderer* m_renderer;
     AbstractController* m_controller;
+
+    QHash<QString, Scene::Camera*> m_cameras;
+    Scene::Camera* m_activeCamera;
+
     static Canvas* m_self;
 };
 
