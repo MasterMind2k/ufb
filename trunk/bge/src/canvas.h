@@ -1,7 +1,6 @@
 /***************************************************************************
  *   Copyright (C) 2010 by Gregor Kališnik <gregor@unimatrix-one.org>      *
  *   Copyright (C) 2010 by Matej Jakop     <matej@jakop.si>                *
- *   Copyright (C) 2010 by Matevž Pesek    <be inserted>                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License version 3        *
@@ -33,33 +32,94 @@ namespace Rendering
 class Renderer;
 }
 
+/**
+ * @short The "display" of the engine
+ *
+ * It has all general methods to control the engine. Through this class
+ * you can create and add cameras, add objects to the scene and many more.
+ *
+ * @see canvas
+ */
 class Canvas : public QGLWidget
 {
   Q_OBJECT
   public:
+    /**
+     * Adds an SceneObject to the scene.
+     *
+     * @see Scene::SceneObject
+     */
     void addSceneObject(Scene::SceneObject* object);
-    inline Scene::SceneObject* scene() const
+    /**
+     * Returns the root node of the scene.
+     */
+    inline const Scene::SceneObject* scene() const
     {
       return m_scene;
     }
 
+    /**
+     * Returns the instancce of the canvas.
+     */
     static Canvas* canvas();
 
+    /**
+     * Sets the input controller. All keyboard and mouse events will
+     * be directed to this controller.
+     *
+     * @see AbstractController
+     */
     void setController(AbstractController* controller);
 
-    Scene::Camera* createCamera(const QString& name);
+    /**
+     * Creates a camera with a name. The camera is _not_ added to the scene.
+     *
+     * @note If you do not specify a name, the camera will have a generic
+     * name.
+     *
+     * @see Scene::Camera
+     */
+    Scene::Camera* createCamera(const QString& name = QString());
+    /**
+     * Get a camera with a name. If it doesn't exist, then this method will
+     * return null.
+     *
+     * @param name Name of the camera
+     *
+     * @return @c 0l There is no camera with the specified name
+     *
+     * @see createCamera
+     */
     inline Scene::Camera* camera(const QString& name) const
     {
       return m_cameras.value(name);
     }
+    /**
+     * Activates the specified camera. Returns false if the camera doesn't
+     * exist.
+     *
+     * @return @c false Camera doesn't exist, and there were no changes
+     * @return @c true Camera successfuly activated
+     *
+     * @see createCamera
+     */
     bool activateCamera(const QString& name);
+    /**
+     * Removes a camera. Note that you cannot remove an active camera!
+     *
+     * @return @c false Camera was not removed, it wasn't found or it is active
+     */
     bool removeCamera(const QString& name);
+    /**
+     * Returns an active camera.
+     */
     inline Scene::Camera* activeCamera()
     {
       return m_activeCamera;
     }
 
-  protected:
+  private:
+    /* Reimplemented methods */
     void initializeGL();
     void resizeGL(int w, int h);
     void paintGL();
@@ -68,7 +128,7 @@ class Canvas : public QGLWidget
     void mouseMoveEvent(QMouseEvent* event);
     void mousePressEvent(QMouseEvent* event);
 
-  private:
+    /* Really private stuff */
     Canvas();
 
     Scene::SceneObject* m_scene;

@@ -1,7 +1,6 @@
 /***************************************************************************
  *   Copyright (C) 2010 by Gregor Kališnik <gregor@unimatrix-one.org>      *
  *   Copyright (C) 2010 by Matej Jakop     <matej@jakop.si>                *
- *   Copyright (C) 2010 by Matevž Pesek    <be inserted>                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License version 3        *
@@ -22,6 +21,11 @@ namespace BGE
 namespace Rendering
 {
 
+/**
+ * @short Renderer for old OpenGL API
+ *
+ * This renderer should support only commands prior to OpenGL 2.1.
+ */
 class DirectRenderer : public Renderer
 {
   public:

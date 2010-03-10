@@ -1,7 +1,6 @@
 /***************************************************************************
  *   Copyright (C) 2010 by Gregor Kališnik <gregor@unimatrix-one.org>      *
  *   Copyright (C) 2010 by Matej Jakop     <matej@jakop.si>                *
- *   Copyright (C) 2010 by Matevž Pesek    <be inserted>                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License version 3        *
@@ -33,13 +32,16 @@ Canvas* Canvas::m_self = 0l;
 Canvas::Canvas()
 : QGLWidget()
 {
+  // Creating a renderer
   m_renderer = new Rendering::DirectRenderer;
 
+  // Setting up a timer for "game loop"
   QTimer* timer = new QTimer(this);
   timer->setSingleShot(false);
   timer->setInterval(30);
   timer->start();
 
+  // Initialize scene graph and set active camera to none
   m_scene = new Scene::SceneObject;
   m_activeCamera = 0l;
 
@@ -61,6 +63,7 @@ Canvas* Canvas::canvas()
 
 void Canvas::initializeGL()
 {
+  // This initialization method could/should be moved to Rendering API
   glClearColor(0, 0, 0, 0);
   glShadeModel(GL_SMOOTH);
   glEnable(GL_DEPTH_TEST);
@@ -85,13 +88,16 @@ void Canvas::resizeGL(int w, int h)
 
 void Canvas::paintGL()
 {
+  // Reset the matrix and other stuff
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
 
+  // Calculate all the transforms (recursive)
   m_scene->prepareTransforms();
 
-  /* Culling comes here :D */
+  // Enqueue objects for rendering
+  /// @TODO Culling comes here somewhere :D (someday)
   QQueue<Scene::SceneObject*> list;
   list.enqueue(m_scene);
   while (!list.isEmpty()) {
@@ -100,6 +106,7 @@ void Canvas::paintGL()
     list.append(object->childs());
   }
 
+  // Make the actual rendering
   m_renderer->renderScene();
 }
 
@@ -133,6 +140,9 @@ bool Canvas::removeCamera(const QString& name)
     return false;
 
   Scene::Camera* camera = m_cameras.value(name);
+  if (m_activeCamera == camera)
+    return false;
+
   m_cameras.remove(name);
   delete camera;
 }

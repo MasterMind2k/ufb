@@ -1,7 +1,6 @@
 /***************************************************************************
  *   Copyright (C) 2010 by Gregor Kališnik <gregor@unimatrix-one.org>      *
  *   Copyright (C) 2010 by Matej Jakop     <matej@jakop.si>                *
- *   Copyright (C) 2010 by Matevž Pesek    <be inserted>                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License version 3        *
@@ -30,20 +29,46 @@ class SceneObject;
 namespace Rendering
 {
 
+/**
+ * @short Abstract renderer
+ *
+ * It's an abstract interface to the OpenGL rendering.
+ */
 class Renderer
 {
   public:
-    void enqueueObject(Scene::SceneObject* object);
+    /**
+     * Enqueues an object tot he rendering queue.
+     */
+    inline void enqueueObject(Scene::SceneObject* object)
+    {
+      m_renderQueue.enqueue(object);
+    }
 
+    /**
+     * A convenient method for drawing rectangles.
+     */
     void drawRectangle(const Vector3f& bottomLeft, const Vector3f& bottomRight, const Vector3f& upperLeft, const Vector3f& upperRight);
 
+    /**
+     * Method for drawing quads.
+     */
     virtual void drawQuads(const QList<Vector3f>& vertexes) = 0;
 
+    /**
+     * Method for making the whole scene rendering.
+     */
     virtual void renderScene() = 0;
 
   protected:
+    /**
+     * A "redirect" method for accessing the render method of the Scene::SceneObject.
+     */
     void render(Scene::SceneObject* object);
 
+    /**
+     * Queue to be used by implementations.
+     */
     QQueue<Scene::SceneObject*> m_renderQueue;
 };
 
