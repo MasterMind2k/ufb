@@ -4,6 +4,7 @@ include_directories(.. ${CMAKE_CURRENT_BINARY_DIR} ${EIGEN2_INCLUDE_DIR} ${QT_IN
 
 set(scene_SRCS
   sceneobject.cpp
+  camera.cpp
 )
 
 #qt4_wrap_cpp(scene_MOC ${scene_HDRS})
