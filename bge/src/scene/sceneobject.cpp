@@ -1,7 +1,6 @@
 /***************************************************************************
  *   Copyright (C) 2010 by Gregor Kališnik <gregor@unimatrix-one.org>      *
  *   Copyright (C) 2010 by Matej Jakop     <matej@jakop.si>                *
- *   Copyright (C) 2010 by Matevž Pesek    <be inserted>                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License version 3        *
@@ -23,29 +22,35 @@ using namespace BGE::Scene;
 
 SceneObject::SceneObject()
 {
+  // Set the default transforms
   m_transform.setIdentity();
   m_globalTransform.setIdentity();
-  m_globalOrientation.setIdentity();
+  // Set the default position and orientation
   m_orientation.setIdentity();
+  m_globalOrientation.setIdentity();
   m_position.setZero();
   m_globalPosition.setZero();
+
+  // And init other properties
   m_parent = 0l;
   m_transformModified = false;
 }
 
-void SceneObject::move(Vector3f direction)
+void SceneObject::move(const Vector3f& direction)
 {
   m_globalPosition += direction;
   m_position += direction;
+
+  // Mark for recalculation
   m_transformModified = true;
 }
 
-void SceneObject::rotate(AngleAxisf rotation)
+void SceneObject::rotate(const AngleAxisf& rotation)
 {
   m_orientation = m_orientation * rotation;
-  m_orientation.normalize();
   m_globalOrientation = m_globalOrientation * rotation;
-  m_globalOrientation.normalize();
+
+  // Mark for recalculation
   m_transformModified = true;
 }
 
@@ -67,43 +72,26 @@ void SceneObject::rotateZ(qreal angle)
   rotate(rotation);
 }
 
-Transform3f SceneObject::transform() const
-{
-  return m_transform;
-}
-
-Vector3f SceneObject::globalPosition() const
-{
-  return m_globalPosition;
-}
-
-Vector3f SceneObject::position() const
-{
-  return m_position;
-}
-
-Quaternionf SceneObject::globalOrientation() const
-{
-  return m_globalOrientation;
-}
-
-Quaternionf SceneObject::orientation() const
-{
-  return m_orientation;
-}
-
 void SceneObject::prepareTransforms()
 {
+  // Calculate any additional transformations
   calculateTransforms();
+
+  // Refresh the transform matrices
   if (isTransformModified()) {
+    // Calculate the local transform
     m_transform = Transform3f::Identity();
     m_transform.translate(m_position);
     m_transform *= m_orientation;
+
+    // And then the global transforms
     if (parent()) {
+      // When we have a parent
       m_globalPosition = parent()->m_globalPosition + m_position;
       m_globalOrientation = parent()->m_globalOrientation * m_orientation;
       m_globalTransform = parent()->m_globalTransform * m_transform;
     } else {
+      // Just copy if we don't have a parent
       m_globalTransform = m_transform;
       m_globalPosition = m_position;
       m_globalOrientation = m_orientation;
@@ -114,7 +102,11 @@ void SceneObject::prepareTransforms()
     // Propagate changes downwards
     if (isTransformModified())
       child->m_transformModified = true;
+
+    // Make the recursion
     child->prepareTransforms();
   }
+
+  // The transforms got calculated
   m_transformModified = false;
 }

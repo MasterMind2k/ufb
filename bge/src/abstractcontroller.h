@@ -1,7 +1,6 @@
 /***************************************************************************
  *   Copyright (C) 2010 by Gregor Kališnik <gregor@unimatrix-one.org>      *
  *   Copyright (C) 2010 by Matej Jakop     <matej@jakop.si>                *
- *   Copyright (C) 2010 by Matevž Pesek    <be inserted>                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License version 3        *
@@ -21,11 +20,27 @@
 namespace BGE
 {
 
+/**
+ * @short Input handling class.
+ *
+ * Use this class to implement your input handling through the canvas.
+ *
+ * @see Canvas::setController
+ */
 class AbstractController
 {
   public:
+    /**
+     * This method gets called when a user presses a key.
+     */
     virtual void keyPressed(QKeyEvent* event) {}
+    /**
+     * This method gets called wen user moves a mouse.
+     */
     virtual void mouseMoved(QMouseEvent* event) {}
+    /**
+     * This method gets called wen user presses a mouse button.
+     */
     virtual void mouseButtonPressed(QMouseEvent* event) {}
 };
 

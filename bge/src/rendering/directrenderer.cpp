@@ -1,7 +1,6 @@
 /***************************************************************************
  *   Copyright (C) 2010 by Gregor Kališnik <gregor@unimatrix-one.org>      *
  *   Copyright (C) 2010 by Matej Jakop     <matej@jakop.si>                *
- *   Copyright (C) 2010 by Matevž Pesek    <be inserted>                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License version 3        *
@@ -38,7 +37,7 @@ void DirectRenderer::renderScene()
   // Needed for gl commands
   Canvas::canvas()->makeCurrent();
 
-  // Let's use out active camera
+  // Let's use the active camera
   Scene::Camera* camera = Canvas::canvas()->activeCamera();
   bool isGlobalCamera = camera && camera->parent() == Canvas::canvas()->scene();
 

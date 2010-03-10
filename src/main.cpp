@@ -1,7 +1,6 @@
 /***************************************************************************
  *   Copyright (C) 2010 by Gregor Kališnik <gregor@unimatrix-one.org>      *
  *   Copyright (C) 2010 by Matej Jakop     <matej@jakop.si>                *
- *   Copyright (C) 2010 by Matevž Pesek    <be inserted>                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License version 3        *
@@ -35,6 +34,7 @@ class Cube : public BGE::Scene::SceneObject
     void render(BGE::Rendering::Renderer* renderer)
     {
       float half = m_a /2;
+      // Prepare our vertices
       Vector3f bottomFrontLeft(-half, -half, half);
       Vector3f bottomFrontRight(half, -half, half);
       Vector3f topFrontLeft(-half, half, half);
@@ -45,6 +45,7 @@ class Cube : public BGE::Scene::SceneObject
       Vector3f topBehindLeft(-half, half, -half);
       Vector3f topBehindRight(half, half, -half);
 
+      // And draw the cube
       // Front
       renderer->drawRectangle(bottomFrontLeft, bottomFrontRight, topFrontLeft, topFrontRight);
       // Right side
@@ -106,6 +107,7 @@ class Controller : public BGE::AbstractController
           m_controlled->rotateY(-M_PI/150);
           break;
         case Qt::Key_Space:
+          // Camera rotation
           if (BGE::Canvas::canvas()->activeCamera() != BGE::Canvas::canvas()->camera("First camera"))
             BGE::Canvas::canvas()->activateCamera("First camera");
           else
@@ -122,33 +124,43 @@ int main(int argc, char** argv)
 {
   QApplication app(argc, argv);
 
+  // Let's initialize canvas and show it
   BGE::Canvas *canvas = BGE::Canvas::canvas();
   canvas->show();
 
+  // Create a cube with two smaller cubes as it's childs
   Cube* object = new Cube(1);
   object->addChild(new Cube(0.5));
   object->addChild(new Cube(0.1));
+  // Move the childs, to create a little more complicated object
   object->child(0)->move(0.5, 0.5, 0);
   object->child(1)->move(0, 0, 3);
 
+  // Create a camera and set it a child of the "complicated" object
   BGE::Scene::Camera* camera = canvas->createCamera("First camera");
   object->addChild(camera);
   camera->move(0, 0, 3);
 
+  // Create the second camera and move it up
   canvas->addSceneObject(canvas->createCamera("Second camera"));
   canvas->camera("Second camera")->move(0, 20, 5);
-
   canvas->camera("Second camera")->rotateX(-M_PI / 2);
 
+  // Set the first camera the default camera
   canvas->activateCamera("First camera");
+
+  // Create and use our controller
   Controller controller(object);
   canvas->setController(&controller);
 
+  // Add our object to the scene
   canvas->addSceneObject(object);
 
+  // Create another cube and add it to the scene
   object = new Cube(2);
   object->move(0, 0, 10);
   canvas->addSceneObject(object);
 
+  // QApplication event loop execution
   return app.exec();
 }

@@ -1,7 +1,6 @@
 /***************************************************************************
  *   Copyright (C) 2010 by Gregor Kališnik <gregor@unimatrix-one.org>      *
  *   Copyright (C) 2010 by Matej Jakop     <matej@jakop.si>                *
- *   Copyright (C) 2010 by Matevž Pesek    <be inserted>                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License version 3        *
@@ -31,67 +30,222 @@ class Renderer;
 namespace Scene
 {
 
+/**
+ *@short Main Scene graph object representation
+ *
+ * It contains the basic transform commands (currently move and rotate).
+ * It should contain also a texture, material and shader settings for an
+ * object.
+ */
 class SceneObject
 {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+    /**
+     * Just a constructor :).
+     */
     SceneObject();
 
-    inline void move(qreal x, qreal y, qreal z)
+    /**
+     * @overload
+     */
+    inline void move(qreal dx, qreal dy, qreal dz)
     {
-      move(Vector3f(x, y, z));
+      move(Vector3f(dx, dy, dz));
     }
 
-    void move(Vector3f direction);
-    void rotate(AngleAxisf rotation);
+    /**
+     * Moves the object into the direction.
+     *
+     * @param direction A vector comprises of dx, dy and dz
+     */
+    void move(const Vector3f& direction);
+
+    /**
+     * Rotates the object by rotation.
+     *
+     * @see rotateX
+     * @see rotateY
+     * @see rotateZ
+     */
+    void rotate(const AngleAxisf& rotation);
+    /**
+     * Wrapper method for convenience.
+     *
+     * @param angle Angle in radians
+     *
+     * @see rotate
+     */
     void rotateX(qreal angle);
+    /**
+     * Wrapper method for convenience.
+     *
+     * @param angle Angle in radians
+     *
+     * @see rotate
+     */
     void rotateY(qreal angle);
+    /**
+     * Wrapper method for convenience.
+     *
+     * @param angle Angle in radians
+     *
+     * @see rotate
+     */
     void rotateZ(qreal angle);
 
-    Transform3f transform() const;
-    inline Transform3f globalTransform() const
+    /**
+     * Returns the local transformation matrix. Relative to the parent.
+     *
+     * @warning It contains proper values when all transforms get calculated.
+     * Outside rendering framework, use the position and orientation methods.
+     *
+     * @see position
+     * @see orientation
+     */
+    inline const Transform3f& transform() const
+    {
+      return m_transform;
+    }
+    /**
+     * Returns the global transformation matrix.
+     *
+     * @warning It contains proper values when all transforms get calculated.
+     * Outside rendering framework, use the position and orientation methods.
+     *
+     * @see globalPosition
+     * @see globalOrientation
+     */
+    inline const Transform3f& globalTransform() const
     {
       return m_globalTransform;
     }
-    Vector3f globalPosition() const;
-    Vector3f position() const;
-    Quaternionf globalOrientation() const;
-    Quaternionf orientation() const;
 
+    /**
+     * Returns the local position. Relative to the parent.
+     *
+     * @see globalPosition
+     */
+    inline const Vector3f& position() const
+    {
+      return m_position;
+    }
+    /**
+     * Returns the global position.
+     *
+     * @see position
+     */
+    inline const Vector3f& globalPosition() const
+    {
+      return m_globalPosition;
+    }
+
+    /**
+     * Returns the local orientation. Relative to the parent.
+     *
+     * @see globalOrientation
+     */
+    inline const Quaternionf& orientation() const
+    {
+      return m_orientation;
+    }
+    /**
+     * Returns the global orientation.
+     *
+     * @see orientation
+     */
+    inline const Quaternionf& globalOrientation() const
+    {
+      return m_globalOrientation;
+    }
+
+    /**
+     * Adds a child.
+     *
+     * @see removeChild
+     */
     inline void addChild(SceneObject* child)
     {
       m_childs << child;
       child->setParent(this);
     }
+    /**
+     * Removes a child.
+     *
+     * @see addChild
+     */
     inline void removeChild(SceneObject* child)
     {
       m_childs.removeOne(child);
     }
+    /**
+     * Returns a child.
+     *
+     * @warning You may get ASSERT error if you get out of bounds!
+     *
+     * @see childsNum
+     */
     inline SceneObject* child(int index) const
     {
       return m_childs.at(index);
     }
-    inline void setParent(SceneObject* parent)
+    /**
+     * Returns the number of children.
+     */
+    inline int childsNum() const
     {
-      m_parent = parent;
+      return m_childs.size();
     }
-    inline SceneObject* parent() const
-    {
-      return m_parent;
-    }
-
-    inline bool isTransformModified() const
-    {
-      return m_transformModified;
-    }
-
+    /**
+     * Returns a list of all children.
+     *
+     * @note It returns a read only reference
+     */
     inline const QList<SceneObject*>& childs() const
     {
       return m_childs;
     }
 
+    /**
+     * Sets the parent.
+     *
+     * @see parent
+     */
+    inline void setParent(SceneObject* parent)
+    {
+      m_parent = parent;
+    }
+    /**
+     * Gets the parent.
+     *
+     * @see setParent
+     */
+    inline SceneObject* parent() const
+    {
+      return m_parent;
+    }
+
+    /**
+     * @TODO Does this method has to be public?
+     * True if transformations have to be recalculated.
+     */
+    inline bool isTransformModified() const
+    {
+      return m_transformModified;
+    }
+
   protected:
+    /**
+     * A implementable method for defining rendering commands. Use the renderer
+     * to render the desired shape.
+     *
+     * Reimplement this method if you want to show this object on the scene.
+     */
     virtual inline void render(Rendering::Renderer* renderer) {}
+    /**
+     * This method gets called _before_ transform matrices get updated. Reimplement
+     * it to add your own transforms.
+     */
     virtual inline void calculateTransforms() {}
 
   private:
