@@ -19,6 +19,7 @@
 
 #include <QtGui/QKeyEvent>
 #include <QtGui/QMatrix4x4>
+#include <QtGui/QApplication>
 
 #include "scene/sceneobject.h"
 #include "scene/camera.h"
@@ -48,6 +49,7 @@ Canvas::Canvas()
   m_activeCamera = 0l;
 
   connect(timer, SIGNAL(timeout()), SLOT(updateGL()));
+  connect(QApplication::instance(), SIGNAL(aboutToQuit()), SLOT(cleanup()));
 }
 
 void Canvas::addSceneObject(Scene::SceneObject* object)
@@ -105,7 +107,7 @@ void Canvas::paintGL()
   while (!list.isEmpty()) {
     Scene::SceneObject* object = list.dequeue();
     m_renderer->enqueueObject(object);
-    list.append(object->childs());
+    list.append(object->children());
   }
 
   // Make the actual rendering
@@ -178,4 +180,20 @@ void Canvas::mousePressEvent(QMouseEvent* event)
   if (m_controller)
     m_controller->mouseButtonPressed(event);
   QWidget::mousePressEvent(event);
+}
+
+void Canvas::cleanup()
+{
+  // Let's unbind our meshes, textures, etc.
+  QQueue<Scene::SceneObject*> queue;
+  queue.enqueue(m_scene);
+  while (!queue.isEmpty()) {
+    Scene::SceneObject* object = queue.dequeue();
+    m_renderer->unbindMesh(object);
+    queue.append(object->children());
+  }
+
+  // And delete the scene
+  delete m_scene;
+  delete m_renderer;
 }

@@ -37,6 +37,11 @@ SceneObject::SceneObject()
   m_meshId = 0;
 }
 
+SceneObject::~SceneObject()
+{
+  qDeleteAll(m_children);
+}
+
 void SceneObject::move(const Vector3f& direction)
 {
   m_globalPosition += direction;
@@ -106,7 +111,7 @@ void SceneObject::prepareTransforms()
     }
   }
 
-  foreach (SceneObject* child, m_childs) {
+  foreach (SceneObject* child, m_children) {
     // Propagate changes downwards
     if (isTransformModified())
       child->m_transformModified = true;

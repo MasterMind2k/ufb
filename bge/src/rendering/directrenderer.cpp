@@ -83,5 +83,6 @@ void DirectRenderer::bindMesh(Scene::SceneObject* object)
 
 void DirectRenderer::unbindMesh(Scene::SceneObject* object)
 {
-  glDeleteLists(object->meshId(), 1);
+  if (object->meshId())
+    glDeleteLists(object->meshId(), 1);
 }
