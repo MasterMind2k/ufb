@@ -62,6 +62,26 @@ void DirectRenderer::renderScene()
     glLoadMatrixf(worldTransform.data());
 
     // Let's render! :D
-    render(object);
+    if (object->isBindable()) {
+      if (!object->meshId())
+        bindMesh(object);
+      else
+        glCallList(object->meshId());
+    } else {
+      render(object);
+    }
   }
+}
+
+void DirectRenderer::bindMesh(Scene::SceneObject* object)
+{
+  quint32 meshId = glGenLists(1);
+  glNewList(meshId, GL_COMPILE_AND_EXECUTE);
+  Renderer::bindMesh(object, meshId);
+  glEndList();
+}
+
+void DirectRenderer::unbindMesh(Scene::SceneObject* object)
+{
+  glDeleteLists(object->meshId(), 1);
 }
