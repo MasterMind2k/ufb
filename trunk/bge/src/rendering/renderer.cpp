@@ -28,3 +28,8 @@ void Renderer::render(Scene::SceneObject* object)
 {
   object->render(this);
 }
+
+void Renderer::bindMesh(Scene::SceneObject* object, quint32 meshId)
+{
+  object->bindMesh(this, meshId);
+}

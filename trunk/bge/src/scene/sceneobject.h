@@ -233,12 +233,48 @@ class SceneObject
       return m_transformModified;
     }
 
+    /**
+     * Mesh id, used by renderer for binded mesh.
+     */
+    inline quint32 meshId() const
+    {
+      return m_meshId;
+    }
+
+    /**
+     * Returns the bindable property. It has to be true, for renderer to use the
+     * bindMesh method.
+     *
+     * @see setBindable
+     * @see bindMesh
+     */
+    inline bool isBindable() const
+    {
+      return m_isBindable;
+    }
+
   protected:
+    /**
+     * Method for binding. It has similar meaning as render, only that this
+     * method binds the mesh, not draw it. It is preferable to use this method.
+     * Also make sure you set the bindable property to true.
+     *
+     * @see setBindable
+     */
+    virtual void bindMesh(Rendering::Renderer* renderer, quint32 bindId);
+    /**
+     * Sets the mesh id.
+     */
+    inline void setMeshId(quint32 meshId)
+    {
+      m_meshId = meshId;
+    }
+
     /**
      * A implementable method for defining rendering commands. Use the renderer
      * to render the desired shape.
      *
-     * Reimplement this method if you want to show this object on the scene.
+     * @note Reimplement this method only when you
      */
     virtual inline void render(Rendering::Renderer* renderer) {}
     /**
@@ -246,6 +282,17 @@ class SceneObject
      * it to add your own transforms.
      */
     virtual inline void calculateTransforms() {}
+
+    /**
+     * Sets the isBindable property.
+     *
+     * @see isBindable
+     * @see bindMesh
+     */
+    inline void setBindable(bool isBindable)
+    {
+      m_isBindable = isBindable;
+    }
 
   private:
     void prepareTransforms();
@@ -259,6 +306,9 @@ class SceneObject
     QList<SceneObject*> m_childs;
     SceneObject* m_parent;
     bool m_transformModified;
+
+    quint32 m_meshId;
+    bool m_isBindable;
 
     /* Be very careful in these classes!!! */
     friend class BGE::Canvas;

@@ -37,7 +37,7 @@ class Renderer
 {
   public:
     /**
-     * Enqueues an object tot he rendering queue.
+     * Enqueues an object to the rendering queue.
      */
     inline void enqueueObject(Scene::SceneObject* object)
     {
@@ -59,11 +59,20 @@ class Renderer
      */
     virtual void renderScene() = 0;
 
+    /**
+     * Unbinds the mesh.
+     */
+    virtual void unbindMesh(Scene::SceneObject* object) = 0;
+
   protected:
     /**
      * A "redirect" method for accessing the render method of the Scene::SceneObject.
      */
     void render(Scene::SceneObject* object);
+    /**
+     * A "redirect" method for accessing the bindMesh method of the Scene::SceneObject.
+     */
+    void bindMesh(BGE::Scene::SceneObject* object, quint32 meshId);
 
     /**
      * Queue to be used by implementations.

@@ -31,6 +31,10 @@ class DirectRenderer : public Renderer
     void drawQuads(const QList<Vector3f>& vertices);
 
     void renderScene();
+
+    void bindMesh(Scene::SceneObject* object);
+
+    void unbindMesh(Scene::SceneObject* object);
 };
 
 }

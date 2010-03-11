@@ -27,10 +27,11 @@ class Cube : public BGE::Scene::SceneObject
     Cube(float a)
     {
       m_a = a;
+      setBindable(true);
     }
 
   protected:
-    void render(BGE::Rendering::Renderer* renderer)
+    void bindMesh(BGE::Rendering::Renderer* renderer, quint32 meshId)
     {
       float half = m_a / 2;
       // Prepare our vertices
@@ -57,6 +58,8 @@ class Cube : public BGE::Scene::SceneObject
       renderer->drawRectangle(topBehindLeft, topBehindRight, bottomBehindLeft, bottomBehindRight);
       // Top
       renderer->drawRectangle(topFrontLeft, topFrontRight, topBehindLeft, topBehindRight);
+
+      setMeshId(meshId);
     }
 
   private:
