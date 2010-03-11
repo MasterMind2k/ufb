@@ -118,6 +118,13 @@ class Canvas : public QGLWidget
       return m_activeCamera;
     }
 
+    /**
+     * Loads the resource. The resource file has to be a Qt's binary resource file.
+     *
+     * @note This method uses QResource class.
+     */
+    void loadResource(const QString& fileName);
+
   private:
     /* Reimplemented methods */
     void initializeGL();

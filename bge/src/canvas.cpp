@@ -16,12 +16,15 @@
 #include "rendering/directrenderer.h"
 
 #include <QtCore/QTimer>
+#include <QtCore/QResource>
 
 #include <QtGui/QKeyEvent>
 #include <QtGui/QMatrix4x4>
 
 #include "scene/sceneobject.h"
 #include "scene/camera.h"
+
+#include "storage/storage.h"
 
 #include "abstractcontroller.h"
 
@@ -145,6 +148,15 @@ bool Canvas::removeCamera(const QString& name)
 
   m_cameras.remove(name);
   delete camera;
+}
+
+void Canvas::loadResource(const QString& fileName)
+{
+  if (!QResource::registerResource(fileName, "/bge_resources"))
+    qWarning("BGE::Canvas::loadResource: Cannot register '%s' resource!", fileName.toAscii().data());
+  Storage::self()->load();
+  if (!QResource::unregisterResource(fileName, "/bge_resources"))
+    qWarning("BGE::Canvas::loadResource: Cannot unregister '%s' resource!", fileName.toAscii().data());
 }
 
 void Canvas::keyPressEvent(QKeyEvent* event)
