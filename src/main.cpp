@@ -1,6 +1,5 @@
 /***************************************************************************
  *   Copyright (C) 2010 by Gregor Kališnik <gregor@unimatrix-one.org>      *
- *   Copyright (C) 2010 by Matej Jakop     <matej@jakop.si>                *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License version 3        *
@@ -33,7 +32,7 @@ class Cube : public BGE::Scene::SceneObject
   protected:
     void render(BGE::Rendering::Renderer* renderer)
     {
-      float half = m_a /2;
+      float half = m_a / 2;
       // Prepare our vertices
       Vector3f bottomFrontLeft(-half, -half, half);
       Vector3f bottomFrontRight(half, -half, half);
@@ -95,16 +94,16 @@ class Controller : public BGE::AbstractController
           m_controlled->move(Vector3f(0, 0, -0.1));
           break;
         case Qt::Key_A:
-          m_controlled->rotateX(M_PI/150);
+          m_controlled->rotateX(M_PI / 150);
           break;
         case Qt::Key_S:
-          m_controlled->rotateX(-M_PI/150);
+          m_controlled->rotateX(-M_PI / 150);
           break;
         case Qt::Key_W:
-          m_controlled->rotateY(M_PI/150);
+          m_controlled->rotateY(M_PI / 150);
           break;
         case Qt::Key_E:
-          m_controlled->rotateY(-M_PI/150);
+          m_controlled->rotateY(-M_PI / 150);
           break;
         case Qt::Key_Space:
           // Camera rotation
