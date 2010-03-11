@@ -145,6 +145,9 @@ class Canvas : public QGLWidget
     Scene::Camera* m_activeCamera;
 
     static Canvas* m_self;
+
+  private slots:
+    void cleanup();
 };
 
 }

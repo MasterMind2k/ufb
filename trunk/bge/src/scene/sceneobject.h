@@ -40,10 +40,9 @@ class SceneObject
 {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-    /**
-     * Just a constructor :).
-     */
     SceneObject();
+
+    virtual ~SceneObject();
 
     /**
      * @overload
@@ -165,7 +164,7 @@ class SceneObject
      */
     inline void addChild(SceneObject* child)
     {
-      m_childs << child;
+      m_children << child;
       child->setParent(this);
     }
     /**
@@ -175,34 +174,34 @@ class SceneObject
      */
     inline void removeChild(SceneObject* child)
     {
-      m_childs.removeOne(child);
+      m_children.removeOne(child);
     }
     /**
      * Returns a child.
      *
      * @warning You may get ASSERT error if you get out of bounds!
      *
-     * @see childsNum
+     * @see childrenNum
      */
     inline SceneObject* child(int index) const
     {
-      return m_childs.at(index);
+      return m_children.at(index);
     }
     /**
      * Returns the number of children.
      */
-    inline int childsNum() const
+    inline int childrenNum() const
     {
-      return m_childs.size();
+      return m_children.size();
     }
     /**
      * Returns a list of all children.
      *
      * @note It returns a read only reference
      */
-    inline const QList<SceneObject*>& childs() const
+    inline const QList<SceneObject*>& children() const
     {
-      return m_childs;
+      return m_children;
     }
 
     /**
@@ -303,7 +302,7 @@ class SceneObject
     Vector3f m_position;
     Quaternionf m_globalOrientation;
     Quaternionf m_orientation;
-    QList<SceneObject*> m_childs;
+    QList<SceneObject*> m_children;
     SceneObject* m_parent;
     bool m_transformModified;
 
