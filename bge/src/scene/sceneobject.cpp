@@ -33,8 +33,7 @@ SceneObject::SceneObject()
   // And init other properties
   m_parent = 0l;
   m_transformModified = false;
-  m_isBindable = false;
-  m_meshId = 0;
+  m_mesh = 0l;
 }
 
 SceneObject::~SceneObject()
@@ -76,13 +75,6 @@ void SceneObject::rotateZ(qreal angle)
 {
   AngleAxisf rotation(angle, Vector3f::UnitZ());
   rotate(rotation);
-}
-
-void SceneObject::bindMesh(Rendering::Renderer* renderer, quint32 bindId)
-{
-  /// @TODO render the model
-
-  m_meshId = bindId;
 }
 
 void SceneObject::prepareTransforms()

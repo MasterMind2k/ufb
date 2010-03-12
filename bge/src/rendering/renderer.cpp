@@ -14,6 +14,8 @@
 
 #include "scene/sceneobject.h"
 
+#include "storage/mesh.h"
+
 using namespace BGE;
 using namespace BGE::Rendering;
 
@@ -29,7 +31,10 @@ void Renderer::render(Scene::SceneObject* object)
   object->render(this);
 }
 
-void Renderer::bindMesh(Scene::SceneObject* object, quint32 meshId)
+void Renderer::bindMesh(Mesh *mesh)
 {
-  object->bindMesh(this, meshId);
+  // @TODO Finish this up
+  QList<VectorList> vertices = mesh->vertices(Mesh::Quads);
+  foreach (VectorList vertexList, vertices)
+    drawQuads(vertexList);
 }

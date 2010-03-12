@@ -21,6 +21,7 @@ class QGLWidget;
 
 namespace BGE
 {
+class Mesh;
 namespace Scene
 {
 class SceneObject;
@@ -70,9 +71,9 @@ class Renderer
      */
     void render(Scene::SceneObject* object);
     /**
-     * A "redirect" method for accessing the bindMesh method of the Scene::SceneObject.
+     * High-level binding of mesh.
      */
-    void bindMesh(BGE::Scene::SceneObject* object, quint32 meshId);
+    void bindMesh(Mesh* mesh);
 
     /**
      * Queue to be used by implementations.
