@@ -24,9 +24,18 @@
 using namespace BGE;
 using namespace BGE::Rendering;
 
-void DirectRenderer::drawQuads(const QList<Vector3f>& vertices)
+void DirectRenderer::drawQuads(const VectorList& vertices)
 {
   glBegin(GL_QUADS);
+  foreach(Vector3f vertex, vertices)
+    glVertex3fv(vertex.data());
+
+  glEnd();
+}
+
+void DirectRenderer::drawTriangles(const VectorList& vertices)
+{
+  glBegin(GL_TRIANGLES);
   foreach(Vector3f vertex, vertices)
     glVertex3fv(vertex.data());
 
@@ -86,6 +95,9 @@ void DirectRenderer::bindMesh(Scene::SceneObject* object)
 
 void DirectRenderer::unbindMesh(Scene::SceneObject* object)
 {
+  if (!object->mesh())
+    return;
+
   if (object->mesh()->bindId())
     glDeleteLists(object->mesh()->bindId(), 1);
 }

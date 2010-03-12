@@ -37,4 +37,8 @@ void Renderer::bindMesh(Mesh *mesh)
   QList<VectorList> vertices = mesh->vertices(Mesh::Quads);
   foreach (VectorList vertexList, vertices)
     drawQuads(vertexList);
+
+  vertices = mesh->vertices(Mesh::Triangles);
+  foreach (VectorList vertexList, vertices)
+    drawTriangles(vertexList);
 }

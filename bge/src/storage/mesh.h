@@ -14,6 +14,7 @@
 #define __BGE_MESH_H
 
 #include <QtCore/QMultiMap>
+#include <QtCore/QVector>
 
 #include "storage/item.h"
 
@@ -26,7 +27,8 @@ class Mesh : public Item
 {
   public:
     enum Primitives {
-      Quads = 0x1
+      Quads,
+      Triangles
     };
 
     inline Mesh(const QString& name) : Item(name)
@@ -45,6 +47,15 @@ class Mesh : public Item
       return m_vertices.value(primitive);
     }
 
+    inline void addFace(const QVector<quint16>& face)
+    {
+      m_faces << face;
+    }
+    inline const QList< QVector<quint16> >& faces() const
+    {
+      return m_faces;
+    }
+
     inline void bind(quint32 id)
     {
       m_bindId = id;
@@ -57,6 +68,7 @@ class Mesh : public Item
   private:
     // Should contain normals and colors...
     QMultiMap<Primitives, QList<VectorList> > m_vertices;
+    QList< QVector<quint16> > m_faces;
     quint32 m_bindId;
 
 };

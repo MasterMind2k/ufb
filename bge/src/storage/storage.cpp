@@ -17,7 +17,10 @@
 #include <QtCore/QStack>
 #include <QtCore/QHash>
 
+#include "storage/loader/loader3ds.h"
+
 #include "storage/item.h"
+#include "storage/mesh.h"
 
 using namespace BGE;
 
@@ -51,13 +54,40 @@ void Storage::load()
       parent->addItem(item);
       dirs += QDir(fileInfo.absoluteFilePath()).entryInfoList().toVector();
     } else {
-      /// @TODO not yet implemented!
-      item = new Item(fileInfo.fileName());
-      parent->addItem(item);
+      // Load 3ds
+      if (fileInfo.fileName().endsWith(".3ds")) {
+        Loader::Loader3DS *loader = new Loader::Loader3DS(fileInfo.absoluteFilePath());
+        parent->addItem(loader->mesh());
+        delete loader;
+      }
     }
 
     processedDirs.push(parent);
     if (fileInfo.isDir())
       processedDirs.push(item);
+  }
+}
+
+Item* Storage::get(const QString &path) const
+{
+  if (!path.startsWith("/") || path.endsWith("/"))
+    return 0l;
+
+  QStringList splited = path.split("/");
+  // Remove the dummy element
+  splited.removeAt(0);
+
+  Item* node = m_root;
+  for (quint16 i = 0; i < splited.size(); i++) {
+    QString part = splited.at(i);
+    node = node->item(part);
+    // The looked for item does not exist
+    if (!node)
+      return 0l;
+    if (node->isDir() && i == splited.size() - 1)
+      return 0l;
+
+    if (!node->isDir() && i == splited.size() - 1)
+      return node;
   }
 }
