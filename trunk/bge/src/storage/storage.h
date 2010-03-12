@@ -39,11 +39,16 @@ class Storage
      */
     void load();
 
+    /**
+     * Gets an item.
+     */
+    Item* get(const QString& path) const;
+
   private:
     static Storage* m_self;
     Item* m_root;
 
-    /* It's a dingleton class */
+    /* It's a singleton class */
     Storage();
 };
 

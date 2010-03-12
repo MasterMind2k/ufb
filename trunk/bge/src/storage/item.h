@@ -65,6 +65,8 @@ class Item
      */
     inline void addItem(Item* item)
     {
+      if (!item)
+        return;
       m_items.insert(item->name(), item);
       m_isDir = true;
     }
