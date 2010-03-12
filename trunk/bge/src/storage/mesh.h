@@ -10,44 +10,56 @@
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
  ***************************************************************************/
-#ifndef __BGE_GLOBAL_H
+#ifndef __BGE_MESH_H
+#define __BGE_MESH_H
 
-#include <QtCore/QList>
+#include <QtCore/QMultiMap>
 
-#include <Eigen/Core>
-#include <Eigen/Geometry>
-#include <Eigen/LU>
-#include <Eigen/SVD>
+#include "storage/item.h"
 
-USING_PART_OF_NAMESPACE_EIGEN
-using Eigen::Transform3f;
-using Eigen::Quaternionf;
-using Eigen::AngleAxisf;
+#include "global.h"
 
-typedef QList<Vector3f> VectorList;
-
-// Some documentation entries
-/**
- * @short Main namespace of the engine.
- */
 namespace BGE
 {
 
-/**
- * @short All scene graph related classes are inside this namespace.
- */
-namespace Scene
+class Mesh : public Item
 {
-}
+  public:
+    enum Primitives {
+      Quads = 0x1
+    };
 
-/**
- * @short Namespace containing rendering classes.
- * Classes from this namespace should be used only inside the
- * engine and specific render methods of the BGE::Scene classes.
- */
-namespace Rendering
-{
-}
+    inline Mesh(const QString& name) : Item(name)
+    {
+      m_bindId = 0;
+    }
+
+    inline void addVertices(Primitives primitive, const VectorList& vertices)
+    {
+      QList<VectorList> temp = m_vertices.value(primitive);
+      temp.append(vertices);
+      m_vertices.insert(primitive, temp);
+    }
+    inline QList<VectorList> vertices(Primitives primitive) const
+    {
+      return m_vertices.value(primitive);
+    }
+
+    inline void bind(quint32 id)
+    {
+      m_bindId = id;
+    }
+    inline quint32 bindId() const
+    {
+      return m_bindId;
+    }
+
+  private:
+    // Should contain normals and colors...
+    QMultiMap<Primitives, QList<VectorList> > m_vertices;
+    quint32 m_bindId;
+
+};
 
 }
 

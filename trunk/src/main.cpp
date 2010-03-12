@@ -20,19 +20,27 @@
 #include "scene/sceneobject.h"
 #include "scene/camera.h"
 
+#include "storage/mesh.h"
+
 // Our little testing cube :D
 class Cube : public BGE::Scene::SceneObject
 {
   public:
+    Cube(BGE::Mesh* mesh)
+    {
+      setMesh(mesh);
+    }
+
     Cube(float a)
     {
       m_a = a;
-      setBindable(true);
+      prepareMesh();
     }
 
   protected:
-    void bindMesh(BGE::Rendering::Renderer* renderer, quint32 meshId)
+    void prepareMesh()
     {
+      VectorList temp;
       float half = m_a / 2;
       // Prepare our vertices
       Vector3f bottomFrontLeft(-half, -half, half);
@@ -45,21 +53,35 @@ class Cube : public BGE::Scene::SceneObject
       Vector3f topBehindLeft(-half, half, -half);
       Vector3f topBehindRight(half, half, -half);
 
+      BGE::Mesh* mesh = new BGE::Mesh("Cube");
+
       // And draw the cube
       // Front
-      renderer->drawRectangle(bottomFrontLeft, bottomFrontRight, topFrontLeft, topFrontRight);
+      temp << bottomFrontLeft << bottomFrontRight << topFrontRight << topFrontLeft;
+      mesh->addVertices(BGE::Mesh::Quads, temp);
+      temp.clear();
       // Right side
-      renderer->drawRectangle(bottomFrontRight, bottomBehindRight, topFrontRight, topBehindRight);
+      temp << bottomFrontRight << bottomBehindRight << topBehindRight << topFrontRight;
+      mesh->addVertices(BGE::Mesh::Quads, temp);
+      temp.clear();
       // Left side
-      renderer->drawRectangle(bottomBehindLeft, bottomFrontLeft, topBehindLeft, topFrontLeft);
+      temp << bottomBehindLeft << bottomFrontLeft << topFrontLeft << topBehindLeft;
+      mesh->addVertices(BGE::Mesh::Quads, temp);
+      temp.clear();
       // Bottom
-      renderer->drawRectangle(bottomBehindLeft, bottomBehindRight, bottomFrontLeft, bottomFrontRight);
+      temp << bottomBehindLeft << bottomBehindRight << bottomFrontRight << bottomFrontLeft;
+      mesh->addVertices(BGE::Mesh::Quads, temp);
+      temp.clear();
       // Behind
-      renderer->drawRectangle(topBehindLeft, topBehindRight, bottomBehindLeft, bottomBehindRight);
+      temp << topBehindLeft << topBehindRight << bottomBehindRight << bottomBehindLeft;
+      mesh->addVertices(BGE::Mesh::Quads, temp);
       // Top
-      renderer->drawRectangle(topFrontLeft, topFrontRight, topBehindLeft, topBehindRight);
+      temp.clear();
+      temp << topFrontLeft << topFrontRight << topBehindRight << topBehindLeft;
+      mesh->addVertices(BGE::Mesh::Quads, temp);
+      temp.clear();
 
-      setMeshId(meshId);
+      setMesh(mesh);
     }
 
   private:
@@ -133,7 +155,7 @@ int main(int argc, char** argv)
   // Create a cube with two smaller cubes as it's childs
   Cube* object = new Cube(1);
   object->addChild(new Cube(0.5));
-  object->addChild(new Cube(0.1));
+  object->addChild(new Cube(object->child(0)->mesh()));
   // Move the childs, to create a little more complicated object
   object->child(0)->move(0.5, 0.5, 0);
   object->child(1)->move(0, 0, 3);

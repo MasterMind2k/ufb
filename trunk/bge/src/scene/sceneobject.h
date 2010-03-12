@@ -20,6 +20,7 @@
 namespace BGE
 {
 class Canvas;
+class Mesh;
 
 namespace Rendering
 {
@@ -233,11 +234,18 @@ class SceneObject
     }
 
     /**
+     * Sets the mesh.
+     */
+    inline void setMesh(Mesh* mesh)
+    {
+      m_mesh = mesh;
+    }
+    /**
      * Mesh id, used by renderer for binded mesh.
      */
-    inline quint32 meshId() const
+    inline Mesh* mesh() const
     {
-      return m_meshId;
+      return m_mesh;
     }
 
     /**
@@ -249,26 +257,10 @@ class SceneObject
      */
     inline bool isBindable() const
     {
-      return m_isBindable;
+      return m_mesh != 0l;
     }
 
   protected:
-    /**
-     * Method for binding. It has similar meaning as render, only that this
-     * method binds the mesh, not draw it. It is preferable to use this method.
-     * Also make sure you set the bindable property to true.
-     *
-     * @see setBindable
-     */
-    virtual void bindMesh(Rendering::Renderer* renderer, quint32 bindId);
-    /**
-     * Sets the mesh id.
-     */
-    inline void setMeshId(quint32 meshId)
-    {
-      m_meshId = meshId;
-    }
-
     /**
      * A implementable method for defining rendering commands. Use the renderer
      * to render the desired shape.
@@ -281,17 +273,6 @@ class SceneObject
      * it to add your own transforms.
      */
     virtual inline void calculateTransforms() {}
-
-    /**
-     * Sets the isBindable property.
-     *
-     * @see isBindable
-     * @see bindMesh
-     */
-    inline void setBindable(bool isBindable)
-    {
-      m_isBindable = isBindable;
-    }
 
   private:
     void prepareTransforms();
@@ -306,8 +287,7 @@ class SceneObject
     SceneObject* m_parent;
     bool m_transformModified;
 
-    quint32 m_meshId;
-    bool m_isBindable;
+    Mesh* m_mesh;
 
     /* Be very careful in these classes!!! */
     friend class BGE::Canvas;

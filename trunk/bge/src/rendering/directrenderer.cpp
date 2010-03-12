@@ -19,6 +19,8 @@
 #include "scene/sceneobject.h"
 #include "scene/camera.h"
 
+#include "storage/mesh.h"
+
 using namespace BGE;
 using namespace BGE::Rendering;
 
@@ -63,10 +65,10 @@ void DirectRenderer::renderScene()
 
     // Let's render! :D
     if (object->isBindable()) {
-      if (!object->meshId())
+      if (!object->mesh()->bindId())
         bindMesh(object);
       else
-        glCallList(object->meshId());
+        glCallList(object->mesh()->bindId());
     } else {
       render(object);
     }
@@ -77,12 +79,13 @@ void DirectRenderer::bindMesh(Scene::SceneObject* object)
 {
   quint32 meshId = glGenLists(1);
   glNewList(meshId, GL_COMPILE_AND_EXECUTE);
-  Renderer::bindMesh(object, meshId);
+  object->mesh()->bind(meshId);
+  Renderer::bindMesh(object->mesh());
   glEndList();
 }
 
 void DirectRenderer::unbindMesh(Scene::SceneObject* object)
 {
-  if (object->meshId())
-    glDeleteLists(object->meshId(), 1);
+  if (object->mesh()->bindId())
+    glDeleteLists(object->mesh()->bindId(), 1);
 }

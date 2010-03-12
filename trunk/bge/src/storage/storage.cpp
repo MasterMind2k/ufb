@@ -19,8 +19,6 @@
 
 #include "storage/item.h"
 
-#include <QtDebug>
-
 using namespace BGE;
 
 Storage* Storage::m_self = 0l;

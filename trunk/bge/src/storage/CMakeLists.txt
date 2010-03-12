@@ -5,6 +5,7 @@ include_directories(.. ${CMAKE_CURRENT_BINARY_DIR} ${EIGEN2_INCLUDE_DIR} ${QT_IN
 set(storage_SRCS
   storage.cpp
   item.cpp
+  mesh.cpp
 )
 
 add_library(storage ${storage_SRCS})
