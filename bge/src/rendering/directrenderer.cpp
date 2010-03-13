@@ -121,10 +121,10 @@ void DirectRenderer::unbindObject(Scene::SceneObject* object)
     return;
 
   // Unbind mesh
-  if (object->mesh()->bindId())
+  if (object->mesh() && object->mesh()->bindId())
     glDeleteLists(object->mesh()->bindId(), 1);
   // Unbind texture
-  if (object->texture()->bindId())
+  if (object->texture() && object->texture()->bindId())
     Canvas::canvas()->deleteTexture(object->texture()->bindId());
 }
 
