@@ -30,15 +30,3 @@ void Renderer::render(Scene::SceneObject* object)
 {
   object->render(this);
 }
-
-void Renderer::bindMesh(Mesh *mesh)
-{
-  // @TODO Finish this up
-  QList<VectorList> vertices = mesh->vertices(Mesh::Quads);
-  foreach (VectorList vertexList, vertices)
-    drawQuads(vertexList);
-
-  vertices = mesh->vertices(Mesh::Triangles);
-  foreach (VectorList vertexList, vertices)
-    drawTriangles(vertexList);
-}

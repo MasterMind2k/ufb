@@ -75,9 +75,10 @@ class Renderer
      */
     void render(Scene::SceneObject* object);
     /**
-     * High-level binding of mesh.
+     * Binds the mesh, texture and everything else that is associated with the object
+     * and it is bindable.
      */
-    void bindMesh(Mesh* mesh);
+    virtual void bindObject(Scene::SceneObject* object) = 0;
 
     /**
      * Queue to be used by implementations.

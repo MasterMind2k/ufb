@@ -20,28 +20,33 @@
 #include "scene/sceneobject.h"
 #include "scene/camera.h"
 
+#include "storage/storage.h"
 #include "storage/mesh.h"
 
 // Our little testing cube :D
 class Cube : public BGE::Scene::SceneObject
 {
   public:
-    Cube(BGE::Mesh* mesh)
+    Cube(BGE::Mesh* mesh, float a)
     {
       setMesh(mesh);
+      m_a = a;
+      scale(m_a);
     }
 
     Cube(float a)
     {
       m_a = a;
       prepareMesh();
+      scale(m_a);
     }
 
   protected:
     void prepareMesh()
     {
+      QString name = "cube";
       VectorList temp;
-      float half = m_a / 2;
+      float half = 0.5;
       // Prepare our vertices
       Vector3f bottomFrontLeft(-half, -half, half);
       Vector3f bottomFrontRight(half, -half, half);
@@ -56,30 +61,18 @@ class Cube : public BGE::Scene::SceneObject
       BGE::Mesh* mesh = new BGE::Mesh("Cube");
 
       // And draw the cube
-      // Front
-      temp << bottomFrontLeft << bottomFrontRight << topFrontRight << topFrontLeft;
-      mesh->addVertices(BGE::Mesh::Quads, temp);
-      temp.clear();
+      // Front side
+      mesh->addRectangle(name, bottomFrontLeft, bottomFrontRight, topFrontLeft, topFrontRight);
       // Right side
-      temp << bottomFrontRight << bottomBehindRight << topBehindRight << topFrontRight;
-      mesh->addVertices(BGE::Mesh::Quads, temp);
-      temp.clear();
+      mesh->addRectangle(name, bottomFrontRight, bottomBehindRight, topFrontRight, topBehindRight);
       // Left side
-      temp << bottomBehindLeft << bottomFrontLeft << topFrontLeft << topBehindLeft;
-      mesh->addVertices(BGE::Mesh::Quads, temp);
-      temp.clear();
-      // Bottom
-      temp << bottomBehindLeft << bottomBehindRight << bottomFrontRight << bottomFrontLeft;
-      mesh->addVertices(BGE::Mesh::Quads, temp);
-      temp.clear();
-      // Behind
-      temp << topBehindLeft << topBehindRight << bottomBehindRight << bottomBehindLeft;
-      mesh->addVertices(BGE::Mesh::Quads, temp);
-      // Top
-      temp.clear();
-      temp << topFrontLeft << topFrontRight << topBehindRight << topBehindLeft;
-      mesh->addVertices(BGE::Mesh::Quads, temp);
-      temp.clear();
+      mesh->addRectangle(name, bottomBehindLeft, bottomFrontLeft, topBehindLeft, topFrontLeft);
+      // Bottom side
+      mesh->addRectangle(name, bottomBehindLeft, bottomBehindRight, bottomFrontLeft, bottomFrontRight);
+      // Behind side
+      mesh->addRectangle(name, topBehindLeft, topBehindRight, bottomBehindLeft, bottomBehindRight);
+      // Top side
+      mesh->addRectangle(name, topFrontLeft, topFrontRight, topBehindLeft, topBehindRight);
 
       setMesh(mesh);
     }
@@ -150,12 +143,13 @@ int main(int argc, char** argv)
 
   // Let's initialize canvas and show it
   BGE::Canvas *canvas = BGE::Canvas::canvas();
+  canvas->loadResource("./res.rcc");
   canvas->show();
 
   // Create a cube with two smaller cubes as it's childs
   Cube* object = new Cube(1);
-  object->addChild(new Cube(0.5));
-  object->addChild(new Cube(object->child(0)->mesh()));
+  object->addChild(new Cube(object->mesh(), 0.5));
+  object->addChild(new Cube(object->mesh(), 0.1));
   // Move the childs, to create a little more complicated object
   object->child(0)->move(0.5, 0.5, 0);
   object->child(1)->move(0, 0, 3);
@@ -173,15 +167,21 @@ int main(int argc, char** argv)
   // Set the first camera the default camera
   canvas->activateCamera("First camera");
 
+  // Let us use our test plane :)
+  BGE::Scene::SceneObject* plane = new BGE::Scene::SceneObject;
+  plane->setMesh(dynamic_cast<BGE::Mesh*> (BGE::Storage::self()->get("/models/Fighter")));
+  plane->scale(0.01);
+  canvas->addSceneObject(plane);
+
   // Create and use our controller
-  Controller controller(object);
+  Controller controller(plane);
   canvas->setController(&controller);
 
   // Add our object to the scene
   canvas->addSceneObject(object);
 
   // Create another cube and add it to the scene
-  object = new Cube(2);
+  object = new Cube(object->mesh(), 2.0);
   object->move(0, 0, 10);
   canvas->addSceneObject(object);
 
