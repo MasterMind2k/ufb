@@ -46,39 +46,24 @@ class Renderer
     }
 
     /**
-     * A convenient method for drawing rectangles.
-     */
-    void drawRectangle(const Vector3f& bottomLeft, const Vector3f& bottomRight, const Vector3f& upperLeft, const Vector3f& upperRight);
-
-    /**
-     * Method for drawing quads.
-     */
-    virtual void drawQuads(const VectorList& vertexes, const Vector3f& normal = Vector3f::Zero()) = 0;
-    /**
-     * Method for drawing triangles.
-     */
-    virtual void drawTriangles(const VectorList& vertexes, const Vector3f& normal = Vector3f::Zero()) = 0;
-
-    /**
      * Method for making the whole scene rendering.
      */
     virtual void renderScene() = 0;
 
     /**
-     * Unbinds the mesh.
+     * Unbinds the object.
      */
-    virtual void unbindMesh(Scene::SceneObject* object) = 0;
+    virtual void unbindObject(Scene::SceneObject* object) = 0;
 
   protected:
     /**
-     * A "redirect" method for accessing the render method of the Scene::SceneObject.
+     * Binds the texture that is associated with the object.
      */
-    void render(Scene::SceneObject* object);
+    virtual void bindTexture(Scene::SceneObject* object) = 0;
     /**
-     * Binds the mesh, texture and everything else that is associated with the object
-     * and it is bindable.
+     * Binds the mesh that is associated with the object.
      */
-    virtual void bindObject(Scene::SceneObject* object) = 0;
+    virtual void bindMesh(Scene::SceneObject* object) = 0;
 
     /**
      * Queue to be used by implementations.

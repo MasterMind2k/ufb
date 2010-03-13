@@ -62,15 +62,19 @@ void Loader3DS::parse()
         // Skip to Sub-chunks (we do not need to know the objects' name?)
         char byte;
         objectName.clear();
-        do {
+        while (true) {
           byte = modelFile.read(1).at(0);
+          if (byte == 0x00)
+            break;
+
           objectName.append(byte);
-        } while(byte != 0x00);
+        }
         break;
       }
 
       // Vertices list
       case 0x4110: {
+        vertices.clear();
         quint16 verticesNumber = *(quint16*) modelFile.read(2).data();
         size_t size = 3 * sizeof(float);
         float* coordinates = (float*) malloc(size);
@@ -79,12 +83,17 @@ void Loader3DS::parse()
           vertices << Vector3f(coordinates);
         }
         m_mesh->addVertices(objectName, vertices);
+
+        if (!m_mesh->faces(objectName).isEmpty())
+          m_mesh->calculateNormals(objectName);
         free(coordinates);
         break;
       }
 
       // Faces description
       case 0x4120: {
+        bool calculateNormals = !vertices.isEmpty();
+
         quint16 facesNumber = *(quint16*) modelFile.read(2).data();
         size_t size = 4 * sizeof(quint16);
         quint16* vertexList = (quint16*) malloc(size);
@@ -95,6 +104,23 @@ void Loader3DS::parse()
           m_mesh->addFace(objectName, Mesh::Triangles, temp);
         }
         free(vertexList);
+
+        if (calculateNormals)
+          m_mesh->calculateNormals(objectName);
+        break;
+      }
+
+      // Mapping coordinates list for each vertex
+      case 0x4140: {
+          quint16 verticesNumber = *(quint16*) modelFile.read(2).data();
+          size_t size = 2* sizeof(float);
+          float* raw = (float*) malloc(size);
+          for (quint16 i = 0; i < verticesNumber; i++) {
+            modelFile.read((char*) raw, size);
+            m_mesh->addTextureMap(objectName, Vector2f(raw));
+          }
+          free(raw);
+          break;
       }
 
       // A complete chunk skip

@@ -35,6 +35,7 @@ SceneObject::SceneObject()
   m_parent = 0l;
   m_transformModified = false;
   m_mesh = 0l;
+  m_texture = 0l;
 }
 
 SceneObject::~SceneObject()
@@ -58,24 +59,6 @@ void SceneObject::rotate(const AngleAxisf& rotation)
 
   // Mark for recalculation
   m_transformModified = true;
-}
-
-void SceneObject::rotateX(qreal angle)
-{
-  AngleAxisf rotation(angle, Vector3f::UnitX());
-  rotate(rotation);
-}
-
-void SceneObject::rotateY(qreal angle)
-{
-  AngleAxisf rotation(angle, Vector3f::UnitY());
-  rotate(rotation);
-}
-
-void SceneObject::rotateZ(qreal angle)
-{
-  AngleAxisf rotation(angle, Vector3f::UnitZ());
-  rotate(rotation);
 }
 
 void SceneObject::prepareTransforms()

@@ -5,6 +5,7 @@ include_directories(../.. ${CMAKE_CURRENT_BINARY_DIR} ${EIGEN2_INCLUDE_DIR} ${QT
 set(loader_SRCS
   modelloader.cpp
   loader3ds.cpp
+  textureloader.cpp
 )
 
 add_library(loader ${loader_SRCS})

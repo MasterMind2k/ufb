@@ -10,38 +10,29 @@
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
  ***************************************************************************/
-#ifndef __BGE_RENDERING_DIRECTRENDERER_H
-#define __BGE_RENDERING_DIRECTRENDERER_H
+#ifndef __BGE_LOADER_TEXTURELOADER_H
+#define __BGE_LOADER_TEXTURELOADER_H
 
-#include "global.h"
-
-#include "rendering/renderer.h"
-
-#include <QtCore/QVector>
+#include <QtCore/QString>
 
 namespace BGE
 {
-namespace Rendering
+class Texture;
+namespace Loader
 {
 
-/**
- * @short Renderer for old OpenGL API
- *
- * This renderer should support only commands prior to OpenGL 2.1.
- */
-class DirectRenderer : public Renderer
+class TextureLoader
 {
   public:
-    void drawQuads(const VectorList& vertices, const VectorList& normals, const QVector<Vector2f>& textureMaps = QVector<Vector2f>());
-    void drawTriangles(const VectorList& vertices, const VectorList& normals, const QVector<Vector2f>& textureMaps = QVector<Vector2f>());
+    TextureLoader(const QString& filename);
 
-    void renderScene();
-
-    void unbindObject(Scene::SceneObject* object);
+    inline Texture* texture() const
+    {
+      return m_texture;
+    }
 
   private:
-    void bindTexture(Scene::SceneObject* object);
-    void bindMesh(Scene::SceneObject* object);
+    Texture* m_texture;
 };
 
 }

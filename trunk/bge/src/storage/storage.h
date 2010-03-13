@@ -43,6 +43,14 @@ class Storage
      * Gets an item.
      */
     Item* get(const QString& path) const;
+    /**
+     * \overload
+     */
+    template <class T>
+    inline T get(const QString& path) const
+    {
+      return static_cast<T> (get(path));
+    }
 
   private:
     static Storage* m_self;

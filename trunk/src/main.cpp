@@ -22,6 +22,7 @@
 
 #include "storage/storage.h"
 #include "storage/mesh.h"
+#include "storage/texture.h"
 
 // Our little testing cube :D
 class Cube : public BGE::Scene::SceneObject
@@ -74,6 +75,7 @@ class Cube : public BGE::Scene::SceneObject
       // Top side
       mesh->addRectangle(name, topFrontLeft, topFrontRight, topBehindLeft, topBehindRight);
 
+      mesh->calculateNormals("cube");
       setMesh(mesh);
     }
 
@@ -167,14 +169,8 @@ int main(int argc, char** argv)
   // Set the first camera the default camera
   canvas->activateCamera("First camera");
 
-  // Let us use our test plane :)
-  BGE::Scene::SceneObject* plane = new BGE::Scene::SceneObject;
-  plane->setMesh(dynamic_cast<BGE::Mesh*> (BGE::Storage::self()->get("/models/Fighter")));
-  plane->scale(0.01);
-  canvas->addSceneObject(plane);
-
   // Create and use our controller
-  Controller controller(plane);
+  Controller controller(object);
   canvas->setController(&controller);
 
   // Add our object to the scene
