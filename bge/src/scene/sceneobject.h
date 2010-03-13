@@ -61,6 +61,29 @@ class SceneObject
     void move(const Vector3f& direction);
 
     /**
+     * Scales the object using the coeficients vector.
+     */
+    inline void scale(const Scaling3f& scale)
+    {
+      m_scale = m_scale * scale;
+      m_transformModified = true;
+    }
+    /**
+     * \overload
+     */
+    inline void scale(float sx, float sy, float sz)
+    {
+      scale(Scaling3f(sx, sz, sy));
+    }
+    /**
+     * \overload
+     */
+    inline void scale(float s)
+    {
+      scale(Scaling3f(s, s, s));
+    }
+
+    /**
      * Rotates the object by rotation.
      *
      * @see rotateX
@@ -281,6 +304,7 @@ class SceneObject
     Transform3f m_globalTransform;
     Vector3f m_globalPosition;
     Vector3f m_position;
+    Scaling3f m_scale;
     Quaternionf m_globalOrientation;
     Quaternionf m_orientation;
     QList<SceneObject*> m_children;

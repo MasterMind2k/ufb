@@ -24,8 +24,6 @@
 using namespace BGE;
 using namespace BGE::Loader;
 
-typedef QList<Vector3f> VertexList;
-
 void Loader3DS::parse()
 {
   QFile modelFile(m_filename);
@@ -37,7 +35,8 @@ void Loader3DS::parse()
   QString name = m_filename.split("/").last();
   m_mesh = new Mesh(name.split(".").first());
 
-  VertexList vertices;
+  VectorList vertices;
+  QString objectName;
 
   // Used the format definition from
   // http://jerome.jouvie.free.fr/OpenGl/Projects/3dsInfo.txt
@@ -61,9 +60,11 @@ void Loader3DS::parse()
       // Object block
       case 0x4000: {
         // Skip to Sub-chunks (we do not need to know the objects' name?)
-        quint8 byte;
+        char byte;
+        objectName.clear();
         do {
           byte = modelFile.read(1).at(0);
+          objectName.append(byte);
         } while(byte != 0x00);
         break;
       }
@@ -77,7 +78,7 @@ void Loader3DS::parse()
           modelFile.read((char*) coordinates, size);
           vertices << Vector3f(coordinates);
         }
-        m_mesh->addVertices(Mesh::Triangles, vertices);
+        m_mesh->addVertices(objectName, vertices);
         free(coordinates);
         break;
       }
@@ -85,14 +86,15 @@ void Loader3DS::parse()
       // Faces description
       case 0x4120: {
         quint16 facesNumber = *(quint16*) modelFile.read(2).data();
-        size_t size = 3 * sizeof(quint16);
+        size_t size = 4 * sizeof(quint16);
         quint16* vertexList = (quint16*) malloc(size);
         for (quint16 i = 0; i < facesNumber; i++) {
           modelFile.read((char*) vertexList, size);
           QVector<quint16> temp;
           temp << vertexList[0] << vertexList[1] << vertexList[2];
-          m_mesh->addFace(temp);
+          m_mesh->addFace(objectName, Mesh::Triangles, temp);
         }
+        free(vertexList);
       }
 
       // A complete chunk skip

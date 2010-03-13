@@ -33,9 +33,10 @@ class DirectRenderer : public Renderer
 
     void renderScene();
 
-    void bindMesh(Scene::SceneObject* object);
-
     void unbindMesh(Scene::SceneObject* object);
+
+  private:
+    void bindObject(Scene::SceneObject* object);
 };
 
 }

@@ -12,7 +12,7 @@
  ***************************************************************************/
 #include "rendering/directrenderer.h"
 
-#include <QtCore/QSet>
+#include <QtCore/QVector>
 
 #include "canvas.h"
 
@@ -75,22 +75,13 @@ void DirectRenderer::renderScene()
     // Let's render! :D
     if (object->isBindable()) {
       if (!object->mesh()->bindId())
-        bindMesh(object);
+        bindObject(object);
       else
         glCallList(object->mesh()->bindId());
     } else {
       render(object);
     }
   }
-}
-
-void DirectRenderer::bindMesh(Scene::SceneObject* object)
-{
-  quint32 meshId = glGenLists(1);
-  glNewList(meshId, GL_COMPILE_AND_EXECUTE);
-  object->mesh()->bind(meshId);
-  Renderer::bindMesh(object->mesh());
-  glEndList();
 }
 
 void DirectRenderer::unbindMesh(Scene::SceneObject* object)
@@ -100,4 +91,38 @@ void DirectRenderer::unbindMesh(Scene::SceneObject* object)
 
   if (object->mesh()->bindId())
     glDeleteLists(object->mesh()->bindId(), 1);
+}
+
+void DirectRenderer::bindObject(Scene::SceneObject* object)
+{
+  // Bind the mesh
+  quint32 meshId = glGenLists(1);
+  glNewList(meshId, GL_COMPILE_AND_EXECUTE);
+  object->mesh()->bind(meshId);
+
+  foreach (QString meshObject, object->mesh()->objects()) {
+    QVector<Vector3f> vertices = object->mesh()->vertices(meshObject);
+
+    foreach (Face face, object->mesh()->faces(meshObject)) {
+      VectorList temp;
+      QVector<quint16> idxs = face.second;
+      switch (face.first) {
+        case Mesh::Quads:
+          foreach (quint16 idx, idxs)
+            temp << vertices.at(idx);
+          drawQuads(temp);
+          break;
+
+        case Mesh::Triangles:
+          temp << vertices.at(idxs.at(0)) << vertices.at(idxs.at(1)) << vertices.at(idxs.at(2));
+          drawTriangles(temp);
+          break;
+
+        default:
+          break;
+      }
+    }
+  }
+
+  glEndList();
 }

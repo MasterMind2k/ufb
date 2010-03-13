@@ -24,11 +24,12 @@ SceneObject::SceneObject()
   // Set the default transforms
   m_transform.setIdentity();
   m_globalTransform.setIdentity();
-  // Set the default position and orientation
+  // Set the default position, orientation and scale
   m_orientation.setIdentity();
   m_globalOrientation.setIdentity();
   m_position.setZero();
   m_globalPosition.setZero();
+  m_scale = Scaling3f(1, 1, 1);
 
   // And init other properties
   m_parent = 0l;
@@ -87,6 +88,7 @@ void SceneObject::prepareTransforms()
     // Calculate the local transform
     m_transform = Transform3f::Identity();
     m_transform.translate(m_position);
+    m_transform *= m_scale;
     m_transform *= m_orientation;
 
     // And then the global transforms

@@ -15,6 +15,8 @@
 
 #include <QtCore/QMultiMap>
 #include <QtCore/QVector>
+#include <QtCore/QStringList>
+#include <QtCore/QSet>
 
 #include "storage/item.h"
 
@@ -36,24 +38,29 @@ class Mesh : public Item
       m_bindId = 0;
     }
 
-    inline void addVertices(Primitives primitive, const VectorList& vertices)
+    void addVertices(const QString& name, const VectorList& vertices);
+    inline void addVertices(const QString& name, const QVector<Vector3f>& vertices)
     {
-      QList<VectorList> temp = m_vertices.value(primitive);
-      temp.append(vertices);
-      m_vertices.insert(primitive, temp);
+      addVertices(name, vertices.toList());
     }
-    inline QList<VectorList> vertices(Primitives primitive) const
+    inline QVector<Vector3f> vertices(const QString& name) const
     {
-      return m_vertices.value(primitive);
+      return m_vertices.value(name);
     }
 
-    inline void addFace(const QVector<quint16>& face)
+    inline void addFace(const QString& name, Primitives primitive, const QVector<quint16>& face)
     {
-      m_faces << face;
+      if (!m_objects.contains(name))
+        m_objects << name;
+
+      QPair<Primitives, QVector<quint16> > pair(primitive, face);
+      QList<QPair<Primitives, QVector<quint16> > > temp = m_faces.value(name);
+      temp <<  pair;
+      m_faces.insert(name, temp);
     }
-    inline const QList< QVector<quint16> >& faces() const
+    inline QList<QPair<Primitives, QVector<quint16> > > faces(const QString& name) const
     {
-      return m_faces;
+      return m_faces.value(name);
     }
 
     inline void bind(quint32 id)
@@ -65,14 +72,33 @@ class Mesh : public Item
       return m_bindId;
     }
 
+    inline void createObject(const QString& name)
+    {
+      m_objects << name;
+    }
+    inline QStringList objects() const
+    {
+      return m_objects.toList();
+    }
+
+    void addRectangle(const QString& objectName, const Vector3f& bottomLeft, const Vector3f& bottomRight, const Vector3f& topLeft, const Vector3f& topRight);
+
   private:
-    // Should contain normals and colors...
-    QMultiMap<Primitives, QList<VectorList> > m_vertices;
-    QList< QVector<quint16> > m_faces;
+    QSet<QString> m_objects;
+    QHash<QString, QVector<Vector3f> > m_vertices;
+    QHash<QString, QList<QPair<Primitives, QVector<quint16> > > > m_faces;
+
     quint32 m_bindId;
 
 };
 
 }
+
+inline uint qHash(BGE::Mesh::Primitives primitive)
+{
+  return (uint) primitive;
+}
+
+typedef QPair<BGE::Mesh::Primitives, QVector<quint16> > Face;
 
 #endif
