@@ -21,6 +21,7 @@ namespace BGE
 {
 class Canvas;
 class Mesh;
+class Texture;
 
 namespace Rendering
 {
@@ -98,7 +99,11 @@ class SceneObject
      *
      * @see rotate
      */
-    void rotateX(qreal angle);
+    inline void rotateX(qreal angle)
+    {
+      AngleAxisf rotation(angle, Vector3f::UnitX());
+      rotate(rotation);
+    }
     /**
      * Wrapper method for convenience.
      *
@@ -106,7 +111,11 @@ class SceneObject
      *
      * @see rotate
      */
-    void rotateY(qreal angle);
+    inline void rotateY(qreal angle)
+    {
+      AngleAxisf rotation(angle, Vector3f::UnitY());
+      rotate(rotation);
+    }
     /**
      * Wrapper method for convenience.
      *
@@ -114,7 +123,11 @@ class SceneObject
      *
      * @see rotate
      */
-    void rotateZ(qreal angle);
+    inline void rotateZ(qreal angle)
+    {
+      AngleAxisf rotation(angle, Vector3f::UnitZ());
+      rotate(rotation);
+    }
 
     /**
      * Returns the local transformation matrix. Relative to the parent.
@@ -264,11 +277,26 @@ class SceneObject
       m_mesh = mesh;
     }
     /**
-     * Mesh id, used by renderer for binded mesh.
+     * Gets the mesh.
      */
     inline Mesh* mesh() const
     {
       return m_mesh;
+    }
+
+    /**
+     * Sets the texture.
+     */
+    inline void setTexture(Texture* texture)
+    {
+      m_texture = texture;
+    }
+    /**
+     * Gets the texture.
+     */
+    inline Texture* texture() const
+    {
+      return m_texture;
     }
 
     /**
@@ -284,13 +312,6 @@ class SceneObject
     }
 
   protected:
-    /**
-     * A implementable method for defining rendering commands. Use the renderer
-     * to render the desired shape.
-     *
-     * @note Reimplement this method only when you
-     */
-    virtual inline void render(Rendering::Renderer* renderer) {}
     /**
      * This method gets called _before_ transform matrices get updated. Reimplement
      * it to add your own transforms.
@@ -312,10 +333,10 @@ class SceneObject
     bool m_transformModified;
 
     Mesh* m_mesh;
+    Texture* m_texture;
 
     /* Be very careful in these classes!!! */
     friend class BGE::Canvas;
-    friend class BGE::Rendering::Renderer;
 };
 
 }

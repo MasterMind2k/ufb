@@ -12,6 +12,8 @@
  ***************************************************************************/
 #include "mesh.h"
 
+#include <QtCore/QMap>
+
 using namespace BGE;
 
 void Mesh::addVertices(const QString& name, const VectorList& vertices)
@@ -27,29 +29,55 @@ void Mesh::addVertices(const QString& name, const VectorList& vertices)
 
 void Mesh::addFace(const QString &name, Primitives primitive, const QVector<quint16> &face)
 {
-  if (!m_objects.contains(name)) {
+  if (!m_objects.contains(name))
     m_objects << name;
-  }
-
-  // Calculate normal vector
-  Vector3f normal = Vector3f::Zero();
-  if (face.size() > 3 && !m_vertices.value("name").isEmpty()) {
-    Vector3f a = m_vertices.value(name).at(face.at(0)) - m_vertices.value(name).at(face.at(1));
-    Vector3f b = m_vertices.value(name).at(face.at(2)) - m_vertices.value(name).at(face.at(1));
-    normal = b.cross(a);
-    normal.normalize();
-  }
-  {
-    QVector<Vector3f> temp = m_normals.value(name);
-    temp << normal;
-    m_normals.insert(name, temp);
-  }
 
   // Add the face
   QPair<Primitives, QVector<quint16> > pair(primitive, face);
   QList<Face> temp = m_faces.value(name);
   temp <<  pair;
   m_faces.insert(name, temp);
+}
+
+void Mesh::calculateNormals(const QString& name)
+{
+  if (!m_objects.contains(name))
+    return;
+
+  // Calculate normal vectors
+  QList<Face> faces = m_faces.value(name);
+  QVector<Vector3f> vertices = m_vertices.value(name);
+  QMultiMap<quint16, Vector3f> faceNormals;
+  foreach (Face face, faces) {
+    // Let's calculate the normal vector
+    Vector3f normal = Vector3f::Zero();
+    if (face.second.size() >= 3 && !m_vertices.value(name).isEmpty()) {
+      Vector3f a = vertices.at(face.second.at(0)) - vertices.at(face.second.at(1));
+      Vector3f b = vertices.at(face.second.at(2)) - vertices.at(face.second.at(1));
+      normal = b.cross(a).normalized();
+    }
+
+    // For each vertex we add a normal
+    foreach (quint16 vertexIdx, face.second)
+      faceNormals.insert(vertexIdx, normal);
+  }
+
+  // Calculate per-vertex normal
+  quint16 size = vertices.size();
+  QVector<Vector3f> normals = m_normals.value(name);
+  for (quint16 i = 0; i < size; i++) {
+    VectorList vertices = faceNormals.values(i);
+    Vector3f normal = Vector3f::Zero();
+
+    if (vertices.size()) {
+      foreach (Vector3f absoluteNormal, vertices)
+        normal += absoluteNormal;
+      normal = (normal / vertices.size()).normalized();
+    }
+
+    normals << normal;
+  }
+  m_normals.insert(name, normals);
 }
 
 void Mesh::addRectangle(const QString& objectName, const Vector3f& bottomLeft, const Vector3f& bottomRight, const Vector3f& topLeft, const Vector3f& topRight)

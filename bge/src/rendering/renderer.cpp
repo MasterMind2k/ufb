@@ -19,14 +19,3 @@
 using namespace BGE;
 using namespace BGE::Rendering;
 
-void Renderer::drawRectangle(const Vector3f& bottomLeft, const Vector3f& bottomRight, const Vector3f& upperLeft, const Vector3f& upperRight)
-{
-  QList<Vector3f> vertices;
-  vertices << bottomRight << upperRight << upperLeft << bottomLeft;
-  drawQuads(vertices);
-}
-
-void Renderer::render(Scene::SceneObject* object)
-{
-  object->render(this);
-}

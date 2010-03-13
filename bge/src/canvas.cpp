@@ -76,6 +76,7 @@ void Canvas::initializeGL()
   glEnable(GL_LIGHT0);
   glEnable(GL_COLOR_MATERIAL);
   glEnable(GL_CULL_FACE);
+  glEnable(GL_TEXTURE_2D);
   glEnable(GL_NORMALIZE);
 }
 
@@ -190,7 +191,7 @@ void Canvas::cleanup()
   queue.enqueue(m_scene);
   while (!queue.isEmpty()) {
     Scene::SceneObject* object = queue.dequeue();
-    m_renderer->unbindMesh(object);
+    m_renderer->unbindObject(object);
     queue.append(object->children());
   }
 

@@ -8,6 +8,7 @@ set(storage_SRCS
   storage.cpp
   item.cpp
   mesh.cpp
+  texture.cpp
 )
 
 add_library(storage ${storage_SRCS})

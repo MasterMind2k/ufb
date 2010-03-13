@@ -28,6 +28,9 @@ namespace BGE
 class Mesh : public Item
 {
   public:
+    /**
+     * Rendering primitives
+     */
     enum Primitives {
       Quads,
       Triangles
@@ -38,45 +41,106 @@ class Mesh : public Item
       m_bindId = 0;
     }
 
+    /**
+     * Adds vertices to the list.
+     */
     void addVertices(const QString& name, const VectorList& vertices);
+    /**
+     * \overload
+     */
     inline void addVertices(const QString& name, const QVector<Vector3f>& vertices)
     {
       addVertices(name, vertices.toList());
     }
+    /**
+     * Gets vertices.
+     */
     inline QVector<Vector3f> vertices(const QString& name) const
     {
       return m_vertices.value(name);
     }
 
+    /**
+     * Adds a face.
+     *
+     * @param primitive The primitive used at rendering/binding
+     * @param face A vector of _index-es_ of bounding vertices
+     */
     void addFace(const QString& name, Primitives primitive, const QVector<quint16>& face);
+    /**
+     * Gets a list of faces.
+     *
+     * @note You can use Face type for conviniance.
+     */
     inline QList<QPair<Primitives, QVector<quint16> > > faces(const QString& name) const
     {
       return m_faces.value(name);
     }
 
+    /**
+     * Calculates and sets the normals.
+     */
+    void calculateNormals(const QString& name);
+    /**
+     * Gets the normals.
+     */
     inline QVector<Vector3f> normals(const QString& name) const
     {
       return m_normals.value(name);
     }
 
+    /**
+     * Adds uv mapping for textures.
+     *
+     * @warning Make sure you add as much mappings as you have vertices!
+     */
+    inline void addTextureMap(const QString& name, const Vector2f& map)
+    {
+      QVector<Vector2f> temp = m_textureMaps.value(name);
+      temp += map;
+      m_textureMaps.insert(name, temp);
+    }
+    /**
+     * Gets the uv texture mappings.
+     */
+    inline QVector<Vector2f> textureMaps(const QString& name) const
+    {
+      return m_textureMaps.value(name);
+    }
+
+    /**
+     * Assign the bind id.
+     */
     inline void bind(quint32 id)
     {
       m_bindId = id;
     }
+    /**
+     * Gets the mesh's bind id.
+     */
     inline quint32 bindId() const
     {
       return m_bindId;
     }
 
+    /**
+     * Adds the object name to the list.
+     */
     inline void createObject(const QString& name)
     {
       m_objects << name;
     }
+    /**
+     * Get a lst of all object names.
+     */
     inline QStringList objects() const
     {
       return m_objects.toList();
     }
 
+    /**
+     * A conveniance method for creating rectangles.
+     */
     void addRectangle(const QString& objectName, const Vector3f& bottomLeft, const Vector3f& bottomRight, const Vector3f& topLeft, const Vector3f& topRight);
 
   private:
@@ -84,6 +148,8 @@ class Mesh : public Item
     QHash<QString, QVector<Vector3f> > m_vertices;
     QHash<QString, QList<QPair<Primitives, QVector<quint16> > > > m_faces;
     QHash<QString, QVector<Vector3f> > m_normals;
+    /* The uv thingies */
+    QHash<QString, QVector<Vector2f> > m_textureMaps;
 
     quint32 m_bindId;
 

@@ -13,6 +13,7 @@
 #ifndef __BGE_GLOBAL_H
 
 #include <QtCore/QList>
+#include <QtCore/QPair>
 
 #include <Eigen/Core>
 #include <Eigen/Geometry>

@@ -18,9 +18,11 @@
 #include <QtCore/QHash>
 
 #include "storage/loader/loader3ds.h"
+#include "storage/loader/textureloader.h"
 
 #include "storage/item.h"
 #include "storage/mesh.h"
+#include "storage/texture.h"
 
 using namespace BGE;
 
@@ -54,10 +56,15 @@ void Storage::load()
       parent->addItem(item);
       dirs += QDir(fileInfo.absoluteFilePath()).entryInfoList().toVector();
     } else {
-      // Load 3ds
-      if (fileInfo.fileName().endsWith(".3ds")) {
+      if (fileInfo.fileName().endsWith(".3ds", Qt::CaseInsensitive)) {
+        // Load 3ds
         Loader::Loader3DS *loader = new Loader::Loader3DS(fileInfo.absoluteFilePath());
         parent->addItem(loader->mesh());
+        delete loader;
+      } else if (fileInfo.fileName().endsWith(".png", Qt::CaseInsensitive) || fileInfo.fileName().endsWith(".jpg", Qt::CaseInsensitive)) {
+        // Load texture
+        Loader::TextureLoader *loader = new Loader::TextureLoader(fileInfo.absoluteFilePath());
+        parent->addItem(loader->texture());
         delete loader;
       }
     }

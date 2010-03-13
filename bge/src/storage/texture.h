@@ -10,41 +10,60 @@
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
  ***************************************************************************/
-#ifndef __BGE_RENDERING_DIRECTRENDERER_H
-#define __BGE_RENDERING_DIRECTRENDERER_H
+#ifndef __BGE_TEXTURE_H
+#define __BGE_TEXTURE_H
 
-#include "global.h"
+#include "storage/item.h"
 
-#include "rendering/renderer.h"
-
-#include <QtCore/QVector>
+#include <QtGui/QImage>
 
 namespace BGE
 {
-namespace Rendering
-{
 
-/**
- * @short Renderer for old OpenGL API
- *
- * This renderer should support only commands prior to OpenGL 2.1.
- */
-class DirectRenderer : public Renderer
+class Texture : public BGE::Item
 {
   public:
-    void drawQuads(const VectorList& vertices, const VectorList& normals, const QVector<Vector2f>& textureMaps = QVector<Vector2f>());
-    void drawTriangles(const VectorList& vertices, const VectorList& normals, const QVector<Vector2f>& textureMaps = QVector<Vector2f>());
+    inline Texture(const QString& name) : Item(name)
+    {
+      m_bindId = 0;
+    }
 
-    void renderScene();
+    /**
+     * Bind the texture.
+     */
+    inline void bind(quint32 bindId)
+    {
+      m_bindId = bindId;
+    }
+    /**
+     * Gets the texture id.
+     */
+    inline quint32 bindId() const
+    {
+      return m_bindId;
+    }
 
-    void unbindObject(Scene::SceneObject* object);
+    /**
+     * Sets a texture image.
+     */
+    inline void setTexture(const QImage& image)
+    {
+      m_texture = image;
+    }
+    /**
+     * Gets a texture image.
+     */
+    inline const QImage& texture() const
+    {
+      return m_texture;
+    }
 
   private:
-    void bindTexture(Scene::SceneObject* object);
-    void bindMesh(Scene::SceneObject* object);
+    QImage m_texture;
+
+    quint32 m_bindId;
 };
 
-}
 }
 
 #endif
