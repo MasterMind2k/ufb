@@ -76,6 +76,7 @@ void Canvas::initializeGL()
   glEnable(GL_LIGHT0);
   glEnable(GL_COLOR_MATERIAL);
   glEnable(GL_CULL_FACE);
+  glEnable(GL_NORMALIZE);
 }
 
 void Canvas::resizeGL(int w, int h)

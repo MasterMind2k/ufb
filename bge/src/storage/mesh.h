@@ -48,19 +48,15 @@ class Mesh : public Item
       return m_vertices.value(name);
     }
 
-    inline void addFace(const QString& name, Primitives primitive, const QVector<quint16>& face)
-    {
-      if (!m_objects.contains(name))
-        m_objects << name;
-
-      QPair<Primitives, QVector<quint16> > pair(primitive, face);
-      QList<QPair<Primitives, QVector<quint16> > > temp = m_faces.value(name);
-      temp <<  pair;
-      m_faces.insert(name, temp);
-    }
+    void addFace(const QString& name, Primitives primitive, const QVector<quint16>& face);
     inline QList<QPair<Primitives, QVector<quint16> > > faces(const QString& name) const
     {
       return m_faces.value(name);
+    }
+
+    inline QVector<Vector3f> normals(const QString& name) const
+    {
+      return m_normals.value(name);
     }
 
     inline void bind(quint32 id)
@@ -87,6 +83,7 @@ class Mesh : public Item
     QSet<QString> m_objects;
     QHash<QString, QVector<Vector3f> > m_vertices;
     QHash<QString, QList<QPair<Primitives, QVector<quint16> > > > m_faces;
+    QHash<QString, QVector<Vector3f> > m_normals;
 
     quint32 m_bindId;
 
