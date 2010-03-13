@@ -24,18 +24,26 @@
 using namespace BGE;
 using namespace BGE::Rendering;
 
-void DirectRenderer::drawQuads(const VectorList& vertices)
+void DirectRenderer::drawQuads(const VectorList& vertices, const Vector3f& normal)
 {
   glBegin(GL_QUADS);
+
+  if (!normal.isZero())
+    glNormal3fv(normal.data());
+
   foreach(Vector3f vertex, vertices)
     glVertex3fv(vertex.data());
 
   glEnd();
 }
 
-void DirectRenderer::drawTriangles(const VectorList& vertices)
+void DirectRenderer::drawTriangles(const VectorList& vertices, const Vector3f& normal)
 {
   glBegin(GL_TRIANGLES);
+
+  if (!normal.isZero())
+    glNormal3fv(normal.data());
+
   foreach(Vector3f vertex, vertices)
     glVertex3fv(vertex.data());
 
@@ -102,7 +110,9 @@ void DirectRenderer::bindObject(Scene::SceneObject* object)
 
   foreach (QString meshObject, object->mesh()->objects()) {
     QVector<Vector3f> vertices = object->mesh()->vertices(meshObject);
+    QVector<Vector3f> normals = object->mesh()->normals(meshObject);
 
+    quint16 i = 0;
     foreach (Face face, object->mesh()->faces(meshObject)) {
       VectorList temp;
       QVector<quint16> idxs = face.second;
@@ -110,17 +120,19 @@ void DirectRenderer::bindObject(Scene::SceneObject* object)
         case Mesh::Quads:
           foreach (quint16 idx, idxs)
             temp << vertices.at(idx);
-          drawQuads(temp);
+          drawQuads(temp, normals.at(i));
           break;
 
         case Mesh::Triangles:
           temp << vertices.at(idxs.at(0)) << vertices.at(idxs.at(1)) << vertices.at(idxs.at(2));
-          drawTriangles(temp);
+          drawTriangles(temp, normals.at(i));
           break;
 
         default:
           break;
       }
+
+      i++;
     }
   }
 

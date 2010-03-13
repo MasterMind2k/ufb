@@ -53,11 +53,11 @@ class Renderer
     /**
      * Method for drawing quads.
      */
-    virtual void drawQuads(const VectorList& vertexes) = 0;
+    virtual void drawQuads(const VectorList& vertexes, const Vector3f& normal = Vector3f::Zero()) = 0;
     /**
      * Method for drawing triangles.
      */
-    virtual void drawTriangles(const VectorList& vertexes) = 0;
+    virtual void drawTriangles(const VectorList& vertexes, const Vector3f& normal = Vector3f::Zero()) = 0;
 
     /**
      * Method for making the whole scene rendering.

@@ -25,6 +25,33 @@ void Mesh::addVertices(const QString& name, const VectorList& vertices)
   m_vertices.insert(name, temp);
 }
 
+void Mesh::addFace(const QString &name, Primitives primitive, const QVector<quint16> &face)
+{
+  if (!m_objects.contains(name)) {
+    m_objects << name;
+  }
+
+  // Calculate normal vector
+  Vector3f normal = Vector3f::Zero();
+  if (face.size() > 3 && !m_vertices.value("name").isEmpty()) {
+    Vector3f a = m_vertices.value(name).at(face.at(0)) - m_vertices.value(name).at(face.at(1));
+    Vector3f b = m_vertices.value(name).at(face.at(2)) - m_vertices.value(name).at(face.at(1));
+    normal = b.cross(a);
+    normal.normalize();
+  }
+  {
+    QVector<Vector3f> temp = m_normals.value(name);
+    temp << normal;
+    m_normals.insert(name, temp);
+  }
+
+  // Add the face
+  QPair<Primitives, QVector<quint16> > pair(primitive, face);
+  QList<Face> temp = m_faces.value(name);
+  temp <<  pair;
+  m_faces.insert(name, temp);
+}
+
 void Mesh::addRectangle(const QString& objectName, const Vector3f& bottomLeft, const Vector3f& bottomRight, const Vector3f& topLeft, const Vector3f& topRight)
 {
   if (!m_objects.contains(objectName))
