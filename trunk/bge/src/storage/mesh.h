@@ -18,12 +18,64 @@
 #include <QtCore/QStringList>
 #include <QtCore/QSet>
 
+#include <QtGui/QColor>
+
 #include "storage/item.h"
 
 #include "global.h"
 
 namespace BGE
 {
+
+class Material
+{
+  public:
+    enum Side{
+      Front,
+      Back
+    };
+    enum Property {
+      Ambient,
+      Diffuse,
+      Specular,
+      Emmission,
+      Shininess
+    };
+
+    inline void setColor(Side side, Property property, const QColor& color)
+    {
+      m_colors.insert(QPair<Side, Property> (side, property), color);
+    }
+    inline QColor color(QPair<Side, Property> key) const
+    {
+      return m_colors.value(key);
+    }
+    inline QColor color(Side side, Property property) const
+    {
+      return color(QPair<Side, Property> (side, property));
+    }
+    inline const QMap<QPair<Side, Property>, QColor>& colors() const
+    {
+      return m_colors;
+    }
+
+    inline void addFaceIdx(quint16 faceIdx)
+    {
+      m_faceIdxs << faceIdx;
+    }
+    inline void addFaceIdxs(const QList<quint16>& faceIdxs)
+    {
+      m_faceIdxs += faceIdxs;
+    }
+    inline const QList<quint16>& faceIdxs() const
+    {
+      return m_faceIdxs;
+    }
+
+  private:
+    QMap<QPair<Side, Property>, QColor> m_colors;
+    QList<quint16> m_faceIdxs;
+};
 
 class Mesh : public Item
 {
@@ -38,6 +90,12 @@ class Mesh : public Item
 
     inline Mesh(const QString& name) : Item(name)
     {}
+
+    inline ~Mesh()
+    {
+      foreach (QList<Material*> materials, m_materials.values())
+        qDeleteAll(materials);
+    }
 
     /**
      * Adds vertices to the list.
@@ -106,6 +164,17 @@ class Mesh : public Item
       return m_textureMaps.value(name);
     }
 
+    inline void addMaterial(const QString& name, Material* material)
+    {
+      QList<Material*> temp = m_materials.value(name);
+      temp << material;
+      m_materials.insert(name, temp);
+    }
+    inline QList<Material*> materials(const QString& name) const
+    {
+      return m_materials.value(name);
+    }
+
     /**
      * Adds the object name to the list.
      */
@@ -128,12 +197,16 @@ class Mesh : public Item
 
   private:
     QSet<QString> m_objects;
+    /* Vertices */
     QHash<QString, QVector<Vector3f> > m_vertices;
+    /* Faces */
     QHash<QString, QList<QPair<Primitives, QVector<quint16> > > > m_faces;
+    /* Normal vectors */
     QHash<QString, QVector<Vector3f> > m_normals;
-    /* The uv thingies */
+    /* The uv texture mapping */
     QHash<QString, QVector<Vector2f> > m_textureMaps;
-
+    /* Materials */
+    QHash<QString, QList<Material*> > m_materials;
 };
 
 }

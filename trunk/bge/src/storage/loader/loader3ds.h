@@ -16,6 +16,8 @@
 
 #include "storage/loader/modelloader.h"
 
+class QFile;
+
 namespace BGE
 {
 namespace Loader
@@ -31,6 +33,8 @@ class Loader3DS : public ModelLoader
 
   private:
     void parse();
+
+    QString readString(QFile& file);
 };
 
 }
