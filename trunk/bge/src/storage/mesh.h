@@ -37,9 +37,7 @@ class Mesh : public Item
     };
 
     inline Mesh(const QString& name) : Item(name)
-    {
-      m_bindId = 0;
-    }
+    {}
 
     /**
      * Adds vertices to the list.
@@ -109,21 +107,6 @@ class Mesh : public Item
     }
 
     /**
-     * Assign the bind id.
-     */
-    inline void bind(quint32 id)
-    {
-      m_bindId = id;
-    }
-    /**
-     * Gets the mesh's bind id.
-     */
-    inline quint32 bindId() const
-    {
-      return m_bindId;
-    }
-
-    /**
      * Adds the object name to the list.
      */
     inline void createObject(const QString& name)
@@ -150,8 +133,6 @@ class Mesh : public Item
     QHash<QString, QVector<Vector3f> > m_normals;
     /* The uv thingies */
     QHash<QString, QVector<Vector2f> > m_textureMaps;
-
-    quint32 m_bindId;
 
 };
 

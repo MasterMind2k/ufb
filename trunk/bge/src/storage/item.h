@@ -29,6 +29,7 @@ class Item
     {
       m_name = name;
       m_isDir = false;
+      m_bindId = 0;
     }
 
     /**
@@ -87,10 +88,26 @@ class Item
       return m_items.value(name, 0l);
     }
 
+    /**
+     * Sets the bind id.
+     */
+    inline void bind(quint32 bindId)
+    {
+      m_bindId = bindId;
+    }
+    /**
+     * Gets the bind id.
+     */
+    inline quint32 bindId() const
+    {
+      return m_bindId;
+    }
+
   private:
     QString m_name;
     bool m_isDir;
     QHash<QString, Item*> m_items;
+    quint32 m_bindId;
 
     /* Invalid constructor */
     inline Item()
