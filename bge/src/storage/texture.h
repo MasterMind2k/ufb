@@ -24,24 +24,7 @@ class Texture : public BGE::Item
 {
   public:
     inline Texture(const QString& name) : Item(name)
-    {
-      m_bindId = 0;
-    }
-
-    /**
-     * Bind the texture.
-     */
-    inline void bind(quint32 bindId)
-    {
-      m_bindId = bindId;
-    }
-    /**
-     * Gets the texture id.
-     */
-    inline quint32 bindId() const
-    {
-      return m_bindId;
-    }
+    {}
 
     /**
      * Sets a texture image.
@@ -60,8 +43,6 @@ class Texture : public BGE::Item
 
   private:
     QImage m_texture;
-
-    quint32 m_bindId;
 };
 
 }
