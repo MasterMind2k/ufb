@@ -110,7 +110,11 @@ void DirectRenderer::renderScene()
         glBindTexture(GL_TEXTURE_2D, object->texture()->bindId());
       }
 
+      if (object->texture())
+        glEnable(GL_TEXTURE_2D);
       glCallList(object->mesh()->bindId());
+      if (object->texture())
+        glDisable(GL_TEXTURE_2D);
     }
   }
 }
