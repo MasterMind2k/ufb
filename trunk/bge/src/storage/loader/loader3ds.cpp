@@ -38,9 +38,6 @@ void Loader3DS::parse()
   // Temporary variables
   VectorList vertices;
   QString objectName;
-  QString materialName;
-  Material* material = 0l;
-  QHash<QString, Material*> materials;
 
   // Used the format definition from
   // http://jerome.jouvie.free.fr/OpenGl/Projects/3dsInfo.txt
@@ -58,15 +55,12 @@ void Loader3DS::parse()
       case 0x3D3D:
       // Triangular mesh
       case 0x4100:
-      // Material block
-      case 0xAFFF:
         // Nothing to do :)
         break;
 
       // Object block
       case 0x4000: {
         objectName = readString(modelFile);
-        materials.clear();
 
         qDebug("BGE::Storage::Loader3DS::parse(): Parsing object '%s'", objectName.toUtf8().data());
         break;
@@ -116,53 +110,16 @@ void Loader3DS::parse()
 
       // Mapping coordinates list for each vertex
       case 0x4140: {
-          quint16 verticesNumber = *(quint16*) modelFile.read(2).data();
-          size_t size = 2* sizeof(float);
-          float* raw = (float*) malloc(size);
-          for (quint16 i = 0; i < verticesNumber; i++) {
-            modelFile.read((char*) raw, size);
-            m_mesh->addTextureMap(objectName, Vector2f(raw));
-          }
-          free(raw);
-
-          qDebug("BGE::Storage::Loader3DS::parse(): Parsed %d texture mappings for vertices.", verticesNumber);
-          break;
-      }
-
-      // Faces material list
-      case 0x4130: {
-          QString materialName = readString(modelFile);
-          quint16 facesNumber = *(quint16*) modelFile.read(2).data();
-
-          QList<quint16> idxs;
-          for (quint16 i = 0; i < facesNumber; i++) {
-            quint16 idx = *(quint16*) modelFile.read(2).data();
-            idxs << idx;
-          }
-          Material* material = materials.value(materialName);
-          if (!material)
-            material = new Material;
-          material->addFaceIdxs(idxs);
-          materials.insert(materialName, material);
-
-          qDebug("BGE::Storage::Loader3DS::parse(): Parsed %d faces mappings for material '%s'.", facesNumber, materialName.toUtf8().data());
-          break;
-      }
-
-      // Material block
-      case 0xA000: {
-        if (material) {
-          Material* temp = materials.value(materialName);
-          if (temp) {
-            material->addFaceIdxs(temp->faceIdxs());
-            delete temp;
-          }
-          materials.insert(materialName, material);
-          material = 0l;
+        quint16 verticesNumber = *(quint16*) modelFile.read(2).data();
+        size_t size = 2* sizeof(float);
+        float* raw = (float*) malloc(size);
+        for (quint16 i = 0; i < verticesNumber; i++) {
+          modelFile.read((char*) raw, size);
+          m_mesh->addTextureMap(objectName, Vector2f(raw));
         }
-        materialName = readString(modelFile);
+        free(raw);
 
-        qDebug("BGE::Storage::Loader3DS::parse(): Parsing material '%s'.", materialName.toUtf8().data());
+        qDebug("BGE::Storage::Loader3DS::parse(): Parsed %d texture mappings for vertices.", verticesNumber);
         break;
       }
 
