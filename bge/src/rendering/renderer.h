@@ -25,6 +25,7 @@ class Mesh;
 namespace Scene
 {
 class SceneObject;
+class Light;
 }
 namespace Rendering
 {
@@ -55,6 +56,20 @@ class Renderer
      */
     virtual void unbindObject(Scene::SceneObject* object) = 0;
 
+    virtual quint8 assignLight(Scene::Light* light)
+    {
+      m_assignedLights.append(light);
+      return m_assignedLights.size() - 1;
+    }
+    virtual const QList<Scene::Light*>& assignedLights() const
+    {
+      return m_assignedLights;
+    }
+    virtual void clearAssignedLights()
+    {
+      m_assignedLights.clear();
+    }
+
   protected:
     /**
      * Binds the texture that is associated with the object.
@@ -69,6 +84,9 @@ class Renderer
      * Queue to be used by implementations.
      */
     QQueue<Scene::SceneObject*> m_renderQueue;
+
+  private:
+    QList<Scene::Light*> m_assignedLights;
 };
 
 }

@@ -25,6 +25,7 @@ namespace Scene
 {
 class SceneObject;
 class Camera;
+class Light;
 }
 namespace Rendering
 {
@@ -118,6 +119,31 @@ class Canvas : public QGLWidget
     }
 
     /**
+     * Creates a light. It doesn't get inserted to the scene.
+     * If you want to create a directional light, you don't
+     * have to add it to the scene.
+     */
+    Scene::Light* createLight(const QString& name = QString());
+    /**
+     * Removes the light.
+     */
+    bool removeLight(const QString& name);
+    /**
+     * Gets the light.
+     */
+    inline Scene::Light* light(const QString& name) const
+    {
+      return m_lights.value(name);
+    }
+    /**
+     * Gets the list of all lights.
+     */
+    inline QList<Scene::Light*> lights() const
+    {
+      return m_lights.values();
+    }
+
+    /**
      * Loads the resource. The resource file has to be a Qt's binary resource file.
      *
      * @note This method uses QResource class.
@@ -143,6 +169,8 @@ class Canvas : public QGLWidget
 
     QHash<QString, Scene::Camera*> m_cameras;
     Scene::Camera* m_activeCamera;
+
+    QHash<QString, Scene::Light*> m_lights;
 
     static Canvas* m_self;
 

@@ -23,6 +23,7 @@
 
 #include "scene/sceneobject.h"
 #include "scene/camera.h"
+#include "scene/light.h"
 
 #include "storage/storage.h"
 
@@ -73,7 +74,6 @@ void Canvas::initializeGL()
   glEnable(GL_DEPTH_TEST);
 
   glEnable(GL_LIGHTING);
-  glEnable(GL_LIGHT0);
   glEnable(GL_COLOR_MATERIAL);
   glEnable(GL_CULL_FACE);
   glEnable(GL_NORMALIZE);
@@ -126,6 +126,9 @@ Scene::Camera* Canvas::createCamera(const QString &name)
     return 0l;
 
   Scene::Camera* camera = new Scene::Camera(name);
+  if (!camera)
+    return 0l;
+
   m_cameras.insert(name, camera);
   return camera;
 }
@@ -150,6 +153,31 @@ bool Canvas::removeCamera(const QString& name)
 
   m_cameras.remove(name);
   delete camera;
+}
+
+Scene::Light* Canvas::createLight(const QString& name)
+{
+  if (m_lights.contains(name))
+    return 0l;
+
+  Scene::Light* light = new Scene::Light(name);
+  if (!light)
+    return 0l;
+
+  m_lights.insert(name, light);
+  return light;
+}
+
+bool Canvas::removeLight(const QString &name)
+{
+  Scene::Light* light = m_lights.value(name);
+  if (!light)
+    return false;
+
+  delete light;
+  m_lights.remove(name);
+
+  return true;
 }
 
 void Canvas::loadResource(const QString& fileName)

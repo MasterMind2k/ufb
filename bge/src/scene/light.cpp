@@ -15,6 +15,25 @@
 using namespace BGE;
 using namespace Scene;
 
-Light::Light()
+quint8 Light::m_serial = 0;
+
+Light::Light(const QString &name)
+ : SceneObject()
 {
+  if (name.isEmpty())
+    m_name = QString("Light_%0").arg(m_serial++);
+  else
+    m_name = name;
+
+  m_ambient = Qt::black;
+  m_diffuse = m_specular = Qt::white;
+
+  m_isPositional = true;
+
+  m_constantAttenuation = 1;
+  m_linearAttenuation = m_quadraticAttenuation = 0;
+
+  m_isSpot = false;
+  m_spotDirection = Vector3f(0, 0, 0);
+  m_spotCutOff = 90;
 }
