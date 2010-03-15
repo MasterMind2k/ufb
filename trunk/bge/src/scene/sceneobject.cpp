@@ -90,7 +90,7 @@ void SceneObject::prepareTransforms()
 
   foreach (SceneObject* child, m_children) {
     // Propagate changes downwards
-    if (isTransformModified())
+    if (m_transformModified)
       child->m_transformModified = true;
 
     // Make the recursion

@@ -38,8 +38,9 @@ void Camera::lookAt(SceneObject *object)
     return;
 
   Vector3f forward = (object->globalPosition() - globalPosition()).normalized();
-  Vector3f up(0, 0, 1);
+  Vector3f up(0, 1, 0);
   Vector3f side = forward.cross(up).normalized();
+  up = side.cross(forward).normalized();
 
   Transform3f matrix;
   matrix(0,0) = side.x();
@@ -63,7 +64,7 @@ void Camera::lookAt(SceneObject *object)
   matrix(3,3) = 1;
 
   Quaternionf rotation(matrix.rotation());
-  setOrientation(rotation);
+  setOrientation(rotation.normalized());
 }
 
 void Camera::calculateTransforms()
