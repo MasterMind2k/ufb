@@ -14,6 +14,8 @@
 
 #include <QtCore/QString>
 
+#include <QtGui/QMatrix4x4>
+
 using namespace BGE;
 using namespace BGE::Scene;
 
@@ -26,4 +28,46 @@ Camera::Camera(const QString& name)
     m_name = "Camera_" + QString::number(m_serialNumber);
   else
     m_name = name;
+
+  m_observed = 0l;
+}
+
+void Camera::lookAt(SceneObject *object)
+{
+  if (!object)
+    return;
+
+  Vector3f forward = (object->globalPosition() - globalPosition()).normalized();
+  Vector3f up(0, 0, 1);
+  Vector3f side = forward.cross(up).normalized();
+
+  Transform3f matrix;
+  matrix(0,0) = side.x();
+  matrix(1,0) = side.y();
+  matrix(2,0) = side.z();
+  matrix(3,0) = 0;
+
+  matrix(0,1) = up.x();
+  matrix(1,1) = up.y();
+  matrix(2,1) = up.z();
+  matrix(3,1) = 0;
+
+  matrix(0,2) = -forward.x();
+  matrix(1,2) = -forward.y();
+  matrix(2,2) = -forward.z();
+  matrix(3,2) = 0;
+
+  matrix(0,3) = 0;
+  matrix(1,3) = 0;
+  matrix(2,3) = 0;
+  matrix(3,3) = 1;
+
+  Quaternionf rotation(matrix.rotation());
+  setOrientation(rotation);
+}
+
+void Camera::calculateTransforms()
+{
+  if (m_observed)
+    lookAt(m_observed);
 }
