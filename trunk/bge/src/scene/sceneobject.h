@@ -85,6 +85,15 @@ class SceneObject
     }
 
     /**
+     * Sets orientation.
+     */
+    inline void setOrientation(const Quaternionf& orientation)
+    {
+      m_globalOrientation = orientation;
+      m_orientation = orientation;
+      m_transformModified = true;
+    }
+    /**
      * Rotates the object by rotation.
      *
      * @see rotateX
