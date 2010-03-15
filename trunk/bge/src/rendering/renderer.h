@@ -41,10 +41,7 @@ class Renderer
     /**
      * Enqueues an object to the rendering queue.
      */
-    inline void enqueueObject(Scene::SceneObject* object)
-    {
-      m_renderQueue.enqueue(object);
-    }
+    void enqueueObject(Scene::SceneObject* object);
 
     /**
      * Method for making the whole scene rendering.
