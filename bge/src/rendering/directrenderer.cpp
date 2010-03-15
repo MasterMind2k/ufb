@@ -85,12 +85,15 @@ void DirectRenderer::renderScene()
     // Calculate camera translation
     move.translate(-camera->globalPosition());
 
+    // Calculate camera rotation
     rotation.rotate(camera->orientation().inverse());
 
-    // Calculate camera rotation
-    rotation.translate(-camera->position());
-    rotation.rotate(camera->orientation() * camera->globalOrientation().inverse());
-    rotation.translate(camera->position());
+    // And do some fixing for local camera
+    if (camera->parent() != Canvas::canvas()->scene()) {
+      rotation.translate(-camera->position());
+      rotation.rotate(camera->orientation() * camera->globalOrientation().inverse());
+      rotation.translate(camera->position());
+    }
   }
 
   while (!m_renderQueue.isEmpty()) {
@@ -135,32 +138,29 @@ void DirectRenderer::renderScene()
     Transform3f worldTransform = rotation * move * object->globalTransform();
     glLoadMatrixf(worldTransform.data());
 
-    // Let's render! :D
-    if (object->isBindable()) {
-      // Bind the mesh
-      if (!object->mesh()->bindId())
-        bindMesh(object);
-      // Bind the texture
-      if (object->texture()) {
-        if (!object->texture()->bindId())
-          bindTexture(object);
+    // Bind the mesh
+    if (!object->mesh()->bindId())
+      bindMesh(object);
+    // Bind the texture
+    if (object->texture()) {
+      if (!object->texture()->bindId())
+        bindTexture(object);
 
-        // Load texture
-        glBindTexture(GL_TEXTURE_2D, object->texture()->bindId());
-      }
-
-      if (object->texture())
-        glEnable(GL_TEXTURE_2D);
-      glCallList(object->mesh()->bindId());
-      if (object->texture())
-        glDisable(GL_TEXTURE_2D);
-
-      // Disable and clear lights
-      quint8 size = assignedLights().size();
-      for (quint8 i = 0; i < size; i++)
-        glDisable(GL_LIGHT0 + i);
-      clearAssignedLights();
+      // Load texture
+      glBindTexture(GL_TEXTURE_2D, object->texture()->bindId());
     }
+
+    if (object->texture())
+      glEnable(GL_TEXTURE_2D);
+    glCallList(object->mesh()->bindId());
+    if (object->texture())
+      glDisable(GL_TEXTURE_2D);
+
+    // Disable and clear lights
+    quint8 size = assignedLights().size();
+    for (quint8 i = 0; i < size; i++)
+      glDisable(GL_LIGHT0 + i);
+    clearAssignedLights();
   }
 }
 

@@ -14,8 +14,12 @@
 
 #include "scene/sceneobject.h"
 
-#include "storage/mesh.h"
-
 using namespace BGE;
 using namespace BGE::Rendering;
+
+void Renderer::enqueueObject(Scene::SceneObject *object)
+{
+  if (object->isBindable())
+    m_renderQueue.enqueue(object);
+}
 
