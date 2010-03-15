@@ -18,6 +18,7 @@
 
 #include "scene/sceneobject.h"
 #include "scene/camera.h"
+#include "scene/light.h"
 
 #include "storage/mesh.h"
 #include "storage/texture.h"
@@ -72,6 +73,9 @@ void DirectRenderer::renderScene()
   // Needed for gl commands
   Canvas::canvas()->makeCurrent();
 
+  // Make a temporary copy of lights
+  QList<Scene::Light*> lights = Canvas::canvas()->lights();
+
   // Let's use the active camera
   Scene::Camera* camera = Canvas::canvas()->activeCamera();
   bool isGlobalCamera = camera && camera->parent() == Canvas::canvas()->scene();
@@ -92,6 +96,42 @@ void DirectRenderer::renderScene()
 
   while (!m_renderQueue.isEmpty()) {
     Scene::SceneObject* object = m_renderQueue.dequeue();
+
+    // Prepare lighting
+    foreach (Scene::Light* light, lights) {
+      GLenum lightId = GL_LIGHT0 + assignLight(light);
+      if (light->isPositional()) {
+       Transform3f transform = rotation * move * light->globalTransform();
+       glLoadMatrixf(transform.data());
+      }
+
+      // Setup light properties
+      // Position
+      Vector4f temp(0, 0, 0, 1);
+      if (!light->isPositional())
+        temp = Vector4f(light->globalPosition().x(), light->globalPosition().y(), light->globalPosition().z(), 0);
+      glLightfv(lightId, GL_POSITION, temp.data());
+      // Colors
+      temp = Vector4f(light->ambientColor().redF(), light->ambientColor().greenF(), light->ambientColor().blueF(), light->ambientColor().alphaF());
+      glLightfv(lightId, GL_AMBIENT, temp.data());
+      temp = Vector4f(light->diffuseColor().redF(), light->diffuseColor().greenF(), light->diffuseColor().blueF(), light->diffuseColor().alphaF());
+      glLightfv(lightId, GL_DIFFUSE, temp.data());
+      temp = Vector4f(light->specularColor().redF(), light->specularColor().greenF(), light->specularColor().blueF(), light->specularColor().alphaF());
+      glLightfv(lightId, GL_SPECULAR, temp.data());
+      // Attenuation
+      glLightf(lightId, GL_CONSTANT_ATTENUATION, light->constantAttenuation());
+      glLightf(lightId, GL_LINEAR_ATTENUATION, light->linearAttenuation());
+      glLightf(lightId, GL_QUADRATIC_ATTENUATION, light->quadraticAttenuation());
+      // Spot properties
+      if (light->isPositional() && light->isSpot()) {
+        glLightfv(lightId, GL_SPOT_DIRECTION, light->spotDirection().data());
+        glLightf(lightId, GL_SPOT_CUTOFF, light->spotCutOff());
+      }
+
+      // Enable light
+      glEnable(lightId);
+    }
+
     // Calculate world transform
     Transform3f worldTransform = rotation * move * object->globalTransform();
     glLoadMatrixf(worldTransform.data());
@@ -115,6 +155,12 @@ void DirectRenderer::renderScene()
       glCallList(object->mesh()->bindId());
       if (object->texture())
         glDisable(GL_TEXTURE_2D);
+
+      // Disable and clear lights
+      quint8 size = assignedLights().size();
+      for (quint8 i = 0; i < size; i++)
+        glDisable(GL_LIGHT0 + i);
+      clearAssignedLights();
     }
   }
 }
