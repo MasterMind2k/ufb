@@ -78,7 +78,6 @@ void DirectRenderer::renderScene()
 
   // Let's use the active camera
   Scene::Camera* camera = Canvas::canvas()->activeCamera();
-  bool isGlobalCamera = camera && camera->parent() == Canvas::canvas()->scene();
 
   // Calculate camera transformations
   Transform3f move(Transform3f::Identity()), rotation(Transform3f::Identity());
@@ -86,12 +85,12 @@ void DirectRenderer::renderScene()
     // Calculate camera translation
     move.translate(-camera->globalPosition());
 
+    rotation.rotate(camera->orientation().inverse());
+
     // Calculate camera rotation
-    if (!isGlobalCamera)
-      rotation.translate(-camera->position());
-    rotation.rotate(camera->globalOrientation().inverse());
-    if (!isGlobalCamera)
-      rotation.translate(camera->position());
+    rotation.translate(-camera->position());
+    rotation.rotate(camera->orientation() * camera->globalOrientation().inverse());
+    rotation.translate(camera->position());
   }
 
   while (!m_renderQueue.isEmpty()) {
