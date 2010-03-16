@@ -94,17 +94,17 @@ class Light : public BGE::Scene::SceneObject
     {
       return m_isSpot;
     }
-    inline void setSpotDirection(const Vector3f& direction)
+    inline void setSpotExponent(float exponent)
     {
-      m_spotDirection = direction;
+      if (exponent < 0)
+        exponent = 0;
+      else if (exponent > 128)
+        exponent = 128;
+      m_spotExponent = exponent;
     }
-    inline void setSpotDirection(float x, float y, float z)
+    inline float spotExponent() const
     {
-      setSpotDirection(Vector3f(x, y, z));
-    }
-    inline const Vector3f& spotDirection() const
-    {
-      return m_spotDirection;
+      return m_spotExponent;
     }
     inline void setSpotCutOff(float angle)
     {
@@ -138,7 +138,7 @@ class Light : public BGE::Scene::SceneObject
 
     /* Spot */
     bool m_isSpot;
-    Vector3f m_spotDirection;
+    float m_spotExponent;
     float m_spotCutOff;
 };
 

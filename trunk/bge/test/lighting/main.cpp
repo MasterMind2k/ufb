@@ -71,39 +71,47 @@ int main(int argc, char** argv)
   BGE::Canvas::canvas()->addSceneObject(BGE::Canvas::canvas()->camera("Global camera"));
   BGE::Canvas::canvas()->activateCamera("Global camera");
 
-  // Create lights
-  MovingLight* movingLight = new MovingLight;
-
-  BGE::Scene::Light* light = BGE::Canvas::canvas()->createLight("Red light");
-  light->move(-150, -100, -200);
-  light->setDiffuseColor(Qt::red);
-  light->setMesh(cube);
-  movingLight->addChild(light);
-
-  light = BGE::Canvas::canvas()->createLight("Blue light");
-  light->move(150, 100, -200);
-  light->setDiffuseColor(Qt::blue);
-  light->setMesh(cube);
-  movingLight->addChild(light);
-
-  light = BGE::Canvas::canvas()->createLight("Green light");
-  light->move(-150, 100, 200);
-  light->setDiffuseColor(Qt::green);
-  light->setMesh(cube);
-  movingLight->addChild(light);
-
-  light = BGE::Canvas::canvas()->createLight("Yellow light");
-  light->move(150, -100, 200);
-  light->setDiffuseColor(Qt::yellow);
-  light->setMesh(cube);
-  movingLight->addChild(light);
-  BGE::Canvas::canvas()->addSceneObject(movingLight);
-
   // Add our model
   BGE::Scene::SceneObject* fighter = new BGE::Scene::SceneObject;
   fighter->setMesh(BGE::Storage::self()->get<BGE::Mesh*>("/models/Fighter"));
   fighter->setTexture(BGE::Storage::self()->get<BGE::Texture*>("/textures/Fighter"));
   BGE::Canvas::canvas()->addSceneObject(fighter);
+
+  // Create lights
+  MovingLight* movingLight = new MovingLight;
+
+  BGE::Scene::Light* light = BGE::Canvas::canvas()->createLight("Red light");
+  light->move(-150, -80, -200);
+  light->setDiffuseColor(Qt::red);
+  light->setSpotExponent(100);
+  light->setMesh(cube);
+  light->observe(fighter);
+  movingLight->addChild(light);
+
+  light = BGE::Canvas::canvas()->createLight("Blue light");
+  light->move(150, 80, -200);
+  light->setDiffuseColor(Qt::blue);
+  light->setSpotExponent(100);
+  light->setMesh(cube);
+  light->observe(fighter);
+  movingLight->addChild(light);
+
+  light = BGE::Canvas::canvas()->createLight("Green light");
+  light->move(-150, 80, 200);
+  light->setDiffuseColor(Qt::green);
+  light->setSpotExponent(100);
+  light->setMesh(cube);
+  light->observe(fighter);
+  movingLight->addChild(light);
+
+  light = BGE::Canvas::canvas()->createLight("Yellow light");
+  light->move(150, -80, 200);
+  light->setDiffuseColor(Qt::yellow);
+  light->setSpotExponent(100);
+  light->setMesh(cube);
+  light->observe(fighter);
+  movingLight->addChild(light);
+  BGE::Canvas::canvas()->addSceneObject(movingLight);
 
   BGE::Canvas::canvas()->show();
 

@@ -126,8 +126,10 @@ void DirectRenderer::renderScene()
       glLightf(lightId, GL_QUADRATIC_ATTENUATION, light->quadraticAttenuation());
       // Spot properties
       if (light->isPositional() && light->isSpot()) {
-        glLightfv(lightId, GL_SPOT_DIRECTION, light->spotDirection().data());
         glLightf(lightId, GL_SPOT_CUTOFF, light->spotCutOff());
+        glLightf(lightId, GL_SPOT_EXPONENT, light->spotExponent());
+      } else {
+        glLightf(lightId, GL_SPOT_CUTOFF, 180);
       }
 
       // Enable light

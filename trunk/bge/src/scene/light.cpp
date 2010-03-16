@@ -34,6 +34,6 @@ Light::Light(const QString &name)
   m_linearAttenuation = m_quadraticAttenuation = 0;
 
   m_isSpot = false;
-  m_spotDirection = Vector3f(0, 0, 0);
-  m_spotCutOff = 90;
+  m_spotExponent = 0;
+  m_spotCutOff = 45;
 }

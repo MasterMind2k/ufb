@@ -12,12 +12,32 @@
  ***************************************************************************/
 #include "movinglight.h"
 
+#include <QtCore/QTimer>
+
+#include "scene/light.h"
+
 MovingLight::MovingLight()
- : BGE::Scene::SceneObject()
+ : QObject(), BGE::Scene::SceneObject()
 {
+  QTimer* timer = new QTimer(this);
+  timer->setSingleShot(false);
+  timer->setInterval(15000);
+  timer->start();
+
+  connect(timer, SIGNAL(timeout()), SLOT(change()));
 }
 
 void MovingLight::calculateTransforms()
 {
   rotateY(M_PI / 150);
+}
+
+void MovingLight::change()
+{
+  qDebug("Changing light type.");
+  foreach (BGE::Scene::SceneObject* object, BGE::Scene::SceneObject::children()) {
+    BGE::Scene::Light* light = static_cast<BGE::Scene::Light*> (object);
+
+    light->setSpot(!light->isSpot());
+  }
 }

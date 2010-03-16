@@ -320,6 +320,29 @@ class SceneObject
       return m_mesh != 0l;
     }
 
+    /**
+     * Sets the orientation so the camera looks at the center of the
+     * specified object.
+     */
+    void lookAt(SceneObject* object);
+
+    /**
+     * Sets the object, to be looked at.
+     *
+     * @see lookAt
+     */
+    inline void observe(SceneObject* object)
+    {
+      m_observed = object;
+    }
+    /**
+     * Gets the observed object.
+     */
+    inline SceneObject* observed() const
+    {
+      return m_observed;
+    }
+
   protected:
     /**
      * This method gets called _before_ transform matrices get updated. Reimplement
@@ -343,6 +366,8 @@ class SceneObject
 
     Mesh* m_mesh;
     Texture* m_texture;
+
+    SceneObject* m_observed;
 
     /* Be very careful in these classes!!! */
     friend class BGE::Canvas;

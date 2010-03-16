@@ -13,15 +13,21 @@
 #ifndef MOVINGLIGHT_H
 #define MOVINGLIGHT_H
 
+#include <QtCore/QObject>
+
 #include "scene/sceneobject.h"
 
-class MovingLight : public BGE::Scene::SceneObject
+class MovingLight :  public QObject, public BGE::Scene::SceneObject
 {
+  Q_OBJECT
   public:
     explicit MovingLight();
 
   private:
     void calculateTransforms();
+
+  private slots:
+    void change();
 };
 
 #endif
