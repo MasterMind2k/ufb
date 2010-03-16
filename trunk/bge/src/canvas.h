@@ -172,10 +172,15 @@ class Canvas : public QGLWidget
 
     QHash<QString, Scene::Light*> m_lights;
 
+    bool m_showFPS;
+    quint64 m_frames;
+    quint64 m_fps;
+
     static Canvas* m_self;
 
   private slots:
     void cleanup();
+    void updateFPS();
 };
 
 }

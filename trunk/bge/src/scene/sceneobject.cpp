@@ -54,8 +54,7 @@ void SceneObject::move(const Vector3f& direction)
 
 void SceneObject::rotate(const AngleAxisf& rotation)
 {
-  m_orientation = m_orientation * rotation;
-  m_globalOrientation = m_globalOrientation * rotation;
+  m_orientation = (m_orientation * rotation).normalized();
 
   // Mark for recalculation
   m_transformModified = true;
@@ -78,7 +77,7 @@ void SceneObject::prepareTransforms()
     if (parent()) {
       // When we have a parent
       m_globalPosition = parent()->m_globalPosition + m_position;
-      m_globalOrientation = parent()->m_globalOrientation * m_orientation;
+      m_globalOrientation = (parent()->m_globalOrientation * m_orientation).normalized();
       m_globalTransform = parent()->m_globalTransform * m_transform;
     } else {
       // Just copy if we don't have a parent
@@ -96,7 +95,4 @@ void SceneObject::prepareTransforms()
     // Make the recursion
     child->prepareTransforms();
   }
-
-  // The transforms got calculated
-  m_transformModified = false;
 }
