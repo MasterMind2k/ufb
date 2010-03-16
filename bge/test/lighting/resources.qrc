@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/bge_resources/models">
+        <file alias="Fighter.3ds">resources/fighter.3ds</file>
+    </qresource>
+    <qresource prefix="/bge_resources/textures">
+        <file alias="Fighter.jpg">resources/fighter.jpg</file>
+    </qresource>
+</RCC>

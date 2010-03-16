@@ -148,7 +148,7 @@ class Canvas : public QGLWidget
      *
      * @note This method uses QResource class.
      */
-    void loadResource(const QString& fileName);
+    void loadResource(const QString& fileName = QString());
 
   private:
     /* Reimplemented methods */

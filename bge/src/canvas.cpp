@@ -196,6 +196,11 @@ bool Canvas::removeLight(const QString &name)
 
 void Canvas::loadResource(const QString& fileName)
 {
+  if (fileName.isEmpty()) {
+    Storage::self()->load();
+    return;
+  }
+
   if (!QResource::registerResource(fileName, "/bge_resources"))
     qWarning("BGE::Canvas::loadResource: Cannot register '%s' resource!", fileName.toAscii().data());
   Storage::self()->load();

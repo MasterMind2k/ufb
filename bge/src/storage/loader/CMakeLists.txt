@@ -9,3 +9,4 @@ set(loader_SRCS
 )
 
 add_library(loader ${loader_SRCS})
+target_link_libraries(loader storage)
