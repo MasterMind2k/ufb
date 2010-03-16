@@ -89,8 +89,8 @@ class SceneObject
      */
     inline void setOrientation(const Quaternionf& orientation)
     {
-      m_globalOrientation = orientation;
-      m_orientation = orientation;
+      m_globalOrientation = orientation.normalized();
+      m_orientation = orientation.normalized();
       m_transformModified = true;
     }
     /**

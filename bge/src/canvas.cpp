@@ -36,6 +36,9 @@ Canvas* Canvas::m_self = 0l;
 Canvas::Canvas()
 : QGLWidget()
 {
+  m_frames = 0;
+  m_fps = 0;
+
   // Creating a renderer
   m_renderer = new Rendering::DirectRenderer;
 
@@ -45,11 +48,17 @@ Canvas::Canvas()
   timer->setInterval(30);
   timer->start();
 
+  QTimer* fps = new QTimer(this);
+  fps->setSingleShot(false);
+  fps->setInterval(1000);
+  fps->start();
+
   // Initialize scene graph and set active camera to none
   m_scene = new Scene::SceneObject;
   m_activeCamera = 0l;
 
   connect(timer, SIGNAL(timeout()), SLOT(updateGL()));
+  connect(fps, SIGNAL(timeout()), SLOT(updateFPS()));
   connect(QApplication::instance(), SIGNAL(aboutToQuit()), SLOT(cleanup()));
 }
 
@@ -109,10 +118,15 @@ void Canvas::paintGL()
     Scene::SceneObject* object = list.dequeue();
     m_renderer->enqueueObject(object);
     list.append(object->children());
+
+    // Mark the object with calculatd transforms
+    object->m_transformModified = false;
   }
 
   // Make the actual rendering
   m_renderer->renderScene();
+
+  m_frames++;
 }
 
 void Canvas::setController(AbstractController* controller)
@@ -225,4 +239,11 @@ void Canvas::cleanup()
   // And delete the scene
   delete m_scene;
   delete m_renderer;
+}
+
+void Canvas::updateFPS()
+{
+  m_fps = m_frames;
+  m_frames = 0;
+  qDebug("FPS: %lld", m_fps);
 }
