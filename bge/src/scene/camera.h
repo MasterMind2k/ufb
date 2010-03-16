@@ -56,41 +56,13 @@ class Camera : public SceneObject
       return m_name;
     }
 
-    /**
-     * Sets the orientation so the camera looks at the center of the
-     * specified object.
-     */
-    void lookAt(SceneObject* object);
-
-    /**
-     * Sets the object, to be looked at.
-     *
-     * @see lookAt
-     */
-    inline void observe(SceneObject* object)
-    {
-      m_observed = object;
-    }
-    /**
-     * Gets the observed object.
-     */
-    inline SceneObject* observed() const
-    {
-      return m_observed;
-    }
-
   private:
     QString m_name;
 
     static quint32 m_serialNumber;
 
-    SceneObject* m_observed;
-
     Camera(const QString& name = QString());
     ~Camera() {}
-
-    /* Reimplemented functions */
-    void calculateTransforms();
 
   friend class BGE::Canvas;
 };

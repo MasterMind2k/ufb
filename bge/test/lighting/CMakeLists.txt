@@ -10,9 +10,14 @@ set(bge_lighting_SRCS
   movinglight.cpp
 )
 
+set(bge_lighting_HDRS
+  movinglight.h
+)
+
+qt4_wrap_cpp(bge_lighting_MOC ${bge_lighting_HDRS})
 qt4_add_resources(bge_lighting_RC resources.qrc)
 
-add_executable(bge_lighting ${bge_lighting_SRCS} ${bge_lighting_RC})
+add_executable(bge_lighting ${bge_lighting_SRCS} ${bge_lighting_MOC} ${bge_lighting_RC})
 
 target_link_libraries(bge_lighting bge ${QT_LIBRARIES})
 
