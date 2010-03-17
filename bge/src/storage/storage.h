@@ -16,8 +16,7 @@
 
 #include <QtCore/QString>
 
-namespace BGE
-{
+namespace BGE {
 class Item;
 
 class Storage

@@ -16,11 +16,9 @@
 
 #include <QtCore/QString>
 
-namespace BGE
-{
+namespace BGE {
 class Mesh;
-namespace Loader
-{
+namespace Loader {
 
 class ModelLoader
 {

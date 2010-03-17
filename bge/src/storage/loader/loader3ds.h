@@ -18,10 +18,8 @@
 
 class QFile;
 
-namespace BGE
-{
-namespace Loader
-{
+namespace BGE {
+namespace Loader {
 
 class Loader3DS : public ModelLoader
 {

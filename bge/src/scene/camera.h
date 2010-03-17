@@ -17,10 +17,8 @@
 
 #include <QtCore/QString>
 
-namespace BGE
-{
-namespace Scene
-{
+namespace BGE {
+namespace Scene {
 
 /**
  * @short A viewing tool in the game

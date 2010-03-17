@@ -16,8 +16,7 @@
 #include <QtCore/QString>
 #include <QtCore/QHash>
 
-namespace BGE
-{
+namespace BGE {
 
 class Item
 {

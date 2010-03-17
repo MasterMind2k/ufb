@@ -19,16 +19,13 @@ class QGLWidget;
 
 #include "global.h"
 
-namespace BGE
-{
+namespace BGE {
 class Mesh;
-namespace Scene
-{
+namespace Scene {
 class Object;
 class Light;
 }
-namespace Rendering
-{
+namespace Rendering {
 
 /**
  * @short Abstract renderer
