@@ -21,7 +21,7 @@
 #include <QtGui/QMatrix4x4>
 #include <QtGui/QApplication>
 
-#include "scene/sceneobject.h"
+#include "scene/object.h"
 #include "scene/camera.h"
 #include "scene/light.h"
 
@@ -54,7 +54,7 @@ Canvas::Canvas()
   fps->start();
 
   // Initialize scene graph and set active camera to none
-  m_scene = new Scene::SceneObject;
+  m_scene = new Scene::Object;
   m_activeCamera = 0l;
 
   m_controller = 0l;
@@ -64,7 +64,7 @@ Canvas::Canvas()
   connect(QApplication::instance(), SIGNAL(aboutToQuit()), SLOT(cleanup()));
 }
 
-void Canvas::addSceneObject(Scene::SceneObject* object)
+void Canvas::addSceneObject(Scene::Object* object)
 {
   m_scene->addChild(object);
 }
@@ -114,10 +114,10 @@ void Canvas::paintGL()
 
   // Enqueue objects for rendering
   /// @TODO Culling comes here somewhere :D (someday)
-  QQueue<Scene::SceneObject*> list;
+  QQueue<Scene::Object*> list;
   list.enqueue(m_scene);
   while (!list.isEmpty()) {
-    Scene::SceneObject* object = list.dequeue();
+    Scene::Object* object = list.dequeue();
     m_renderer->enqueueObject(object);
     list.append(object->children());
 
@@ -235,10 +235,10 @@ void Canvas::mousePressEvent(QMouseEvent* event)
 void Canvas::cleanup()
 {
   // Let's unbind our meshes, textures, etc.
-  QQueue<Scene::SceneObject*> queue;
+  QQueue<Scene::Object*> queue;
   queue.enqueue(m_scene);
   while (!queue.isEmpty()) {
-    Scene::SceneObject* object = queue.dequeue();
+    Scene::Object* object = queue.dequeue();
     m_renderer->unbindObject(object);
     queue.append(object->children());
   }

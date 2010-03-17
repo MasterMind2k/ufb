@@ -38,13 +38,13 @@ namespace Scene
  * It should contain also a texture, material and shader settings for an
  * object.
  */
-class SceneObject
+class Object
 {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-    SceneObject();
+    Object();
 
-    virtual ~SceneObject();
+    virtual ~Object();
 
     /**
      * @overload
@@ -208,7 +208,7 @@ class SceneObject
      *
      * @see removeChild
      */
-    inline void addChild(SceneObject* child)
+    inline void addChild(Object* child)
     {
       m_children << child;
       child->setParent(this);
@@ -218,7 +218,7 @@ class SceneObject
      *
      * @see addChild
      */
-    inline void removeChild(SceneObject* child)
+    inline void removeChild(Object* child)
     {
       m_children.removeOne(child);
     }
@@ -229,7 +229,7 @@ class SceneObject
      *
      * @see childrenNum
      */
-    inline SceneObject* child(int index) const
+    inline Object* child(int index) const
     {
       return m_children.at(index);
     }
@@ -245,7 +245,7 @@ class SceneObject
      *
      * @note It returns a read only reference
      */
-    inline const QList<SceneObject*>& children() const
+    inline const QList<Object*>& children() const
     {
       return m_children;
     }
@@ -255,7 +255,7 @@ class SceneObject
      *
      * @see parent
      */
-    inline void setParent(SceneObject* parent)
+    inline void setParent(Object* parent)
     {
       m_parent = parent;
     }
@@ -264,7 +264,7 @@ class SceneObject
      *
      * @see setParent
      */
-    inline SceneObject* parent() const
+    inline Object* parent() const
     {
       return m_parent;
     }
@@ -324,21 +324,21 @@ class SceneObject
      * Sets the orientation so the camera looks at the center of the
      * specified object.
      */
-    void lookAt(SceneObject* object);
+    void lookAt(Object* object);
 
     /**
      * Sets the object, to be looked at.
      *
      * @see lookAt
      */
-    inline void observe(SceneObject* object)
+    inline void observe(Object* object)
     {
       m_observed = object;
     }
     /**
      * Gets the observed object.
      */
-    inline SceneObject* observed() const
+    inline Object* observed() const
     {
       return m_observed;
     }
@@ -360,14 +360,14 @@ class SceneObject
     Scaling3f m_scale;
     Quaternionf m_globalOrientation;
     Quaternionf m_orientation;
-    QList<SceneObject*> m_children;
-    SceneObject* m_parent;
+    QList<Object*> m_children;
+    Object* m_parent;
     bool m_transformModified;
 
     Mesh* m_mesh;
     Texture* m_texture;
 
-    SceneObject* m_observed;
+    Object* m_observed;
 
     /* Be very careful in these classes!!! */
     friend class BGE::Canvas;

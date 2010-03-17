@@ -15,9 +15,9 @@
 
 #include <QtCore/QObject>
 
-#include "scene/sceneobject.h"
+#include "scene/object.h"
 
-class MovingLight :  public QObject, public BGE::Scene::SceneObject
+class MovingLight :  public QObject, public BGE::Scene::Object
 {
   Q_OBJECT
   public:

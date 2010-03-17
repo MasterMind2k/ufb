@@ -72,7 +72,7 @@ int main(int argc, char** argv)
   BGE::Canvas::canvas()->activateCamera("Global camera");
 
   // Add our model
-  BGE::Scene::SceneObject* fighter = new BGE::Scene::SceneObject;
+  BGE::Scene::Object* fighter = new BGE::Scene::Object;
   fighter->setMesh(BGE::Storage::self()->get<BGE::Mesh*>("/models/Fighter"));
   fighter->setTexture(BGE::Storage::self()->get<BGE::Texture*>("/textures/Fighter"));
   BGE::Canvas::canvas()->addSceneObject(fighter);
