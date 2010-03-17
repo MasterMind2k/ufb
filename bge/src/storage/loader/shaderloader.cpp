@@ -20,22 +20,23 @@
 using namespace BGE;
 using namespace BGE::Loader;
 
-ShaderLoader::ShaderLoader(const QString& filename)
+Item* ShaderLoader::load()
 {
-  m_filename = filename;
-  m_shader = 0l;
-
-  parse();
-}
-
-void ShaderLoader::parse()
-{
-  QFile file(m_filename);
+  QFile file(filename());
   file.open(QFile::ReadOnly);
-
-  qDebug("%s", file.fileName().toUtf8().data());
-
-  m_shader = new Shader(file.fileName());
-  m_shader->setShaderSource(QString::fromUtf8(file.readAll()), Shader::Vertex);
+  QString source = QString::fromUtf8(file.readAll());
   file.close();
+
+  Shader* shader = new Shader(name());
+
+  if (filename().endsWith(".vsp", Qt::CaseInsensitive)) {
+    // Load vertex shader program
+    shader->setShaderSource(source, Shader::Vertex);
+  } else if (filename().endsWith(".fsp", Qt::CaseInsensitive)) {
+    // Load vertex shader program
+    shader->setShaderSource(source, Shader::Fragment);
+  }
+  // @TODO loading shader modules / creating shader programs...
+
+  return shader;
 }

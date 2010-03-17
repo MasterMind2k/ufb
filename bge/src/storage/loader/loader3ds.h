@@ -14,29 +14,25 @@
 #ifndef __BGE_LOADER_LOADER3DS_H
 #define __BGE_LOADER_LOADER3DS_H
 
-#include "storage/loader/modelloader.h"
+#include "storage/loader/abstractloader.h"
 
 class QFile;
 
 namespace BGE {
 namespace Loader {
 
-class Loader3DS : public ModelLoader
+class Loader3DS : public AbstractLoader
 {
   public:
-  inline Loader3DS(const QString& filename) : ModelLoader(filename)
-  {
-    parse();
-  }
+  inline Loader3DS(const QString& filename) : AbstractLoader(filename) {}
+
+  Item* load();
 
   private:
-    void parse();
-
-    QString readString(QFile& file);
+    QString readString(QFile& file) const;
 };
 
 }
-
 }
 
 #endif
