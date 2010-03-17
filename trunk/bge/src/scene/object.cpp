@@ -37,6 +37,7 @@ Object::Object()
   m_mesh = 0l;
   m_texture = 0l;
   m_observed = 0l;
+  m_shaderProgramId = 0;
 }
 
 Object::~Object()

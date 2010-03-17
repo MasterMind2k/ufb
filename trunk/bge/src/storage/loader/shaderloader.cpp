@@ -1,5 +1,6 @@
 /***************************************************************************
  *   Copyright (C) 2010 by Gregor Kališnik <gregor@unimatrix-one.org>      *
+ *   Copyright (C) 2010 by Matej Jakop     <matej@jakop.si>                *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License version 3        *
@@ -10,44 +11,31 @@
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
  ***************************************************************************/
-#ifndef __BGE_RENDERING_DIRECTRENDERER_H
-#define __BGE_RENDERING_DIRECTRENDERER_H
+#include "shaderloader.h"
 
-#include "global.h"
+#include <QtCore/QFile>
 
-#include "rendering/renderer.h"
+#include "storage/shader.h"
 
-#include <QtCore/QVector>
+using namespace BGE;
+using namespace BGE::Loader;
 
-namespace BGE {
-namespace Rendering {
-class ShaderManager;
-
-/**
- * @short Renderer for old OpenGL API
- *
- * This renderer should support only commands prior to OpenGL 2.1.
- */
-class DirectRenderer : public Renderer
+ShaderLoader::ShaderLoader(const QString& filename)
 {
-  public:
-    DirectRenderer();
+  m_filename = filename;
+  m_shader = 0l;
 
-    void drawQuads(const VectorList& vertices, const VectorList& normals, const QVector<Vector2f>& textureMaps = QVector<Vector2f>());
-    void drawTriangles(const VectorList& vertices, const VectorList& normals, const QVector<Vector2f>& textureMaps = QVector<Vector2f>());
-
-    void renderScene();
-
-    void unbindObject(Scene::Object* object);
-
-  private:
-    void bindTexture(Scene::Object* object);
-    void bindMesh(Scene::Object* object);
-
-    ShaderManager* m_shaderManager;
-};
-
-}
+  parse();
 }
 
-#endif
+void ShaderLoader::parse()
+{
+  QFile file(m_filename);
+  file.open(QFile::ReadOnly);
+
+  qDebug("%s", file.fileName().toUtf8().data());
+
+  m_shader = new Shader(file.fileName());
+  m_shader->setShaderSource(QString::fromUtf8(file.readAll()), Shader::Vertex);
+  file.close();
+}

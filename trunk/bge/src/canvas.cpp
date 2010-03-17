@@ -29,6 +29,9 @@
 
 #include "abstractcontroller.h"
 
+#include <QtDebug>
+#include <QtOpenGL/QGLShaderProgram>
+
 using namespace BGE;
 
 Canvas* Canvas::m_self = 0l;

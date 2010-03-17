@@ -1,5 +1,6 @@
 /***************************************************************************
  *   Copyright (C) 2010 by Gregor Kališnik <gregor@unimatrix-one.org>      *
+ *   Copyright (C) 2010 by Matej Jakop     <matej@jakop.si>                *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License version 3        *
@@ -10,41 +11,30 @@
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
  ***************************************************************************/
-#ifndef __BGE_RENDERING_DIRECTRENDERER_H
-#define __BGE_RENDERING_DIRECTRENDERER_H
+#ifndef __BGE_LOADER_SHADERLOADER_H
+#define __BGE_LOADER_SHADERLOADER_H
 
-#include "global.h"
-
-#include "rendering/renderer.h"
-
-#include <QtCore/QVector>
+#include <QtCore/QString>
 
 namespace BGE {
-namespace Rendering {
-class ShaderManager;
+class Shader;
+namespace Loader {
 
-/**
- * @short Renderer for old OpenGL API
- *
- * This renderer should support only commands prior to OpenGL 2.1.
- */
-class DirectRenderer : public Renderer
+class ShaderLoader
 {
   public:
-    DirectRenderer();
+    ShaderLoader(const QString& filename);
 
-    void drawQuads(const VectorList& vertices, const VectorList& normals, const QVector<Vector2f>& textureMaps = QVector<Vector2f>());
-    void drawTriangles(const VectorList& vertices, const VectorList& normals, const QVector<Vector2f>& textureMaps = QVector<Vector2f>());
-
-    void renderScene();
-
-    void unbindObject(Scene::Object* object);
+    inline Shader* shader()
+    {
+      return m_shader;
+    }
 
   private:
-    void bindTexture(Scene::Object* object);
-    void bindMesh(Scene::Object* object);
+    void parse();
+    Shader* m_shader;
 
-    ShaderManager* m_shaderManager;
+    QString m_filename;
 };
 
 }

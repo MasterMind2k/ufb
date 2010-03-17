@@ -22,9 +22,18 @@
 
 #include "storage/mesh.h"
 #include "storage/texture.h"
+#include "storage/shader.h"
+
+#include "rendering/shadermanager.h"
 
 using namespace BGE;
 using namespace BGE::Rendering;
+
+DirectRenderer::DirectRenderer()
+  : Renderer()
+{
+  m_shaderManager = new ShaderManager;
+}
 
 void DirectRenderer::drawQuads(const VectorList& vertices, const VectorList& normals, const QVector<Vector2f>& textureMaps)
 {
@@ -139,6 +148,13 @@ void DirectRenderer::renderScene()
     // Calculate world transform
     Transform3f worldTransform = rotation * move * object->globalTransform();
     glLoadMatrixf(worldTransform.data());
+
+    // Bind and use shader
+    if (object->shaders().size()) {
+      if (!object->shaderProgramId())
+        m_shaderManager->bindObject(object);
+      m_shaderManager->useShaderProgram(object);
+    }
 
     // Bind the mesh
     if (!object->mesh()->bindId())
