@@ -1,6 +1,5 @@
 /***************************************************************************
  *   Copyright (C) 2010 by Gregor Kališnik <gregor@unimatrix-one.org>      *
- *   Copyright (C) 2010 by Matej Jakop     <matej@jakop.si>                *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License version 3        *
@@ -11,8 +10,17 @@
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
  ***************************************************************************/
-#include "modelloader.h"
+#include "abstractloader.h"
+
+#include <QtCore/QRegExp>
 
 using namespace BGE;
 using namespace BGE::Loader;
 
+QString AbstractLoader::name() const
+{
+  QRegExp nameMatcher("^.+/(.+)\\..+$");
+  nameMatcher.setPatternSyntax(QRegExp::RegExp2);
+  nameMatcher.exactMatch(m_filename);
+  return nameMatcher.cap(1);
+}

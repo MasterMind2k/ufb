@@ -3,7 +3,7 @@ include_directories(../.. ${CMAKE_CURRENT_BINARY_DIR} ${EIGEN2_INCLUDE_DIR} ${QT
   ${CMAKE_CURRENT_SOURCE_DIR})
 
 set(loader_SRCS
-  modelloader.cpp
+  abstractloader.cpp
   loader3ds.cpp
   textureloader.cpp
   shaderloader.cpp

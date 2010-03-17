@@ -13,24 +13,20 @@
 #ifndef __BGE_LOADER_TEXTURELOADER_H
 #define __BGE_LOADER_TEXTURELOADER_H
 
-#include <QtCore/QString>
+#include "storage/loader/abstractloader.h"
 
 namespace BGE {
-class Texture;
+class Item;
 namespace Loader {
 
-class TextureLoader
+  class TextureLoader : public AbstractLoader
 {
   public:
-    TextureLoader(const QString& filename);
+    inline TextureLoader(const QString& filename) : AbstractLoader(filename) {}
 
-    inline Texture* texture() const
-    {
-      return m_texture;
-    }
+    Item* load();
 
   private:
-    Texture* m_texture;
 };
 
 }

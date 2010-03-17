@@ -58,23 +58,26 @@ void Storage::load()
       parent->addItem(item);
       dirs += QDir(fileInfo.absoluteFilePath()).entryInfoList().toVector();
     } else {
-      if (fileInfo.fileName().endsWith(".3ds", Qt::CaseInsensitive)) {
+      Loader::AbstractLoader* loader = 0l;
+      QString filename = fileInfo.fileName();
+      QString absoluteFilePath = fileInfo.absoluteFilePath();
+
+      if (filename.endsWith(".3ds", Qt::CaseInsensitive)) {
         // Load 3ds
-        qDebug("BGE::Storage::load(): Loading model '%s'", fileInfo.absoluteFilePath().toUtf8().data());
-        Loader::Loader3DS *loader = new Loader::Loader3DS(fileInfo.absoluteFilePath());
-        parent->addItem(loader->mesh());
-        delete loader;
-      } else if (fileInfo.fileName().endsWith(".png", Qt::CaseInsensitive) || fileInfo.fileName().endsWith(".jpg", Qt::CaseInsensitive)) {
+        qDebug("BGE::Storage::load(): Loading model '%s'", absoluteFilePath.toUtf8().data());
+        loader = new Loader::Loader3DS(absoluteFilePath);
+      } else if (filename.endsWith(".png", Qt::CaseInsensitive) || filename.endsWith(".jpg", Qt::CaseInsensitive)) {
         // Load texture
-        qDebug("BGE::Storage::load(): Loading texture '%s'", fileInfo.absoluteFilePath().toUtf8().data());
-        Loader::TextureLoader *loader = new Loader::TextureLoader(fileInfo.absoluteFilePath());
-        parent->addItem(loader->texture());
-        delete loader;
-      } else if (fileInfo.fileName().endsWith(".vs")) {
-        // Load vertex shader
-        qDebug("BGE::Storage::load(): Loading shader '%s'", fileInfo.absoluteFilePath().toUtf8().data());
-        Loader::ShaderLoader* loader = new Loader::ShaderLoader(fileInfo.absoluteFilePath());
-        parent->addItem(loader->shader());
+        qDebug("BGE::Storage::load(): Loading texture '%s'", absoluteFilePath.toUtf8().data());
+        loader = new Loader::TextureLoader(absoluteFilePath);
+      } else if (filename.endsWith(".vsp") || filename.endsWith(".fsp") || filename.endsWith(".vsm") || filename.endsWith(".fsm")) {
+        // Load shaders
+        qDebug("BGE::Storage::load(): Loading shader '%s'", absoluteFilePath.toUtf8().data());
+        loader = new Loader::ShaderLoader(absoluteFilePath);
+      }
+
+      if (loader) {
+        parent->addItem(loader->load());
         delete loader;
       }
     }

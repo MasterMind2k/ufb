@@ -14,27 +14,18 @@
 #ifndef __BGE_LOADER_SHADERLOADER_H
 #define __BGE_LOADER_SHADERLOADER_H
 
-#include <QtCore/QString>
+#include "storage/loader/abstractloader.h"
 
 namespace BGE {
-class Shader;
+class Item;
 namespace Loader {
 
-class ShaderLoader
+  class ShaderLoader : public AbstractLoader
 {
   public:
-    ShaderLoader(const QString& filename);
+    ShaderLoader(const QString& filename) : AbstractLoader(filename) {}
 
-    inline Shader* shader()
-    {
-      return m_shader;
-    }
-
-  private:
-    void parse();
-    Shader* m_shader;
-
-    QString m_filename;
+    Item* load();
 };
 
 }

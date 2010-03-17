@@ -24,16 +24,15 @@
 using namespace BGE;
 using namespace BGE::Loader;
 
-void Loader3DS::parse()
+Item* Loader3DS::load()
 {
-  QFile modelFile(m_filename);
+  QFile modelFile(filename());
   if (!modelFile.open(QFile::ReadOnly)) {
-    qWarning("BGE::Utils::ModelImporter::parse: Cannot open model.");
-    return;
+    qWarning("BGE::Loader::Loader3DS::load(): Cannot open model '%s'.", filename().toUtf8().data());
+    return 0l;
   }
 
-  QString name = m_filename.split("/").last();
-  m_mesh = new Mesh(name.split(".").first());
+  Mesh* mesh = new Mesh(name());
 
   // Temporary variables
   VectorList vertices;
@@ -62,7 +61,7 @@ void Loader3DS::parse()
       case 0x4000: {
         objectName = readString(modelFile);
 
-        qDebug("BGE::Storage::Loader3DS::parse(): Parsing object '%s'", objectName.toUtf8().data());
+        qDebug("BGE::Loader::Loader3DS::parse(): Parsing object '%s'", objectName.toUtf8().data());
         break;
       }
 
@@ -76,13 +75,13 @@ void Loader3DS::parse()
           modelFile.read((char*) coordinates, size);
           vertices << Vector3f(coordinates);
         }
-        m_mesh->addVertices(objectName, vertices);
+        mesh->addVertices(objectName, vertices);
 
-        if (!m_mesh->faces(objectName).isEmpty())
-          m_mesh->calculateNormals(objectName);
+        if (!mesh->faces(objectName).isEmpty())
+          mesh->calculateNormals(objectName);
         free(coordinates);
 
-        qDebug("BGE::Storage::Loader3DS::parse(): Parsed %d vertices.", verticesNumber);
+        qDebug("BGE::Loader::Loader3DS::parse(): Parsed %d vertices.", verticesNumber);
         break;
       }
 
@@ -97,14 +96,14 @@ void Loader3DS::parse()
           modelFile.read((char*) vertexList, size);
           QVector<quint16> temp;
           temp << vertexList[0] << vertexList[1] << vertexList[2];
-          m_mesh->addFace(objectName, Mesh::Triangles, temp);
+          mesh->addFace(objectName, Mesh::Triangles, temp);
         }
         free(vertexList);
 
         if (calculateNormals)
-          m_mesh->calculateNormals(objectName);
+          mesh->calculateNormals(objectName);
 
-        qDebug("BGE::Storage::Loader3DS::parse(): Parsed %d faces.", facesNumber);
+        qDebug("BGE::Loader::Loader3DS::parse(): Parsed %d faces.", facesNumber);
         break;
       }
 
@@ -115,11 +114,11 @@ void Loader3DS::parse()
         float* raw = (float*) malloc(size);
         for (quint16 i = 0; i < verticesNumber; i++) {
           modelFile.read((char*) raw, size);
-          m_mesh->addTextureMap(objectName, Vector2f(raw));
+          mesh->addTextureMap(objectName, Vector2f(raw));
         }
         free(raw);
 
-        qDebug("BGE::Storage::Loader3DS::parse(): Parsed %d texture mappings for vertices.", verticesNumber);
+        qDebug("BGE::Loader::Loader3DS::parse(): Parsed %d texture mappings for vertices.", verticesNumber);
         break;
       }
 
@@ -128,9 +127,11 @@ void Loader3DS::parse()
         modelFile.seek(modelFile.pos() + length - 6);
     }
   }
+
+  return mesh;
 }
 
-QString Loader3DS::readString(QFile& file)
+QString Loader3DS::readString(QFile& file) const
 {
   QString output;
   quint8 byte;

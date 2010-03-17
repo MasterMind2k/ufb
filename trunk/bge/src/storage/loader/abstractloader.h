@@ -1,6 +1,5 @@
 /***************************************************************************
  *   Copyright (C) 2010 by Gregor Kališnik <gregor@unimatrix-one.org>      *
- *   Copyright (C) 2010 by Matej Jakop     <matej@jakop.si>                *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License version 3        *
@@ -11,38 +10,37 @@
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
  ***************************************************************************/
-#ifndef __BGE_LOADER_MODELLOADER_H
-#define __BGE_LOADER_MODELLOADER_H
+#ifndef __BGE_LOADER_ABSTRACTLOADER_H
+#define __BGE_LOADER_ABSTRACTLOADER_H
 
 #include <QtCore/QString>
 
 namespace BGE {
-class Mesh;
+class Item;
 namespace Loader {
 
-class ModelLoader
+class AbstractLoader
 {
   public:
-    inline ModelLoader(const QString& filename)
+    inline AbstractLoader(const QString& filename)
     {
       m_filename = filename;
-      m_mesh = 0l;
     }
 
-    inline BGE::Mesh* mesh() const
-    {
-      return m_mesh;
-    }
+    virtual Item* load() = 0;
 
   protected:
-    virtual void parse() = 0;
+    inline const QString& filename() const
+    {
+      return m_filename;
+    }
+    QString name() const;
 
+  private:
     QString m_filename;
-    Mesh* m_mesh;
 };
 
 }
-
 }
 
 #endif

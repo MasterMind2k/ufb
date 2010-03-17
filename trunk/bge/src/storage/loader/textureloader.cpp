@@ -12,21 +12,19 @@
  ***************************************************************************/
 #include "textureloader.h"
 
-#include <QtCore/QStringList>
-
 #include "storage/texture.h"
 
 using namespace BGE;
-using namespace Loader;
+using namespace BGE::Loader;
 
-TextureLoader::TextureLoader(const QString &filename)
+Item* TextureLoader::load()
 {
-  QImage image(filename);
-  if (image.isNull()) {
-    m_texture = 0l;
-  } else {
-    QString name = filename.split("/").last().split(".").first();
-    m_texture = new Texture(name);
-    m_texture->setTexture(image);
+  QImage image(filename());
+  Texture* texture = 0l;
+  if (!image.isNull()) {
+    texture = new Texture(name());
+    texture->setTexture(image);
   }
+
+  return texture;
 }
