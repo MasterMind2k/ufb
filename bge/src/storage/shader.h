@@ -10,44 +10,41 @@
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
  ***************************************************************************/
-#ifndef __BGE_RENDERING_DIRECTRENDERER_H
-#define __BGE_RENDERING_DIRECTRENDERER_H
+#ifndef __BGE_SHADER_H
+#define __BGE_SHADER_H
 
-#include "global.h"
-
-#include "rendering/renderer.h"
-
-#include <QtCore/QVector>
+#include "storage/item.h"
 
 namespace BGE {
-namespace Rendering {
-class ShaderManager;
 
-/**
- * @short Renderer for old OpenGL API
- *
- * This renderer should support only commands prior to OpenGL 2.1.
- */
-class DirectRenderer : public Renderer
+class Shader : public BGE::Item
 {
   public:
-    DirectRenderer();
+    enum Type {
+      Vertex,
+      Fragment
+    };
+    Shader(const QString& name);
 
-    void drawQuads(const VectorList& vertices, const VectorList& normals, const QVector<Vector2f>& textureMaps = QVector<Vector2f>());
-    void drawTriangles(const VectorList& vertices, const VectorList& normals, const QVector<Vector2f>& textureMaps = QVector<Vector2f>());
-
-    void renderScene();
-
-    void unbindObject(Scene::Object* object);
+    inline void setShaderSource(const QString& source, Type type)
+    {
+      m_source = source;
+      m_type = type;
+    }
+    inline const QString& shaderSource() const
+    {
+      return m_source;
+    }
+    inline Type type() const
+    {
+      return m_type;
+    }
 
   private:
-    void bindTexture(Scene::Object* object);
-    void bindMesh(Scene::Object* object);
-
-    ShaderManager* m_shaderManager;
+    QString m_source;
+    Type m_type;
 };
 
-}
 }
 
 #endif

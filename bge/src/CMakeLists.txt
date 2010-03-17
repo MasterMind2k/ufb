@@ -13,12 +13,16 @@ set(bge_SRCS
   canvas.cpp
 )
 
-set(bge_HDRS
+set(bge_QHDRS
   canvas.h
 )
 
-qt4_wrap_cpp(bge_MOC ${bge_HDRS})
+set(bge_HDRS
+  global.h
+)
 
-add_library(bge ${bge_SRCS} ${bge_MOC})
+qt4_wrap_cpp(bge_MOC ${bge_QHDRS})
+
+add_library(bge ${bge_SRCS} ${bge_MOC} ${bge_HDRS})
 target_link_libraries(bge scene rendering storage ${QT_LIBRARIES})
 add_dependencies(bge rendering storage scene)

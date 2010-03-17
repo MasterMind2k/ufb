@@ -19,10 +19,12 @@
 
 #include "storage/loader/loader3ds.h"
 #include "storage/loader/textureloader.h"
+#include "storage/loader/shaderloader.h"
 
 #include "storage/item.h"
 #include "storage/mesh.h"
 #include "storage/texture.h"
+#include "storage/shader.h"
 
 using namespace BGE;
 
@@ -58,15 +60,21 @@ void Storage::load()
     } else {
       if (fileInfo.fileName().endsWith(".3ds", Qt::CaseInsensitive)) {
         // Load 3ds
-        qDebug("BGE::Storage::load(): Loading file '%s'", fileInfo.absoluteFilePath().toUtf8().data());
+        qDebug("BGE::Storage::load(): Loading model '%s'", fileInfo.absoluteFilePath().toUtf8().data());
         Loader::Loader3DS *loader = new Loader::Loader3DS(fileInfo.absoluteFilePath());
         parent->addItem(loader->mesh());
         delete loader;
       } else if (fileInfo.fileName().endsWith(".png", Qt::CaseInsensitive) || fileInfo.fileName().endsWith(".jpg", Qt::CaseInsensitive)) {
         // Load texture
-        qDebug("BGE::Storage::load(): Loading file '%s'", fileInfo.absoluteFilePath().toUtf8().data());
+        qDebug("BGE::Storage::load(): Loading texture '%s'", fileInfo.absoluteFilePath().toUtf8().data());
         Loader::TextureLoader *loader = new Loader::TextureLoader(fileInfo.absoluteFilePath());
         parent->addItem(loader->texture());
+        delete loader;
+      } else if (fileInfo.fileName().endsWith(".vs")) {
+        // Load vertex shader
+        qDebug("BGE::Storage::load(): Loading shader '%s'", fileInfo.absoluteFilePath().toUtf8().data());
+        Loader::ShaderLoader* loader = new Loader::ShaderLoader(fileInfo.absoluteFilePath());
+        parent->addItem(loader->shader());
         delete loader;
       }
     }

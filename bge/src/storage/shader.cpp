@@ -10,44 +10,11 @@
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
  ***************************************************************************/
-#ifndef __BGE_RENDERING_DIRECTRENDERER_H
-#define __BGE_RENDERING_DIRECTRENDERER_H
+#include "shader.h"
 
-#include "global.h"
+using namespace BGE;
 
-#include "rendering/renderer.h"
-
-#include <QtCore/QVector>
-
-namespace BGE {
-namespace Rendering {
-class ShaderManager;
-
-/**
- * @short Renderer for old OpenGL API
- *
- * This renderer should support only commands prior to OpenGL 2.1.
- */
-class DirectRenderer : public Renderer
+Shader::Shader(const QString& name)
+ : Item(name)
 {
-  public:
-    DirectRenderer();
-
-    void drawQuads(const VectorList& vertices, const VectorList& normals, const QVector<Vector2f>& textureMaps = QVector<Vector2f>());
-    void drawTriangles(const VectorList& vertices, const VectorList& normals, const QVector<Vector2f>& textureMaps = QVector<Vector2f>());
-
-    void renderScene();
-
-    void unbindObject(Scene::Object* object);
-
-  private:
-    void bindTexture(Scene::Object* object);
-    void bindMesh(Scene::Object* object);
-
-    ShaderManager* m_shaderManager;
-};
-
 }
-}
-
-#endif

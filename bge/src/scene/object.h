@@ -21,6 +21,7 @@ namespace BGE {
 class Canvas;
 class Mesh;
 class Texture;
+class Shader;
 
 namespace Rendering
 {
@@ -342,6 +343,27 @@ class Object
       return m_observed;
     }
 
+    inline void addShader(Shader* shader)
+    {
+      m_shaders << shader;
+    }
+    inline Shader* shader(int i) const
+    {
+      return m_shaders.at(i);
+    }
+    inline const QList<Shader*>& shaders() const
+    {
+      return m_shaders;
+    }
+    inline void setShaderProgramId(quint32 shaderProgramId)
+    {
+      m_shaderProgramId = shaderProgramId;
+    }
+    inline quint32 shaderProgramId() const
+    {
+      return m_shaderProgramId;
+    }
+
   protected:
     /**
      * This method gets called _before_ transform matrices get updated. Reimplement
@@ -367,6 +389,9 @@ class Object
     Texture* m_texture;
 
     Object* m_observed;
+
+    QList<Shader*> m_shaders;
+    quint32 m_shaderProgramId;
 
     /* Be very careful in these classes!!! */
     friend class BGE::Canvas;

@@ -5,8 +5,13 @@ include_directories(.. ${CMAKE_CURRENT_BINARY_DIR} ${EIGEN2_INCLUDE_DIR} ${QT_IN
 set(rendering_SRCS
   directrenderer.cpp
   renderer.cpp
+  shadermanager.cpp
 )
 
-#qt4_wrap_cpp(rendering_MOC ${rendering_HDRS})
+set(rendering_HDRS
+  shader_p.h
+)
 
-add_library(rendering ${rendering_SRCS})
+#qt4_wrap_cpp(rendering_MOC ${rendering_QHDRS})
+
+add_library(rendering ${rendering_SRCS} ${rendering_HDRS})
