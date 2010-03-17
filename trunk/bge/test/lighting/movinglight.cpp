@@ -34,10 +34,11 @@ void MovingLight::calculateTransforms()
 
 void MovingLight::change()
 {
-  qDebug("Changing light type.");
   foreach (BGE::Scene::SceneObject* object, BGE::Scene::SceneObject::children()) {
     BGE::Scene::Light* light = static_cast<BGE::Scene::Light*> (object);
 
     light->setSpot(!light->isSpot());
   }
+  QString msg = static_cast<BGE::Scene::Light*> (child(0))->isSpot() ? "spotlight" : "omni light";
+  qDebug("Changing light type to '%s'.", msg.toUtf8().data());
 }

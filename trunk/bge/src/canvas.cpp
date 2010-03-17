@@ -57,6 +57,8 @@ Canvas::Canvas()
   m_scene = new Scene::SceneObject;
   m_activeCamera = 0l;
 
+  m_controller = 0l;
+
   connect(timer, SIGNAL(timeout()), SLOT(updateGL()));
   connect(fps, SIGNAL(timeout()), SLOT(updateFPS()));
   connect(QApplication::instance(), SIGNAL(aboutToQuit()), SLOT(cleanup()));
