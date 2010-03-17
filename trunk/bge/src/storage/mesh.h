@@ -24,8 +24,7 @@
 
 #include "global.h"
 
-namespace BGE
-{
+namespace BGE {
 
 class Mesh : public Item
 {

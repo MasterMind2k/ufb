@@ -15,11 +15,9 @@
 
 #include <QtCore/QString>
 
-namespace BGE
-{
+namespace BGE {
 class Texture;
-namespace Loader
-{
+namespace Loader {
 
 class TextureLoader
 {

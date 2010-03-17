@@ -17,8 +17,7 @@
 
 #include "global.h"
 
-namespace BGE
-{
+namespace BGE {
 class Canvas;
 class Mesh;
 class Texture;

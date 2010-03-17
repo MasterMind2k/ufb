@@ -17,8 +17,7 @@
 
 #include <QtOpenGL/QGLWidget>
 
-namespace BGE
-{
+namespace BGE {
 
 class AbstractController;
 namespace Scene

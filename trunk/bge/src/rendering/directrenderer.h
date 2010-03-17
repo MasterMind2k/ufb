@@ -19,10 +19,8 @@
 
 #include <QtCore/QVector>
 
-namespace BGE
-{
-namespace Rendering
-{
+namespace BGE {
+namespace Rendering {
 
 /**
  * @short Renderer for old OpenGL API

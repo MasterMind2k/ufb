@@ -17,8 +17,7 @@
 
 #include <QtGui/QImage>
 
-namespace BGE
-{
+namespace BGE {
 
 class Texture : public BGE::Item
 {
