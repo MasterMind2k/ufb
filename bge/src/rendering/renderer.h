@@ -24,7 +24,7 @@ namespace BGE
 class Mesh;
 namespace Scene
 {
-class SceneObject;
+class Object;
 class Light;
 }
 namespace Rendering
@@ -41,7 +41,7 @@ class Renderer
     /**
      * Enqueues an object to the rendering queue.
      */
-    void enqueueObject(Scene::SceneObject* object);
+    void enqueueObject(Scene::Object* object);
 
     /**
      * Method for making the whole scene rendering.
@@ -51,7 +51,7 @@ class Renderer
     /**
      * Unbinds the object.
      */
-    virtual void unbindObject(Scene::SceneObject* object) = 0;
+    virtual void unbindObject(Scene::Object* object) = 0;
 
     virtual quint8 assignLight(Scene::Light* light)
     {
@@ -71,16 +71,16 @@ class Renderer
     /**
      * Binds the texture that is associated with the object.
      */
-    virtual void bindTexture(Scene::SceneObject* object) = 0;
+    virtual void bindTexture(Scene::Object* object) = 0;
     /**
      * Binds the mesh that is associated with the object.
      */
-    virtual void bindMesh(Scene::SceneObject* object) = 0;
+    virtual void bindMesh(Scene::Object* object) = 0;
 
     /**
      * Queue to be used by implementations.
      */
-    QQueue<Scene::SceneObject*> m_renderQueue;
+    QQueue<Scene::Object*> m_renderQueue;
 
   private:
     QList<Scene::Light*> m_assignedLights;

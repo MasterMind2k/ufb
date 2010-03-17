@@ -17,7 +17,7 @@
 #include "scene/light.h"
 
 MovingLight::MovingLight()
- : QObject(), BGE::Scene::SceneObject()
+ : QObject(), BGE::Scene::Object()
 {
   QTimer* timer = new QTimer(this);
   timer->setSingleShot(false);
@@ -34,7 +34,7 @@ void MovingLight::calculateTransforms()
 
 void MovingLight::change()
 {
-  foreach (BGE::Scene::SceneObject* object, BGE::Scene::SceneObject::children()) {
+  foreach (BGE::Scene::Object* object, BGE::Scene::Object::children()) {
     BGE::Scene::Light* light = static_cast<BGE::Scene::Light*> (object);
 
     light->setSpot(!light->isSpot());

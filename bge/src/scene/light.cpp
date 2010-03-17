@@ -18,7 +18,7 @@ using namespace Scene;
 quint8 Light::m_serial = 0;
 
 Light::Light(const QString &name)
- : SceneObject()
+ : Object()
 {
   if (name.isEmpty())
     m_name = QString("Light_%0").arg(m_serial++);

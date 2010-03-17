@@ -12,12 +12,12 @@
  ***************************************************************************/
 #include "rendering/renderer.h"
 
-#include "scene/sceneobject.h"
+#include "scene/object.h"
 
 using namespace BGE;
 using namespace BGE::Rendering;
 
-void Renderer::enqueueObject(Scene::SceneObject *object)
+void Renderer::enqueueObject(Scene::Object *object)
 {
   if (object->isBindable())
     m_renderQueue.enqueue(object);

@@ -10,7 +10,7 @@
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
  ***************************************************************************/
-#include "scene/sceneobject.h"
+#include "scene/object.h"
 
 #include <cmath>
 
@@ -19,7 +19,7 @@
 using namespace BGE;
 using namespace BGE::Scene;
 
-SceneObject::SceneObject()
+Object::Object()
 {
   // Set the default transforms
   m_transform.setIdentity();
@@ -39,12 +39,12 @@ SceneObject::SceneObject()
   m_observed = 0l;
 }
 
-SceneObject::~SceneObject()
+Object::~Object()
 {
   qDeleteAll(m_children);
 }
 
-void SceneObject::move(const Vector3f& direction)
+void Object::move(const Vector3f& direction)
 {
   m_globalPosition += direction;
   m_position += direction;
@@ -53,7 +53,7 @@ void SceneObject::move(const Vector3f& direction)
   m_transformModified = true;
 }
 
-void SceneObject::rotate(const AngleAxisf& rotation)
+void Object::rotate(const AngleAxisf& rotation)
 {
   m_orientation = (m_orientation * rotation).normalized();
 
@@ -61,7 +61,7 @@ void SceneObject::rotate(const AngleAxisf& rotation)
   m_transformModified = true;
 }
 
-void SceneObject::lookAt(SceneObject *object)
+void Object::lookAt(Object *object)
 {
   if (!object)
     return;
@@ -103,7 +103,7 @@ void SceneObject::lookAt(SceneObject *object)
   setOrientation(rotation);
 }
 
-void SceneObject::prepareTransforms()
+void Object::prepareTransforms()
 {
   // Calculate the observing transforms
   if (m_observed && (m_observed->isTransformModified() || isTransformModified()))
@@ -134,7 +134,7 @@ void SceneObject::prepareTransforms()
     }
   }
 
-  foreach (SceneObject* child, m_children) {
+  foreach (Object* child, m_children) {
     // Propagate changes downwards
     if (m_transformModified)
       child->m_transformModified = true;

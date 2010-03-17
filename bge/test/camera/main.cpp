@@ -14,7 +14,7 @@
 
 #include "canvas.h"
 
-#include "scene/sceneobject.h"
+#include "scene/object.h"
 #include "scene/camera.h"
 #include "scene/light.h"
 
@@ -131,7 +131,7 @@ int main(int argc, char** argv)
   cameras.addCamera(camera);
 
   // Big stacionary cubes
-  BGE::Scene::SceneObject* bigCube = new BGE::Scene::SceneObject;
+  BGE::Scene::Object* bigCube = new BGE::Scene::Object;
   bigCube->setMesh(mesh);
   bigCube->scale(3);
   bigCube->move(10, 10, -10);
@@ -143,7 +143,7 @@ int main(int argc, char** argv)
   cameras.addCamera(camera);
   BGE::Canvas::canvas()->addSceneObject(bigCube);
 
-  bigCube = new BGE::Scene::SceneObject;
+  bigCube = new BGE::Scene::Object;
   bigCube->setMesh(mesh);
   bigCube->scale(3);
   bigCube->move(10, -10, -10);
@@ -155,7 +155,7 @@ int main(int argc, char** argv)
   cameras.addCamera(camera);
   BGE::Canvas::canvas()->addSceneObject(bigCube);
 
-  bigCube = new BGE::Scene::SceneObject;
+  bigCube = new BGE::Scene::Object;
   bigCube->setMesh(mesh);
   bigCube->scale(3);
   bigCube->move(-10, 10, -10);
@@ -167,7 +167,7 @@ int main(int argc, char** argv)
   cameras.addCamera(camera);
   BGE::Canvas::canvas()->addSceneObject(bigCube);
 
-  bigCube = new BGE::Scene::SceneObject;
+  bigCube = new BGE::Scene::Object;
   bigCube->setMesh(mesh);
   bigCube->scale(3);
   bigCube->move(-10, -10, -10);
@@ -179,7 +179,7 @@ int main(int argc, char** argv)
   cameras.addCamera(camera);
   BGE::Canvas::canvas()->addSceneObject(bigCube);
 
-  bigCube = new BGE::Scene::SceneObject;
+  bigCube = new BGE::Scene::Object;
   bigCube->setMesh(mesh);
   bigCube->scale(3);
   bigCube->move(10, 10, 10);
@@ -191,7 +191,7 @@ int main(int argc, char** argv)
   cameras.addCamera(camera);
   BGE::Canvas::canvas()->addSceneObject(bigCube);
 
-  bigCube = new BGE::Scene::SceneObject;
+  bigCube = new BGE::Scene::Object;
   bigCube->setMesh(mesh);
   bigCube->scale(3);
   bigCube->move(10, -10, 10);
@@ -203,7 +203,7 @@ int main(int argc, char** argv)
   cameras.addCamera(camera);
   BGE::Canvas::canvas()->addSceneObject(bigCube);
 
-  bigCube = new BGE::Scene::SceneObject;
+  bigCube = new BGE::Scene::Object;
   bigCube->setMesh(mesh);
   bigCube->scale(3);
   bigCube->move(-10, 10, 10);
@@ -215,7 +215,7 @@ int main(int argc, char** argv)
   cameras.addCamera(camera);
   BGE::Canvas::canvas()->addSceneObject(bigCube);
 
-  bigCube = new BGE::Scene::SceneObject;
+  bigCube = new BGE::Scene::Object;
   bigCube->setMesh(mesh);
   bigCube->scale(3);
   bigCube->move(-10, -10, 10);

@@ -16,7 +16,7 @@
 
 #include "canvas.h"
 
-#include "scene/sceneobject.h"
+#include "scene/object.h"
 #include "scene/camera.h"
 #include "scene/light.h"
 
@@ -97,7 +97,7 @@ void DirectRenderer::renderScene()
   }
 
   while (!m_renderQueue.isEmpty()) {
-    Scene::SceneObject* object = m_renderQueue.dequeue();
+    Scene::Object* object = m_renderQueue.dequeue();
 
     // Prepare lighting
     foreach (Scene::Light* light, lights) {
@@ -166,7 +166,7 @@ void DirectRenderer::renderScene()
   }
 }
 
-void DirectRenderer::unbindObject(Scene::SceneObject* object)
+void DirectRenderer::unbindObject(Scene::Object* object)
 {
   if (!object->mesh())
     return;
@@ -179,7 +179,7 @@ void DirectRenderer::unbindObject(Scene::SceneObject* object)
     Canvas::canvas()->deleteTexture(object->texture()->bindId());
 }
 
-void DirectRenderer::bindTexture(Scene::SceneObject *object)
+void DirectRenderer::bindTexture(Scene::Object *object)
 {
   if (!object->texture())
     return;
@@ -187,7 +187,7 @@ void DirectRenderer::bindTexture(Scene::SceneObject *object)
   object->texture()->bind(Canvas::canvas()->bindTexture(object->texture()->texture()));
 }
 
-void DirectRenderer::bindMesh(Scene::SceneObject* object)
+void DirectRenderer::bindMesh(Scene::Object* object)
 {
   if (!object->mesh())
     return;

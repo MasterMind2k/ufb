@@ -15,7 +15,7 @@
 #include <QtCore/QTimer>
 
 MovingCube::MovingCube(int seed)
-  : BGE::Scene::SceneObject(), QObject()
+ : BGE::Scene::Object(), QObject()
 {
   m_direction = Vector3f::Zero();
 

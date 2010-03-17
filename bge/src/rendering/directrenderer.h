@@ -37,11 +37,11 @@ class DirectRenderer : public Renderer
 
     void renderScene();
 
-    void unbindObject(Scene::SceneObject* object);
+    void unbindObject(Scene::Object* object);
 
   private:
-    void bindTexture(Scene::SceneObject* object);
-    void bindMesh(Scene::SceneObject* object);
+    void bindTexture(Scene::Object* object);
+    void bindMesh(Scene::Object* object);
 };
 
 }

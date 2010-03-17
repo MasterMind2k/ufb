@@ -23,7 +23,7 @@ namespace BGE
 class AbstractController;
 namespace Scene
 {
-class SceneObject;
+class Object;
 class Camera;
 class Light;
 }
@@ -49,11 +49,11 @@ class Canvas : public QGLWidget
      *
      * @see Scene::SceneObject
      */
-    void addSceneObject(Scene::SceneObject* object);
+    void addSceneObject(Scene::Object* object);
     /**
      * Returns the root node of the scene.
      */
-    inline const Scene::SceneObject* scene() const
+    inline const Scene::Object* scene() const
     {
       return m_scene;
     }
@@ -163,7 +163,7 @@ class Canvas : public QGLWidget
     /* Really private stuff */
     Canvas();
 
-    Scene::SceneObject* m_scene;
+    Scene::Object* m_scene;
     Rendering::Renderer* m_renderer;
     AbstractController* m_controller;
 

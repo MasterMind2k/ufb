@@ -13,7 +13,7 @@
 #ifndef __BGE_SCENE_LIGHT_H
 #define __BGE_SCENE_LIGHT_H
 
-#include "scene/sceneobject.h"
+#include "scene/object.h"
 
 #include <QtGui/QColor>
 
@@ -22,7 +22,7 @@
 namespace BGE {
 namespace Scene {
 
-class Light : public BGE::Scene::SceneObject
+class Light : public BGE::Scene::Object
 {
   public:
     Light(const QString& name = QString());

@@ -13,7 +13,7 @@
 #ifndef __BGE_SCENE_CAMERA_H
 #define __BGE_SCENE_CAMERA_H
 
-#include "scene/sceneobject.h"
+#include "scene/object.h"
 
 #include <QtCore/QString>
 
@@ -45,7 +45,7 @@ namespace Scene
  * @see Canvas::createCamera
  * @see Canvas::activateCamera
  */
-class Camera : public SceneObject
+class Camera : public Object
 {
   public:
     /**
