@@ -35,6 +35,8 @@ void Cameras::changeCamera()
 {
   BGE::Canvas::canvas()->activateCamera(m_cameras.at(m_currentCamera++)->name());
 
+  qDebug("Changed to '%s'.", BGE::Canvas::canvas()->activeCamera()->name().toUtf8().data());
+
   if (m_currentCamera >= m_cameras.size())
     m_currentCamera = 0;
 }
