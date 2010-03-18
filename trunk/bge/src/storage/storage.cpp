@@ -70,7 +70,7 @@ void Storage::load()
         // Load texture
         qDebug("BGE::Storage::load(): Loading texture '%s'", absoluteFilePath.toUtf8().data());
         loader = new Loader::TextureLoader(absoluteFilePath);
-      } else if (filename.endsWith(".vsp") || filename.endsWith(".fsp") || filename.endsWith(".vsm") || filename.endsWith(".fsm")) {
+      } else if (filename.endsWith(".vsm") || filename.endsWith(".fsm") || filename.endsWith(".sp")) {
         // Load shaders
         qDebug("BGE::Storage::load(): Loading shader '%s'", absoluteFilePath.toUtf8().data());
         loader = new Loader::ShaderLoader(absoluteFilePath);

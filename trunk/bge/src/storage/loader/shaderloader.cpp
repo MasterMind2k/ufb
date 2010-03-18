@@ -14,8 +14,10 @@
 #include "shaderloader.h"
 
 #include <QtCore/QFile>
+#include <QtCore/QRegExp>
 
 #include "storage/shader.h"
+#include "storage/shaderprogram.h"
 
 using namespace BGE;
 using namespace BGE::Loader;
@@ -29,14 +31,54 @@ Item* ShaderLoader::load()
 
   Shader* shader = new Shader(name());
 
-  if (filename().endsWith(".vsp", Qt::CaseInsensitive)) {
-    // Load vertex shader program
-    shader->setShaderSource(source, Shader::Vertex);
-  } else if (filename().endsWith(".fsp", Qt::CaseInsensitive)) {
-    // Load vertex shader program
-    shader->setShaderSource(source, Shader::Fragment);
+  QRegExp typeMatcher(".*\\.(.+)$", Qt::CaseInsensitive, QRegExp::RegExp2);
+  if (!typeMatcher.exactMatch(filename()))
+    return 0l;
+  QString extension = typeMatcher.cap(1).toLower();
+
+  if (extension == "vsm") {
+    // Load vertex shader
+    shader->setShaderSource(source, Shader::VertexShader);
+  } else if (extension == "fsm") {
+    // Load fragment shader
+    shader->setShaderSource(source, Shader::FragmentShader);
+  } else if (extension == "sp") {
+    // Parse and load shader program
+    QString vertexSection = "[vertex]";
+    QString fragmentSection = "[fragment]";
+    int vertexPos = source.indexOf(vertexSection);
+    int fragmentPos = source.indexOf(fragmentSection);
+    QString vertexSource, fragmentSource;
+
+    if (vertexPos == -1) {
+      fragmentSource = source.mid(fragmentPos + fragmentSection.size());
+    } else if (fragmentPos == -1) {
+      vertexSource = source.mid(vertexPos + vertexSection.size());
+    } else if (vertexPos < fragmentPos) {
+      vertexSource = source.mid(vertexPos + vertexSection.size(), fragmentPos - (vertexPos + vertexSection.size()));
+      fragmentSource = source.mid(fragmentPos + fragmentSection.size());
+    } else if (fragmentPos < vertexPos) {
+      fragmentSource = source.mid(fragmentPos + fragmentSection.size(), vertexPos - (fragmentPos + fragmentSection.size()));
+      vertexSource = source.mid(vertexPos + vertexSection.size());
+    }
+
+    Shader* secondShader = 0l;
+    if (!vertexSource.isEmpty() && !fragmentSource.isEmpty()) {
+      shader->setShaderSource(vertexSource, Shader::VertexShader);
+      secondShader = new Shader(name());
+      secondShader->setShaderSource(fragmentSource, Shader::FragmentShader);
+    } else if (!vertexSource.isEmpty()) {
+      shader->setShaderSource(vertexSource, Shader::VertexShader);
+    } else if (!fragmentSource.isEmpty()) {
+      shader->setShaderSource(fragmentSource, Shader::FragmentShader);
+    }
+
+    ShaderProgram* shaderProgram = new ShaderProgram(name());
+    shaderProgram->addShader(shader);
+    shaderProgram->addShader(secondShader);
+
+    return shaderProgram;
   }
-  // @TODO loading shader modules / creating shader programs...
 
   return shader;
 }

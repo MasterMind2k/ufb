@@ -14,6 +14,7 @@
 #define __BGE_SCENE_SCENEOBJECT_H
 
 #include <QtCore/QList>
+#include <QtCore/QMap>
 
 #include "global.h"
 
@@ -22,6 +23,7 @@ class Canvas;
 class Mesh;
 class Texture;
 class Shader;
+class ShaderProgram;
 
 namespace Rendering
 {
@@ -343,25 +345,20 @@ class Object
       return m_observed;
     }
 
-    inline void addShader(Shader* shader)
+    inline void setShaderProgram(ShaderProgram* shaderProgram)
     {
-      m_shaders << shader;
+      if (m_shaderProgram)
+        qWarning("BGE::Scene::Object::setShaderProgram(): Replacing shader program!");
+
+      m_shaderProgram = shaderProgram;
     }
-    inline Shader* shader(int i) const
+    inline void removeShaderProgram()
     {
-      return m_shaders.at(i);
+      m_shaderProgram = 0l;
     }
-    inline const QList<Shader*>& shaders() const
+    inline ShaderProgram* shaderProgram() const
     {
-      return m_shaders;
-    }
-    inline void setShaderProgramId(quint32 shaderProgramId)
-    {
-      m_shaderProgramId = shaderProgramId;
-    }
-    inline quint32 shaderProgramId() const
-    {
-      return m_shaderProgramId;
+      return m_shaderProgram;
     }
 
   protected:
@@ -390,8 +387,7 @@ class Object
 
     Object* m_observed;
 
-    QList<Shader*> m_shaders;
-    quint32 m_shaderProgramId;
+    ShaderProgram* m_shaderProgram;
 
     /* Be very careful in these classes!!! */
     friend class BGE::Canvas;

@@ -16,11 +16,7 @@
 #include <QtCore/QString>
 
 namespace BGE {
-class Shader;
-
-namespace Scene {
-class Object;
-}
+class ShaderProgram;
 
 namespace Rendering {
 
@@ -29,8 +25,11 @@ class ShaderManager
   public:
     ShaderManager();
 
-    void bindObject(Scene::Object* object);
-    void useShaderProgram(Scene::Object* object);
+    void bindProgram(ShaderProgram* shaderProgram);
+    void unbindProgram(ShaderProgram* shaderProgram);
+
+    void useProgram(ShaderProgram* shaderProgram);
+    void unload();
 
   private:
     char** prepareSource(const QString& source, qint32& count, qint32** length);

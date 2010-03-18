@@ -23,6 +23,7 @@
 #include "storage/mesh.h"
 #include "storage/texture.h"
 #include "storage/shader.h"
+#include "storage/shaderprogram.h"
 
 #include "rendering/shadermanager.h"
 
@@ -150,10 +151,10 @@ void DirectRenderer::renderScene()
     glLoadMatrixf(worldTransform.data());
 
     // Bind and use shader
-    if (object->shaders().size()) {
-      if (!object->shaderProgramId())
-        m_shaderManager->bindObject(object);
-      m_shaderManager->useShaderProgram(object);
+    if (object->shaderProgram()) {
+      if (!object->shaderProgram()->bindId())
+        m_shaderManager->bindProgram(object->shaderProgram());
+      m_shaderManager->useProgram(object->shaderProgram());
     }
 
     // Bind the mesh
@@ -179,6 +180,10 @@ void DirectRenderer::renderScene()
     for (quint8 i = 0; i < size; i++)
       glDisable(GL_LIGHT0 + i);
     clearAssignedLights();
+
+    // Unload shader
+    if (object->shaderProgram())
+      m_shaderManager->unload();
   }
 }
 
@@ -193,6 +198,9 @@ void DirectRenderer::unbindObject(Scene::Object* object)
   // Unbind texture
   if (object->texture() && object->texture()->bindId())
     Canvas::canvas()->deleteTexture(object->texture()->bindId());
+  // Unbind shader
+  if (object->shaderProgram())
+    m_shaderManager->unbindProgram(object->shaderProgram());
 }
 
 void DirectRenderer::bindTexture(Scene::Object *object)
