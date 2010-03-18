@@ -42,9 +42,6 @@ Canvas::Canvas()
   m_frames = 0;
   m_fps = 0;
 
-  // Creating a renderer
-  m_renderer = new Rendering::DirectRenderer;
-
   // Setting up a timer for "game loop"
   QTimer* timer = new QTimer(this);
   timer->setSingleShot(false);
@@ -81,7 +78,9 @@ Canvas* Canvas::canvas()
 }
 
 void Canvas::initializeGL()
-{
+{  // Creating a renderer
+  m_renderer = new Rendering::DirectRenderer;
+
   // This initialization method could/should be moved to Rendering API
   glClearColor(0, 0, 0, 0);
   glShadeModel(GL_SMOOTH);

@@ -16,6 +16,8 @@
 
 #include "rendering/renderer.h"
 
+#include "storage/shaderprogram.h"
+
 using namespace BGE;
 using namespace BGE::Scene;
 
@@ -37,7 +39,7 @@ Object::Object()
   m_mesh = 0l;
   m_texture = 0l;
   m_observed = 0l;
-  m_shaderProgramId = 0;
+  m_shaderProgram = 0l;
 }
 
 Object::~Object()

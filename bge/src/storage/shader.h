@@ -15,15 +15,18 @@
 
 #include "storage/item.h"
 
+#include <QtCore/QStringList>
+
 namespace BGE {
 
 class Shader : public BGE::Item
 {
   public:
     enum Type {
-      Vertex,
-      Fragment
+      VertexShader,
+      FragmentShader
     };
+
     Shader(const QString& name);
 
     inline void setShaderSource(const QString& source, Type type)
@@ -40,8 +43,18 @@ class Shader : public BGE::Item
       return m_type;
     }
 
+    inline void addDependency(const QString& dependency)
+    {
+      m_deps << dependency;
+    }
+    inline const QStringList& dependencies() const
+    {
+      return m_deps;
+    }
+
   private:
     QString m_source;
+    QStringList m_deps;
     Type m_type;
 };
 

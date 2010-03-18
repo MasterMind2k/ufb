@@ -10,6 +10,7 @@ set(storage_SRCS
   mesh.cpp
   texture.cpp
   shader.cpp
+  shaderprogram.cpp
 )
 
 add_library(storage ${storage_SRCS})

@@ -10,47 +10,38 @@
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
  ***************************************************************************/
-#ifndef __BGE_GLOBAL_H
-#define __BGE_GLOBAL_H
+#ifndef __BGE_SHADERPROGRAM_H
+#define __BGE_SHADERPROGRAM_H
 
-#include <QtCore/QList>
-#include <QtCore/QPair>
+#include "storage/item.h"
 
-#include <Eigen/Core>
-#include <Eigen/Geometry>
-#include <Eigen/LU>
-#include <Eigen/SVD>
+namespace BGE {
+class Shader;
 
-USING_PART_OF_NAMESPACE_EIGEN
-using Eigen::Transform3f;
-using Eigen::Quaternionf;
-using Eigen::AngleAxisf;
-using Eigen::Scaling3f;
-
-typedef QList<Vector3f> VectorList;
-
-// Some documentation entries
-/**
- * @short Main namespace of the engine.
- */
-namespace BGE
+class ShaderProgram : public BGE::Item
 {
+  public:
+    inline ShaderProgram(const QString& name) : Item(name) {}
 
-/**
- * @short All scene graph related classes are inside this namespace.
- */
-namespace Scene
-{
-}
+    inline void addShader(Shader* shader)
+    {
+      if (shader)
+        m_shaders << shader;
+    }
+    inline Shader* shader(int i) const
+    {
+      return m_shaders.at(i);
+    }
+    inline const QList<Shader*>& shaders() const
+    {
+      return m_shaders;
+    }
 
-/**
- * @short Namespace containing rendering classes.
- * Classes from this namespace should be used only inside the
- * engine and specific render methods of the BGE::Scene classes.
- */
-namespace Rendering
-{
-}
+    bool prepareProgram();
+
+  private:
+    QList<Shader*> m_shaders;
+};
 
 }
 

@@ -16,6 +16,8 @@
 #include <QtCore/QString>
 #include <QtCore/QHash>
 
+#include "global.h"
+
 namespace BGE {
 
 class Item
@@ -29,6 +31,7 @@ class Item
       m_name = name;
       m_isDir = false;
       m_bindId = 0;
+      m_refCounter = 0;
     }
 
     /**
@@ -101,12 +104,38 @@ class Item
     {
       return m_bindId;
     }
+    /**
+     * Unbinds (sets bind id to 0) the item.
+     */
+    inline void unbind()
+    {
+      m_bindId = 0;
+    }
+
+    /**
+     * Increments the reference counter.
+     */
+    inline quint32 incrementReferenceCounter()
+    {
+      return ++m_refCounter;
+    }
+    /**
+     * Secrements the reference counter.
+     */
+    inline quint32 decrementReferenceCounter()
+    {
+      if (!m_refCounter)
+        return 0;
+
+      return --m_refCounter;
+    }
 
   private:
     QString m_name;
     bool m_isDir;
     QHash<QString, Item*> m_items;
     quint32 m_bindId;
+    quint32 m_refCounter;
 
     /* Invalid constructor */
     inline Item()
