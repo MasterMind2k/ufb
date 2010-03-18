@@ -47,6 +47,10 @@ class Shader : public BGE::Item
     {
       m_deps << dependency;
     }
+    inline void addDependencies(const QStringList& dependencies)
+    {
+      m_deps += dependencies;
+    }
     inline const QStringList& dependencies() const
     {
       return m_deps;

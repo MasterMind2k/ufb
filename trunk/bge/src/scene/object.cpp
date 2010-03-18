@@ -106,6 +106,17 @@ void Object::lookAt(Object *object)
   setOrientation(rotation);
 }
 
+void Object::setShaderProgram(ShaderProgram *shaderProgram)
+{
+  if (m_shaderProgram)
+    qWarning("BGE::Scene::Object::setShaderProgram(): Replacing shader program!");
+
+  if (!shaderProgram->prepareProgram())
+    return;
+
+  m_shaderProgram = shaderProgram;
+}
+
 void Object::prepareTransforms()
 {
   // Calculate the observing transforms
