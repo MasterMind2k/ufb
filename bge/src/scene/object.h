@@ -345,13 +345,7 @@ class Object
       return m_observed;
     }
 
-    inline void setShaderProgram(ShaderProgram* shaderProgram)
-    {
-      if (m_shaderProgram)
-        qWarning("BGE::Scene::Object::setShaderProgram(): Replacing shader program!");
-
-      m_shaderProgram = shaderProgram;
-    }
+    void setShaderProgram(ShaderProgram* shaderProgram);
     inline void removeShaderProgram()
     {
       m_shaderProgram = 0l;

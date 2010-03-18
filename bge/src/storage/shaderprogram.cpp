@@ -47,5 +47,7 @@ bool ShaderProgram::prepareProgram()
     }
   }
 
+  m_shaders += shaders;
+
   return true;
 }

@@ -1,6 +1,5 @@
 /***************************************************************************
  *   Copyright (C) 2010 by Gregor Kališnik <gregor@unimatrix-one.org>      *
- *   Copyright (C) 2010 by Matej Jakop     <matej@jakop.si>                *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License version 3        *
@@ -21,6 +20,24 @@
 
 using namespace BGE;
 using namespace BGE::Loader;
+
+QStringList parseSource(QString& source)
+{
+  QStringList modules;
+  QRegExp matcher("\\s*use\\s(/.*);");
+  matcher.setMinimal(true);
+  int pos = 0;
+  int length = 0;
+  while ((pos = matcher.indexIn(source, pos + 1)) != -1) {
+    QString test = matcher.cap(1);
+    modules << matcher.cap(1);
+    length += matcher.matchedLength();
+  }
+
+  source = source.mid(length + 1);
+
+  return modules;
+}
 
 Item* ShaderLoader::load()
 {
@@ -64,12 +81,16 @@ Item* ShaderLoader::load()
 
     Shader* secondShader = 0l;
     if (!vertexSource.isEmpty() && !fragmentSource.isEmpty()) {
+      shader->addDependencies(parseSource(vertexSource));
       shader->setShaderSource(vertexSource, Shader::VertexShader);
       secondShader = new Shader(name());
+      secondShader->addDependencies(parseSource(fragmentSource));
       secondShader->setShaderSource(fragmentSource, Shader::FragmentShader);
     } else if (!vertexSource.isEmpty()) {
+      shader->addDependencies(parseSource(vertexSource));
       shader->setShaderSource(vertexSource, Shader::VertexShader);
     } else if (!fragmentSource.isEmpty()) {
+      shader->addDependencies(parseSource(fragmentSource));
       shader->setShaderSource(fragmentSource, Shader::FragmentShader);
     }
 
