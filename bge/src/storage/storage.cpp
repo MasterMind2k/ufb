@@ -35,6 +35,11 @@ Storage::Storage()
   m_root = new Item("/");
 }
 
+Storage::~Storage()
+{
+  delete m_root;
+}
+
 void Storage::load()
 {
   QStack<QFileInfo> dirs;
