@@ -33,6 +33,8 @@ class Storage
       return m_self;
     }
 
+    ~Storage();
+
     /**
      * Loads the data from the :/bge_resources directory.
      */

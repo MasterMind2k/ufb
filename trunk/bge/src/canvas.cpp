@@ -248,6 +248,9 @@ void Canvas::cleanup()
   // And delete the scene
   delete m_scene;
   delete m_renderer;
+
+  // Delete the storage
+  delete Storage::self();
 }
 
 void Canvas::updateFPS()
