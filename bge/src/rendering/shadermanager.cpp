@@ -34,7 +34,7 @@ ShaderManager::ShaderManager()
 
 void ShaderManager::bindProgram(ShaderProgram* shaderProgram)
 {
-  if (!shaderProgram)
+  if (!shaderProgram || shaderProgram->hasFailed())
     return;
 
   if (shaderProgram->bindId()) {
@@ -64,8 +64,25 @@ void ShaderManager::bindProgram(ShaderProgram* shaderProgram)
       qint32* length;
       char** lines = prepareSource(shader->shaderSource(), count, &length);
 
+      // Load source
       glShaderSource(shader->bindId(), count, (const GLchar**) lines, length);
+      // Compile shader
       glCompileShader(shader->bindId());
+
+      // Check for errors
+      int output;
+      glGetShaderiv(shader->bindId(), GL_COMPILE_STATUS, &output);
+      if (output == GL_FALSE) {
+        glGetShaderiv(shader->bindId(), GL_INFO_LOG_LENGTH, &output);
+        char *log = (char*) malloc(output * sizeof(char));
+        glGetShaderInfoLog(shader->bindId(), output, 0l, log);
+        qDebug("BGE::Rendering::ShaderManager::bindProgram(): Compile failed for shader '%s' with info log:\n%s", shader->path().toUtf8().data(), log);
+        free(log);
+
+        shaderProgram->setFailed(true);
+        unbindProgram(shaderProgram);
+        return;
+      }
     }
 
     // Attach shader
@@ -74,6 +91,21 @@ void ShaderManager::bindProgram(ShaderProgram* shaderProgram)
 
   // Link program
   glLinkProgram(shaderProgram->bindId());
+
+  // Check for errors.
+  int output;
+  glGetProgramiv(shaderProgram->bindId(), GL_LINK_STATUS, &output);
+  if (output == GL_FALSE) {
+    glGetProgramiv(shaderProgram->bindId(), GL_INFO_LOG_LENGTH, &output);
+    char *log = (char*) malloc(output * sizeof(char));
+    glGetProgramInfoLog(shaderProgram->bindId(), output, 0l, log);
+    qDebug("BGE::Rendering::ShaderManager::bindProgram(): Link failed for shader program '%s' with info log:\n%s", shaderProgram->path().toUtf8().data(), log);
+    free(log);
+
+    // Cleanup
+    shaderProgram->setFailed(true);
+    unbindProgram(shaderProgram);
+  }
 }
 
 void ShaderManager::unbindProgram(ShaderProgram *shaderProgram)

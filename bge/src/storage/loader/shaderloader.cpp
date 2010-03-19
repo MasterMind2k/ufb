@@ -29,7 +29,6 @@ QStringList parseSource(QString& source)
   int pos = 0;
   int length = 0;
   while ((pos = matcher.indexIn(source, pos + 1)) != -1) {
-    QString test = matcher.cap(1);
     modules << matcher.cap(1);
     length += matcher.matchedLength();
   }

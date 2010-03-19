@@ -32,6 +32,7 @@ class Item
       m_isDir = false;
       m_bindId = 0;
       m_refCounter = 0;
+      m_parent = 0l;
     }
 
     /**
@@ -72,6 +73,7 @@ class Item
         return;
       m_items.insert(item->name(), item);
       m_isDir = true;
+      item->m_parent = this;
     }
     /**
      * Removes an item with a name.
@@ -120,7 +122,7 @@ class Item
       return ++m_refCounter;
     }
     /**
-     * Secrements the reference counter.
+     * Decrements the reference counter.
      */
     inline quint32 decrementReferenceCounter()
     {
@@ -130,10 +132,16 @@ class Item
       return --m_refCounter;
     }
 
+    /**
+     * Returns the path.
+     */
+    QString path() const;
+
   private:
     QString m_name;
     bool m_isDir;
     QHash<QString, Item*> m_items;
+    Item* m_parent;
     quint32 m_bindId;
     quint32 m_refCounter;
 
