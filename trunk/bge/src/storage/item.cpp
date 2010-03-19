@@ -25,3 +25,12 @@ bool Item::removeItem(const QString& name)
 
   return true;
 }
+
+QString Item::path() const
+{
+  QString output = "/" + name();
+  for (Item* node = m_parent; node->m_parent; node = node->m_parent)
+    output.prepend("/" + node->name());
+
+  return output;
+}

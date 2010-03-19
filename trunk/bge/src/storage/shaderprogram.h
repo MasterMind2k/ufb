@@ -21,7 +21,10 @@ class Shader;
 class ShaderProgram : public BGE::Item
 {
   public:
-    inline ShaderProgram(const QString& name) : Item(name) {}
+    inline ShaderProgram(const QString& name) : Item(name)
+    {
+      m_hasFailed = false;
+    }
 
     inline void addShader(Shader* shader)
     {
@@ -39,8 +42,18 @@ class ShaderProgram : public BGE::Item
 
     bool prepareProgram();
 
+    inline void setFailed(bool failed)
+    {
+      m_hasFailed = failed;
+    }
+    inline bool hasFailed() const
+    {
+      return m_hasFailed;
+    }
+
   private:
     QList<Shader*> m_shaders;
+    bool m_hasFailed;
 };
 
 }
