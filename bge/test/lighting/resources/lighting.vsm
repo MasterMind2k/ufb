@@ -1,0 +1,27 @@
+varying vec4 diffuse[5], ambientGlobal, ambient[5];
+varying vec3 normal, lightDir[5], halfVector[5];
+varying float dist[5];
+
+void calculateLighting()
+{
+  normal = normalize(gl_NormalMatrix * gl_Normal);
+    
+  /* these are the new lines of code to compute the light's direction */
+  vec4 ecPos = gl_ModelViewMatrix * gl_Vertex;
+  for (int i = 0; i < 5; i++) {
+    vec3 aux = vec3(gl_LightSource[i].position - ecPos);
+    lightDir[i] = normalize(aux);
+    dist[i] = length(aux);
+  
+    halfVector[i] = normalize(gl_LightSource[i].halfVector.xyz);
+    
+    /* Compute the diffuse, ambient and globalAmbient terms */
+    diffuse[i] = gl_FrontMaterial.diffuse * gl_LightSource[i].diffuse;
+    
+    /* The ambient terms have been separated since one of them */
+    /* suffers attenuation */
+    ambient[i] = gl_FrontMaterial.ambient * gl_LightSource[i].ambient;
+  }
+  ambientGlobal = gl_LightModel.ambient * gl_FrontMaterial.ambient;
+}
+
