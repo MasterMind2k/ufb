@@ -156,7 +156,6 @@ char** ShaderManager::prepareSource(const QString &source, qint32 &count, qint32
     length[0][i] = line.toUtf8().size();
     output[i] = (char*) malloc((length[0][i] + 1) * sizeof(char));
     memcpy(output[i], line.toUtf8().data(), length[0][i] + 1);
-    qDebug("%s", output[i]);
     i++;
   }
 
