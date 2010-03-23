@@ -130,6 +130,21 @@ void ShaderManager::unbindProgram(ShaderProgram *shaderProgram)
   }
 }
 
+void ShaderManager::bindAttribute(const QString &name, quint32 size, quint32 stride, quint32 offset, ShaderProgram* program)
+{
+  if (!program)
+    return;
+
+  qint32 loc = glGetAttribLocation(program->bindId(), name.toAscii().data());
+  if (loc == -1) {
+    qDebug("BGE::Rendering::ShaderManager::bindAttribute(): Could not find attribute '%s'.", name.toAscii().data());
+    return;
+  }
+
+  glEnableVertexAttribArray(loc);
+  glVertexAttribPointer(loc, size, GL_FLOAT, GL_FALSE, stride, (void*) offset);
+}
+
 void ShaderManager::useProgram(ShaderProgram* shaderProgram)
 {
   if (!shaderProgram)

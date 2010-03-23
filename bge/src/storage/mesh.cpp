@@ -33,7 +33,7 @@ void Mesh::addFace(const QString &name, Primitives primitive, const QVector<quin
     m_objects << name;
 
   // Add the face
-  QPair<Primitives, QVector<quint16> > pair(primitive, face);
+  Face pair(primitive, face);
   QList<Face> temp = m_faces.value(name);
   temp <<  pair;
   m_faces.insert(name, temp);

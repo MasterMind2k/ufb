@@ -10,43 +10,39 @@
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
  ***************************************************************************/
-#ifndef __BGE_RENDERING_DIRECTRENDERER_H
-#define __BGE_RENDERING_DIRECTRENDERER_H
+#ifndef __BGE_RENDERING_BUFFERMANAGER_H
+#define __BGE_RENDERING_BUFFERMANAGER_H
 
+#include <QtCore/QHash>
 #include "global.h"
 
-#include "rendering/renderer.h"
-
-#include <QtCore/QVector>
-
 namespace BGE {
+namespace Scene {
+class Object;
+}
 namespace Rendering {
-class ShaderManager;
-class BufferManager;
 
-/**
- * @short Renderer for old OpenGL API
- *
- * This renderer should support only commands prior to OpenGL 2.1.
- */
-class DirectRenderer : public Renderer
+class BufferManager
 {
   public:
-    DirectRenderer();
+    static BufferManager* init();
 
-    void drawQuads(const VectorList& vertices, const VectorList& normals, const QVector<Vector2f>& textureMaps = QVector<Vector2f>());
-    void drawTriangles(const VectorList& vertices, const VectorList& normals, const QVector<Vector2f>& textureMaps = QVector<Vector2f>());
+    virtual void bindObject(Scene::Object* object) = 0;
+    virtual void removeObject(Scene::Object* object) = 0;
+    virtual void unbindObject(Scene::Object* object) = 0;
+    virtual void drawObject(Scene::Object* object) const = 0;
 
-    void renderScene();
+  protected:
 
-    void unbindObject(Scene::Object* object);
+    struct Plan {
+      quint32 primitive;
+      quint32 count;
+      quint32 offset;
+    };
 
-  private:
-    void bindTexture(Scene::Object* object);
-    void bindMesh(Scene::Object* object);
-
-    ShaderManager* m_shaderManager;
-    BufferManager* m_bufferManager;
+    inline BufferManager() {}
+    QHash<quint32, quint32> m_indices;
+    QHash<quint32, QList<Plan> > m_drawingPlans;
 };
 
 }
