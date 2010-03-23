@@ -10,51 +10,19 @@
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
  ***************************************************************************/
-#ifndef __BGE_RENDERING_RENDERER_H
-#define __BGE_RENDERING_RENDERER_H
+#include "abstractdriver.h"
 
-class QGLWidget;
+#include "gl1.h"
 
-#include <QtCore/QQueue>
+using namespace BGE;
+using namespace BGE::Driver;
 
-#include "global.h"
+AbstractDriver* AbstractDriver::m_self = 0l;
 
-namespace BGE {
-class Mesh;
-namespace Scene {
-class Object;
-class Light;
-}
-namespace Rendering {
-
-/**
- * @short Abstract renderer
- *
- * It's an abstract interface to the OpenGL rendering.
- */
-class Renderer
+AbstractDriver* AbstractDriver::self()
 {
-  public:
-    /**
-     * Enqueues an object to the rendering queue.
-     */
-    void enqueueObject(Scene::Object* object);
+  if (!m_self)
+    m_self = new GL1;
 
-    /**
-     * Method for making the whole scene rendering.
-     */
-    void renderScene();
-
-    /**
-     * Unbinds the object.
-     */
-    void unbindObject(Scene::Object* object);
-
-  private:
-    QQueue<Scene::Object*> m_renderQueue;
-};
-
+  return m_self;
 }
-}
-
-#endif

@@ -14,6 +14,8 @@
 
 #include <QtCore/QMap>
 
+#include "driver/abstractdriver.h"
+
 using namespace BGE;
 using namespace BGE::Storage;
 
@@ -112,4 +114,14 @@ void Mesh::addRectangle(const QString& objectName, const Vector3f& bottomLeft, c
   face << vectors.indexOf(topLeft);
 
   addFace(objectName, Quads, face);
+}
+
+void Mesh::bind()
+{
+  Driver::AbstractDriver::self()->bind(this);
+}
+
+void Mesh::unload()
+{
+  Driver::AbstractDriver::self()->unload(this);
 }

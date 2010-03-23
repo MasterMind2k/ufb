@@ -99,7 +99,7 @@ void VBOManager::prepareObjectBuffer(Scene::Object *object)
   quint32 bindId;
   glGenBuffers(1, &bindId);
   glBindBuffer(GL_ARRAY_BUFFER, bindId);
-  object->mesh()->bind(bindId);
+  object->mesh()->setBindId(bindId);
 
   // Make vertices, normals and faces list
   QList<Vector3f> vertices;

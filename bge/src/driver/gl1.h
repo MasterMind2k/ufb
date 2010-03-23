@@ -10,43 +10,40 @@
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
  ***************************************************************************/
-#ifndef __BGE_RENDERING_DIRECTRENDERER_H
-#define __BGE_RENDERING_DIRECTRENDERER_H
 
-#include "global.h"
+#ifndef __BGE_DRIVER_GL1_H
+#define __BGE_DRIVER_GL1_H
 
-#include "rendering/renderer.h"
-
-#include <QtCore/QVector>
+#include "driver/abstractdriver.h"
 
 namespace BGE {
-namespace Rendering {
-class ShaderManager;
-class BufferManager;
+namespace Driver {
 
-/**
- * @short Renderer for old OpenGL API
- *
- * This renderer should support only commands prior to OpenGL 2.1.
- */
-class DirectRenderer : public Renderer
+class GL1 : public AbstractDriver
 {
   public:
-    DirectRenderer();
+    GL1();
 
-    void drawQuads(const VectorList& vertices, const VectorList& normals, const QVector<Vector2f>& textureMaps = QVector<Vector2f>());
-    void drawTriangles(const VectorList& vertices, const VectorList& normals, const QVector<Vector2f>& textureMaps = QVector<Vector2f>());
+    void bind(Storage::Mesh* mesh);
+    void bind(Storage::Texture* texture);
+    inline void bind(Storage::ShaderProgram* shaderProgram) {/* Ignore */}
 
-    void renderScene();
+    inline void unbind(Storage::Mesh* mesh) {/* Ignore */}
+    inline void unbind(Storage::Texture* texture) {/* Ignore */}
+    inline void unbind(Storage::ShaderProgram* shaderProgram) {/* Ignore */}
 
-    void unbindObject(Scene::Object* object);
+    void unload(Storage::Mesh* mesh);
+    void unload(Storage::Texture* texture);
+
+    void setLight(Scene::Light* light);
+    void resetLighting();
+
+    void setTransformMatrix(const Transform3f& transform);
+
+    void draw(Scene::Object* object);
 
   private:
-    void bindTexture(Scene::Object* object);
-    void bindMesh(Scene::Object* object);
-
-    ShaderManager* m_shaderManager;
-    BufferManager* m_bufferManager;
+    quint8 m_usedLights;
 };
 
 }

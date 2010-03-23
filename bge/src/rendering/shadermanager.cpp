@@ -42,7 +42,7 @@ void ShaderManager::bindProgram(Storage::ShaderProgram* shaderProgram)
     return;
   }
 
-  shaderProgram->bind(glCreateProgram());
+  shaderProgram->setBindId(glCreateProgram());
 
   foreach (Storage::Shader* shader, shaderProgram->shaders()) {
     shader->incrementReferenceCounter();
@@ -50,10 +50,10 @@ void ShaderManager::bindProgram(Storage::ShaderProgram* shaderProgram)
       // Bind and compile shader
       switch (shader->type()) {
         case Storage::Shader::VertexShader:
-          shader->bind(glCreateShader(VERTEX_SHADER));
+          shader->setBindId(glCreateShader(VERTEX_SHADER));
           break;
         case Storage::Shader::FragmentShader:
-          shader->bind(glCreateShader(FRAGMENT_SHADER));
+          shader->setBindId(glCreateShader(FRAGMENT_SHADER));
           break;
         default:
           qWarning("BGE::Rendering::ShaderManager::bindObject(): Shader type not known!");

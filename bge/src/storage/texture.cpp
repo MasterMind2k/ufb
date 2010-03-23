@@ -12,6 +12,17 @@
  ***************************************************************************/
 #include "texture.h"
 
+#include "driver/abstractdriver.h"
+
 using namespace BGE;
 using namespace BGE::Storage;
 
+void Texture::bind()
+{
+  Driver::AbstractDriver::self()->bind(this);
+}
+
+void Texture::unload()
+{
+  Driver::AbstractDriver::self()->unload(this);
+}

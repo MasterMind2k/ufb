@@ -14,5 +14,5 @@ set(storage_SRCS
 )
 
 add_library(storage ${storage_SRCS})
-target_link_libraries(storage loader)
-add_dependencies(storage loader)
+target_link_libraries(storage loader driver)
+add_dependencies(storage loader driver)
