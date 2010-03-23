@@ -5,7 +5,7 @@ include_directories(.. ${CMAKE_CURRENT_BINARY_DIR} ${EIGEN2_INCLUDE_DIR} ${QT_IN
 add_subdirectory(loader)
 
 set(storage_SRCS
-  storage.cpp
+  storagemanager.cpp
   item.cpp
   mesh.cpp
   texture.cpp

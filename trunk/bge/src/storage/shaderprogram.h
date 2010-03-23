@@ -10,15 +10,16 @@
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
  ***************************************************************************/
-#ifndef __BGE_SHADERPROGRAM_H
-#define __BGE_SHADERPROGRAM_H
+#ifndef __BGE_STORAGE_SHADERPROGRAM_H
+#define __BGE_STORAGE_SHADERPROGRAM_H
 
 #include "storage/item.h"
 
 namespace BGE {
+namespace Storage {
 class Shader;
 
-class ShaderProgram : public BGE::Item
+class ShaderProgram : public Item
 {
   public:
     inline ShaderProgram(const QString& name) : Item(name)
@@ -56,6 +57,7 @@ class ShaderProgram : public BGE::Item
     bool m_hasFailed;
 };
 
+}
 }
 
 #endif

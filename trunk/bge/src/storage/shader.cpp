@@ -13,8 +13,4 @@
 #include "shader.h"
 
 using namespace BGE;
-
-Shader::Shader(const QString& name)
- : Item(name)
-{
-}
+using namespace BGE::Storage;

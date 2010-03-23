@@ -16,6 +16,7 @@
 #include "storage/loader/abstractloader.h"
 
 namespace BGE {
+namespace Storage {
 class Item;
 namespace Loader {
 
@@ -29,6 +30,7 @@ namespace Loader {
   private:
 };
 
+}
 }
 }
 

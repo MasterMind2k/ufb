@@ -16,7 +16,9 @@
 #include <QtCore/QString>
 
 namespace BGE {
+namespace Storage {
 class ShaderProgram;
+}
 
 namespace Rendering {
 
@@ -25,12 +27,12 @@ class ShaderManager
   public:
     ShaderManager();
 
-    void bindProgram(ShaderProgram* shaderProgram);
-    void unbindProgram(ShaderProgram* shaderProgram);
+    void bindProgram(Storage::ShaderProgram* shaderProgram);
+    void unbindProgram(Storage::ShaderProgram* shaderProgram);
 
-    void bindAttribute(const QString& name, quint32 size, quint32 stride, quint32 offset, ShaderProgram* shaderProgram);
+    void bindAttribute(const QString& name, quint32 size, quint32 stride, quint32 offset, Storage::ShaderProgram* shaderProgram);
 
-    void useProgram(ShaderProgram* shaderProgram);
+    void useProgram(Storage::ShaderProgram* shaderProgram);
     void unload();
 
   private:

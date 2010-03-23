@@ -25,7 +25,7 @@
 #include "scene/camera.h"
 #include "scene/light.h"
 
-#include "storage/storage.h"
+#include "storage/storagemanager.h"
 
 #include "abstractcontroller.h"
 
@@ -201,13 +201,13 @@ bool Canvas::removeLight(const QString &name)
 void Canvas::loadResource(const QString& fileName)
 {
   if (fileName.isEmpty()) {
-    Storage::self()->load();
+    Storage::StorageManager::self()->load();
     return;
   }
 
   if (!QResource::registerResource(fileName, "/bge_resources"))
     qWarning("BGE::Canvas::loadResource: Cannot register '%s' resource!", fileName.toAscii().data());
-  Storage::self()->load();
+  Storage::StorageManager::self()->load();
   if (!QResource::unregisterResource(fileName, "/bge_resources"))
     qWarning("BGE::Canvas::loadResource: Cannot unregister '%s' resource!", fileName.toAscii().data());
 }
@@ -250,7 +250,7 @@ void Canvas::cleanup()
   delete m_renderer;
 
   // Delete the storage
-  delete Storage::self();
+  delete Storage::StorageManager::self();
 }
 
 void Canvas::updateFPS()

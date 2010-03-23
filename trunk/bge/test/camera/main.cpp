@@ -23,10 +23,10 @@
 #include "movingcube.h"
 #include "cameras.h"
 
-BGE::Mesh* createCube()
+BGE::Storage::Mesh* createCube()
 {
   QString name = "cube";
-  BGE::Mesh* mesh = new BGE::Mesh(name);
+  BGE::Storage::Mesh* mesh = new BGE::Storage::Mesh(name);
   float half = 0.5;
   // Prepare our vertices
   Vector3f bottomFrontLeft(-half, -half, half);
@@ -75,7 +75,7 @@ int main(int argc, char** argv)
   BGE::Canvas::canvas()->activateCamera("Global camera");
 
   // Our cube :D
-  BGE::Mesh* mesh = createCube();
+  BGE::Storage::Mesh* mesh = createCube();
 
   // Create moving cubes
   MovingCube* movingCube = new MovingCube(0);

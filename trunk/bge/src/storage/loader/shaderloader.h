@@ -10,12 +10,13 @@
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
  ***************************************************************************/
-#ifndef __BGE_LOADER_SHADERLOADER_H
-#define __BGE_LOADER_SHADERLOADER_H
+#ifndef __BGE_STORAGE_LOADER_SHADERLOADER_H
+#define __BGE_STORAGE_LOADER_SHADERLOADER_H
 
 #include "storage/loader/abstractloader.h"
 
 namespace BGE {
+namespace Storage {
 class Item;
 namespace Loader {
 
@@ -27,6 +28,7 @@ namespace Loader {
     Item* load();
 };
 
+}
 }
 }
 

@@ -10,8 +10,8 @@
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
  ***************************************************************************/
-#ifndef __BGE_ITEM_H
-#define __BGE_ITEM_H
+#ifndef __BGE_STORAGE_ITEM_H
+#define __BGE_STORAGE_ITEM_H
 
 #include <QtCore/QString>
 #include <QtCore/QHash>
@@ -19,6 +19,7 @@
 #include "global.h"
 
 namespace BGE {
+namespace Storage {
 
 class Item
 {
@@ -152,6 +153,7 @@ class Item
     }
 };
 
+}
 }
 
 #endif

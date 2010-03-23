@@ -19,7 +19,8 @@
 #include "storage/shaderprogram.h"
 
 using namespace BGE;
-using namespace BGE::Loader;
+using namespace BGE::Storage;
+using namespace BGE::Storage::Loader;
 
 QStringList parseSource(QString& source)
 {
