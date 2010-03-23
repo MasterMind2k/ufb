@@ -59,6 +59,8 @@ Canvas::Canvas()
 
   m_controller = 0l;
 
+  setAutoFillBackground(false);
+
   connect(timer, SIGNAL(timeout()), SLOT(updateGL()));
   connect(fps, SIGNAL(timeout()), SLOT(updateFPS()));
   connect(QApplication::instance(), SIGNAL(aboutToQuit()), SLOT(cleanup()));
@@ -131,6 +133,12 @@ void Canvas::paintGL()
   m_renderer->renderScene();
 
   m_frames++;
+
+  // 2D painting
+  QPainter painter(this);
+  painter.setPen(Qt::white);
+  painter.drawText(width() / 2, height() - 3, "FPS: " + QString::number(m_fps));
+  painter.end();
 }
 
 void Canvas::setController(AbstractController* controller)
@@ -248,5 +256,4 @@ void Canvas::updateFPS()
 {
   m_fps = m_frames;
   m_frames = 0;
-  qDebug("FPS: %lld", m_fps);
 }
