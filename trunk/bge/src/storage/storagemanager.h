@@ -38,6 +38,8 @@ class StorageManager
 
     /**
      * Loads the data from the :/bge_resources directory.
+     *
+     * @note Removes all previously loaded resources
      */
     void load();
 
@@ -53,6 +55,13 @@ class StorageManager
     {
       return static_cast<T> (get(path));
     }
+
+    /**
+     * Sets an item.
+     *
+     * @warning Use this method only when resources are loaded!
+     */
+    void set(Item* item, const QString& path);
 
   private:
     static StorageManager* m_self;

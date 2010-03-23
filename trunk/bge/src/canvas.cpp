@@ -236,16 +236,7 @@ void Canvas::mousePressEvent(QMouseEvent* event)
 
 void Canvas::cleanup()
 {
-  // Let's unbind our meshes, textures, etc.
-  QQueue<Scene::Object*> queue;
-  queue.enqueue(m_scene);
-  while (!queue.isEmpty()) {
-    Scene::Object* object = queue.dequeue();
-    m_renderer->unbindObject(object);
-    queue.append(object->children());
-  }
-
-  // And delete the scene
+  // Delete the scene
   delete m_scene;
   delete m_renderer;
 

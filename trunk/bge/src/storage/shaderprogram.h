@@ -52,6 +52,9 @@ class ShaderProgram : public Item
       return m_hasFailed;
     }
 
+    void bind();
+    void unload();
+
   private:
     QList<Shader*> m_shaders;
     bool m_hasFailed;

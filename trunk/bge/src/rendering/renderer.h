@@ -45,11 +45,6 @@ class Renderer
      */
     void renderScene();
 
-    /**
-     * Unbinds the object.
-     */
-    void unbindObject(Scene::Object* object);
-
   private:
     QQueue<Scene::Object*> m_renderQueue;
 };
