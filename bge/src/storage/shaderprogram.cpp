@@ -60,6 +60,11 @@ void ShaderProgram::bind()
   Driver::AbstractDriver::self()->bind(this);
 }
 
+void ShaderProgram::unbind()
+{
+  Driver::AbstractDriver::self()->unbind(this);
+}
+
 void ShaderProgram::unload()
 {
   Driver::AbstractDriver::self()->unload(this);

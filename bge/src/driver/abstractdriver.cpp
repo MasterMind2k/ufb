@@ -12,7 +12,12 @@
  ***************************************************************************/
 #include "abstractdriver.h"
 
+#include <QtCore/QCoreApplication>
+
+#include <QtOpenGL/QGLFormat>
+
 #include "gl1.h"
+#include "gl3.h"
 
 using namespace BGE;
 using namespace BGE::Driver;
@@ -21,8 +26,13 @@ AbstractDriver* AbstractDriver::m_self = 0l;
 
 AbstractDriver* AbstractDriver::self()
 {
-  if (!m_self)
-    m_self = new GL1;
+  if (!m_self) {
+    bool useGL1 = QCoreApplication::instance()->arguments().contains("GL11");
+    if (QGLFormat::openGLVersionFlags() & QGLFormat::OpenGL_Version_3_0 && !useGL1)
+      m_self = new GL3;
+    else
+      m_self = new GL1;
+  }
 
   return m_self;
 }

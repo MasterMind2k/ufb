@@ -57,10 +57,8 @@ void Renderer::renderScene()
 
   // Prepare lighting
   foreach (Scene::Light* light, Canvas::canvas()->lights()) {
-    if (light->isPositional()) {
-     Transform3f transform = rotation * move * light->globalTransform();
-     Driver::AbstractDriver::self()->setTransformMatrix(transform);
-    }
+    Transform3f transform = rotation * move * light->globalTransform();
+    Driver::AbstractDriver::self()->setTransformMatrix(transform);
 
     Driver::AbstractDriver::self()->setLight(light);
   }

@@ -118,12 +118,15 @@ Item* StorageManager::get(const QString &path) const
 
 void StorageManager::set(Item* item, const QString& path)
 {
-  if (!path.startsWith("/") || path.endsWith("/"))
+  if (!path.startsWith("/"))
     return;
 
   QStringList splited = path.split("/");
-  // Remove the dummy element
-  splited.removeAt(0);
+  // Remove the dummy elements
+  splited.removeFirst();
+  if (path.endsWith("/"))
+    splited.removeLast();
+
   Item* parent = m_root;
   Item* node = m_root;
   for (quint16 i = 0; i < splited.size(); i++) {
@@ -137,9 +140,14 @@ void StorageManager::set(Item* item, const QString& path)
       parent->addItem(node);
     }
 
-    if (i == splited.size() - 1)
-      parent->addItem(item);
-    else
+    if (i == splited.size() - 1) {
+      if (!node) {
+        node = new Item(part);
+        parent->addItem(node);
+      }
+      node->addItem(item);
+    } else {
       parent = node;
+    }
   }
 }

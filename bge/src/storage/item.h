@@ -32,7 +32,7 @@ class Item
       m_name = name;
       m_isDir = false;
       m_bindId = 0;
-      m_refCounter = 0;
+      m_refCount = 0;
       m_parent = 0l;
     }
 
@@ -109,6 +109,7 @@ class Item
       m_bindId = bindId;
     }
     inline virtual void bind() {}
+    inline virtual void unbind() {}
     /**
      * Gets the bind id.
      */
@@ -116,38 +117,37 @@ class Item
     {
       return m_bindId;
     }
-    /**
-     * Unbinds (sets bind id to 0) the item.
-     */
-    inline void unbind()
-    {
-      m_bindId = 0;
-    }
 
     inline virtual void unload() {}
-
-    /**
-     * Increments the reference counter.
-     */
-    inline quint32 incrementReferenceCounter()
-    {
-      return ++m_refCounter;
-    }
-    /**
-     * Decrements the reference counter.
-     */
-    inline quint32 decrementReferenceCounter()
-    {
-      if (!m_refCounter)
-        return 0;
-
-      return --m_refCounter;
-    }
 
     /**
      * Returns the path.
      */
     QString path() const;
+
+    inline quint32 refCount() const
+    {
+      return m_refCount;
+    }
+
+  protected:
+    /**
+     * Increments the reference counter.
+     */
+    inline quint32 incrementReferenceCount()
+    {
+      return ++m_refCount;
+    }
+    /**
+     * Decrements the reference counter.
+     */
+    inline quint32 decrementReferenceCount()
+    {
+      if (!m_refCount)
+        return 0;
+
+      return --m_refCount;
+    }
 
   private:
     QString m_name;
@@ -155,7 +155,7 @@ class Item
     QHash<QString, Item*> m_items;
     Item* m_parent;
     quint32 m_bindId;
-    quint32 m_refCounter;
+    quint32 m_refCount;
 
     /* Invalid constructor */
     inline Item()

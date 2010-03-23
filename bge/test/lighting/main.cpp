@@ -65,7 +65,7 @@ int main(int argc, char** argv)
   BGE::Canvas::canvas()->loadResource();
 
   // Make a small cube
-  BGE::Storage::StorageManager::self()->set(createCube(), "/models/Cube");
+  BGE::Storage::StorageManager::self()->set(createCube(), "/models");
 
   // Create camera
   BGE::Canvas::canvas()->createCamera("Global camera")->move(0, -30, 400);
@@ -74,7 +74,7 @@ int main(int argc, char** argv)
 
   // Add our model
   BGE::Scene::Object* fighter = new BGE::Scene::Object;
-  fighter->setShaderProgram(BGE::Storage::StorageManager::self()->get<BGE::Storage::ShaderProgram*>("/shaders/Shader"));
+  fighter->setShaderProgram(BGE::Storage::StorageManager::self()->get<BGE::Storage::ShaderProgram*>("/shaders/Textured"));
   fighter->setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/models/Fighter"));
   fighter->setTexture(BGE::Storage::StorageManager::self()->get<BGE::Storage::Texture*>("/textures/Fighter"));
   BGE::Canvas::canvas()->addSceneObject(fighter);

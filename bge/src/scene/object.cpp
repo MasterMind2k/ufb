@@ -108,6 +108,11 @@ void Object::lookAt(Object *object)
 
 void Object::setShaderProgram(Storage::ShaderProgram *shaderProgram)
 {
+  if (!shaderProgram) {
+    qWarning("BGE::Scene::Object::setShaderProgram(): Shader is not defined. Ignoring.");
+    return;
+  }
+
   if (m_shaderProgram)
     qWarning("BGE::Scene::Object::setShaderProgram(): Replacing shader program!");
 

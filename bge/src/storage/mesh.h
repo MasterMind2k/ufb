@@ -128,6 +128,7 @@ class Mesh : public Item
     void addRectangle(const QString& objectName, const Vector3f& bottomLeft, const Vector3f& bottomRight, const Vector3f& topLeft, const Vector3f& topRight);
 
     void bind();
+    void unbind();
     void unload();
 
   private:
