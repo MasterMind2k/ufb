@@ -10,43 +10,38 @@
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
  ***************************************************************************/
-#ifndef __BGE_RENDERING_DIRECTRENDERER_H
-#define __BGE_RENDERING_DIRECTRENDERER_H
+#ifndef __BGE_RENDERING_VBOMANAGER_H
+#define __BGE_RENDERING_VBOMANAGER_H
 
-#include "global.h"
-
-#include "rendering/renderer.h"
-
-#include <QtCore/QVector>
+#include "buffermanager.h"
 
 namespace BGE {
+namespace Scene {
+class Object;
+}
 namespace Rendering {
-class ShaderManager;
-class BufferManager;
 
-/**
- * @short Renderer for old OpenGL API
- *
- * This renderer should support only commands prior to OpenGL 2.1.
- */
-class DirectRenderer : public Renderer
+class VBOManager : public BufferManager
 {
   public:
-    DirectRenderer();
+    /*
+     * Use this constructor only in BufferManager::init()!
+     */
+    VBOManager();
 
-    void drawQuads(const VectorList& vertices, const VectorList& normals, const QVector<Vector2f>& textureMaps = QVector<Vector2f>());
-    void drawTriangles(const VectorList& vertices, const VectorList& normals, const QVector<Vector2f>& textureMaps = QVector<Vector2f>());
+    /*
+     * Make sure you check if VBO is available!
+     */
+    bool isAvailable() const;
 
-    void renderScene();
-
+    void bindObject(Scene::Object* object);
+    void removeObject(Scene::Object* object);
     void unbindObject(Scene::Object* object);
+    void drawObject(Scene::Object* object) const;
 
   private:
-    void bindTexture(Scene::Object* object);
-    void bindMesh(Scene::Object* object);
+    void prepareObjectBuffer(Scene::Object* object);
 
-    ShaderManager* m_shaderManager;
-    BufferManager* m_bufferManager;
 };
 
 }

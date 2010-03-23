@@ -37,8 +37,7 @@ class Mesh : public Item
       Triangles
     };
 
-    inline Mesh(const QString& name) : Item(name)
-    {}
+    inline Mesh(const QString& name) : Item(name) {}
 
     /**
      * Adds vertices to the list.

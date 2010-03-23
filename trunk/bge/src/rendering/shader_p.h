@@ -35,6 +35,11 @@
 #define glGetShaderInfoLog _glGetShaderInfoLog
 #define glGetProgramInfoLog _glGetProgramInfoLog
 
+/* Defines for atrribute binding */
+#define glGetAttribLocation _glGetAttribLocation
+#define glVertexAttribPointer _glVertexAttribPointer
+#define glEnableVertexAttribArray _glEnableVertexAttribArray
+
 typedef GLuint (APIENTRY *glCreateShader_t) (GLenum type);
 typedef void (APIENTRY *glShaderSource_t) (GLuint shader, GLsizei count, const GLchar** strings, const GLint* length);
 typedef void (APIENTRY *glCompileShader_t) (GLuint shader);
@@ -51,6 +56,10 @@ typedef void (APIENTRY *glGetShaderiv_t) (GLuint shader, GLenum type, int* param
 typedef void (APIENTRY *glGetProgramiv_t) (GLuint program, GLenum type, int* param);
 typedef void (APIENTRY *glGetShaderInfoLog_t) (GLuint shader, int maxLen, int* len, char* log);
 typedef void (APIENTRY *glGetProgramInfoLog_t) (GLuint program, int maxLen, int* len, char* log);
+
+typedef GLint (APIENTRY *glGetAttribLocation_t) (GLuint program, const GLchar* name);
+typedef void (APIENTRY *glVertexAttribPointer_t) (GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid* pointer);
+typedef void (APIENTRY *glEnableVertexAttribArray_t) (GLuint index);
 
 /* Shader */
 glCreateShader_t _glCreateShader = 0l;
@@ -72,7 +81,10 @@ glGetProgramiv_t _glGetProgramiv = 0l;
 glGetShaderInfoLog_t _glGetShaderInfoLog = 0l;
 glGetProgramInfoLog_t _glGetProgramInfoLog = 0l;
 
-/* Need to add binding functions */
+/* Binding functions */
+glGetAttribLocation_t _glGetAttribLocation = 0l;
+glVertexAttribPointer_t _glVertexAttribPointer = 0l;
+glEnableVertexAttribArray_t _glEnableVertexAttribArray = 0l;
 
 GLenum VERTEX_SHADER;
 GLenum FRAGMENT_SHADER;
@@ -110,6 +122,11 @@ void getShaderFunctions()
     _glGetShaderiv = (glGetShaderiv_t) context->getProcAddress("glGetObjectParameterivARB");
     _glGetProgramiv = (glGetProgramiv_t) _glGetShaderiv;
 
+    /* Binders */
+    _glGetAttribLocation = (glGetAttribLocation_t) context->getProcAddress("glGetAttribLocationARB");
+    _glVertexAttribPointer = (glVertexAttribPointer_t) context->getProcAddress("glVertexAttribPointerARB");
+    _glEnableVertexAttribArray = (glEnableVertexAttribArray_t) context->getProcAddress("glEnableVertexAttribArrayARB");
+
     VERTEX_SHADER = GL_VERTEX_SHADER_ARB;
     FRAGMENT_SHADER = GL_FRAGMENT_SHADER_ARB;
   } else {
@@ -131,6 +148,11 @@ void getShaderFunctions()
     _glGetProgramiv = (glGetProgramiv_t) context->getProcAddress("glGetProgramiv");
     _glGetShaderInfoLog = (glGetShaderInfoLog_t) context->getProcAddress("glGetShaderInfoLog");
     _glGetProgramInfoLog = (glGetProgramInfoLog_t) context->getProcAddress("glGetProgramInfoLog");
+
+    /* Binders */
+    _glGetAttribLocation = (glGetAttribLocation_t) context->getProcAddress("glGetAttribLocation");
+    _glVertexAttribPointer = (glVertexAttribPointer_t) context->getProcAddress("glVertexAttribPointer");
+    _glEnableVertexAttribArray = (glEnableVertexAttribArray_t) context->getProcAddress("glEnableVertexAttribArray");
 
     VERTEX_SHADER = GL_VERTEX_SHADER;
     FRAGMENT_SHADER = GL_FRAGMENT_SHADER;

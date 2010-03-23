@@ -26,6 +26,7 @@
 #include "storage/shaderprogram.h"
 
 #include "rendering/shadermanager.h"
+#include "rendering/buffermanager.h"
 
 using namespace BGE;
 using namespace BGE::Rendering;
@@ -34,6 +35,7 @@ DirectRenderer::DirectRenderer()
   : Renderer()
 {
   m_shaderManager = new ShaderManager;
+  m_bufferManager = BufferManager::init();
 }
 
 void DirectRenderer::drawQuads(const VectorList& vertices, const VectorList& normals, const QVector<Vector2f>& textureMaps)
@@ -158,8 +160,8 @@ void DirectRenderer::renderScene()
     }
 
     // Bind the mesh
-    if (!object->mesh()->bindId())
-      bindMesh(object);
+    m_bufferManager->bindObject(object);
+
     // Bind the texture
     if (object->texture()) {
       if (!object->texture()->bindId())
@@ -171,9 +173,13 @@ void DirectRenderer::renderScene()
 
     if (object->texture())
       glEnable(GL_TEXTURE_2D);
-    glCallList(object->mesh()->bindId());
+
+    m_bufferManager->drawObject(object);
+
     if (object->texture())
       glDisable(GL_TEXTURE_2D);
+
+    m_bufferManager->unbindObject(object);
 
     // Disable and clear lights
     quint8 size = assignedLights().size();
@@ -194,7 +200,7 @@ void DirectRenderer::unbindObject(Scene::Object* object)
 
   // Unbind mesh
   if (object->mesh() && object->mesh()->bindId())
-    glDeleteLists(object->mesh()->bindId(), 1);
+    m_bufferManager->removeObject(object);
   // Unbind texture
   if (object->texture() && object->texture()->bindId())
     Canvas::canvas()->deleteTexture(object->texture()->bindId());

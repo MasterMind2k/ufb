@@ -10,34 +10,19 @@
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
  ***************************************************************************/
-#ifndef __BGE_RENDERING_SHADERMANAGER_H
-#define __BGE_RENDERING_SHADERMANAGER_H
 
-#include <QtCore/QString>
+#include "buffermanager.h"
 
-namespace BGE {
-class ShaderProgram;
+#include "vbomanager.h"
 
-namespace Rendering {
+using namespace BGE;
+using namespace BGE::Rendering;
 
-class ShaderManager
+BufferManager* BufferManager::init()
 {
-  public:
-    ShaderManager();
+  VBOManager* output = new VBOManager;
+  if (!output->isAvailable())
+    qFatal("BGE::Rendering::BufferManager::init(): VBO is not present and there is no fallback!");
 
-    void bindProgram(ShaderProgram* shaderProgram);
-    void unbindProgram(ShaderProgram* shaderProgram);
-
-    void bindAttribute(const QString& name, quint32 size, quint32 stride, quint32 offset, ShaderProgram* shaderProgram);
-
-    void useProgram(ShaderProgram* shaderProgram);
-    void unload();
-
-  private:
-    char** prepareSource(const QString& source, qint32& count, qint32** length);
-};
-
+  return output;
 }
-}
-
-#endif

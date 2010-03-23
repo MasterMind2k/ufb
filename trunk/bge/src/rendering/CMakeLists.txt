@@ -6,10 +6,13 @@ set(rendering_SRCS
   directrenderer.cpp
   renderer.cpp
   shadermanager.cpp
+  buffermanager.cpp
+  vbomanager.cpp
 )
 
 set(rendering_HDRS
   shader_p.h
+  buffer_p.h
 )
 
 #qt4_wrap_cpp(rendering_MOC ${rendering_QHDRS})
