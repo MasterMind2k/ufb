@@ -28,10 +28,12 @@ AbstractDriver* AbstractDriver::self()
 {
   if (!m_self) {
     bool useGL1 = QCoreApplication::instance()->arguments().contains("GL11");
-    if (QGLFormat::openGLVersionFlags() & QGLFormat::OpenGL_Version_3_0 && !useGL1)
+    if (QGLFormat::openGLVersionFlags() & QGLFormat::OpenGL_Version_3_0 && !useGL1) {
       m_self = new GL3;
-    else
+    } else {
       m_self = new GL1;
+      qWarning("BGE::Driver::AbstractDriver::self(): Running in compatibility mode (OpenGL 1.1)!");
+    }
   }
 
   return m_self;
