@@ -96,10 +96,11 @@ class Item
     /**
      * Sets the bind id.
      */
-    inline void bind(quint32 bindId)
+    inline void setBindId(quint32 bindId)
     {
       m_bindId = bindId;
     }
+    inline virtual void bind() {}
     /**
      * Gets the bind id.
      */
@@ -114,6 +115,8 @@ class Item
     {
       m_bindId = 0;
     }
+
+    inline virtual void unload() {}
 
     /**
      * Increments the reference counter.

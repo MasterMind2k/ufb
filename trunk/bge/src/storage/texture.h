@@ -40,6 +40,9 @@ class Texture : public Item
       return m_texture;
     }
 
+    void bind();
+    void unload();
+
   private:
     QImage m_texture;
 };

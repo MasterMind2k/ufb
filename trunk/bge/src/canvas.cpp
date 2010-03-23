@@ -12,7 +12,7 @@
  ***************************************************************************/
 #include "canvas.h"
 
-#include "rendering/directrenderer.h"
+#include "rendering/renderer.h"
 
 #include <QtCore/QTimer>
 #include <QtCore/QResource>
@@ -79,7 +79,7 @@ Canvas* Canvas::canvas()
 
 void Canvas::initializeGL()
 {  // Creating a renderer
-  m_renderer = new Rendering::DirectRenderer;
+  m_renderer = new Rendering::Renderer;
 
   // This initialization method could/should be moved to Rendering API
   glClearColor(0, 0, 0, 0);

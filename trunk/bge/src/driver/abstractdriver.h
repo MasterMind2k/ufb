@@ -10,48 +10,58 @@
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
  ***************************************************************************/
-#ifndef __BGE_RENDERING_RENDERER_H
-#define __BGE_RENDERING_RENDERER_H
 
-class QGLWidget;
-
-#include <QtCore/QQueue>
+#ifndef __BGE_DRIVER_ABSTRACTDRIVER_H
+#define __BGE_DRIVER_ABSTRACTDRIVER_H
 
 #include "global.h"
 
+class QString;
+
 namespace BGE {
-class Mesh;
+
 namespace Scene {
 class Object;
 class Light;
 }
-namespace Rendering {
 
-/**
- * @short Abstract renderer
- *
- * It's an abstract interface to the OpenGL rendering.
- */
-class Renderer
+namespace Storage {
+class Mesh;
+class Texture;
+class Shader;
+class ShaderProgram;
+}
+
+namespace Driver {
+
+class AbstractDriver
 {
   public:
-    /**
-     * Enqueues an object to the rendering queue.
-     */
-    void enqueueObject(Scene::Object* object);
+    static AbstractDriver* self();
 
-    /**
-     * Method for making the whole scene rendering.
-     */
-    void renderScene();
+    virtual void bind(Storage::Mesh* mesh) = 0;
+    virtual void bind(Storage::Texture* texture) = 0;
+    virtual void bind(Storage::ShaderProgram* shaderProgram) = 0;
 
-    /**
-     * Unbinds the object.
-     */
-    void unbindObject(Scene::Object* object);
+    virtual void unbind(Storage::Mesh* mesh) = 0;
+    virtual void unbind(Storage::Texture* texture) = 0;
+    virtual void unbind(Storage::ShaderProgram* shaderProgram) = 0;
+
+    virtual void unload(Storage::Mesh* mesh) = 0;
+    virtual void unload(Storage::Texture* texture) = 0;
+
+    virtual void setLight(Scene::Light* light) = 0;
+    virtual void resetLighting() = 0;
+
+    virtual void setTransformMatrix(const Transform3f& transform) = 0;
+
+    virtual void draw(Scene::Object* object) = 0;
+
+  protected:
+    inline AbstractDriver() {}
 
   private:
-    QQueue<Scene::Object*> m_renderQueue;
+    static AbstractDriver* m_self;
 };
 
 }
