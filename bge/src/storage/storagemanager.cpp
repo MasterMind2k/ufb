@@ -49,8 +49,6 @@ void StorageManager::load()
   QStack<Item*> processedDirs;
   processedDirs.push(m_root);
 
-  QHash<QString, Item*> dirItems;
-
   while (!dirs.isEmpty()) {
     QFileInfo fileInfo = dirs.pop();
     Item* parent;
@@ -115,5 +113,33 @@ Item* StorageManager::get(const QString &path) const
 
     if (!node->isDir() && i == splited.size() - 1)
       return node;
+  }
+}
+
+void StorageManager::set(Item* item, const QString& path)
+{
+  if (!path.startsWith("/") || path.endsWith("/"))
+    return;
+
+  QStringList splited = path.split("/");
+  // Remove the dummy element
+  splited.removeAt(0);
+  Item* parent = m_root;
+  Item* node = m_root;
+  for (quint16 i = 0; i < splited.size(); i++) {
+    QString part = splited.at(i);
+    node = node->item(part);
+
+    // The looked for item does not exist
+    // let's create it
+    if (!node && i < splited.size() - 1) {
+      node = new Item(part);
+      parent->addItem(node);
+    }
+
+    if (i == splited.size() - 1)
+      parent->addItem(item);
+    else
+      parent = node;
   }
 }

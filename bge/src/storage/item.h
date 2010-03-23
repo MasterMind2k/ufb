@@ -41,7 +41,10 @@ class Item
      */
     virtual inline ~Item()
     {
-      qDeleteAll(m_items);
+      foreach (Item* item, m_items) {
+        item->unload();
+        delete item;
+      }
     }
 
     /**
@@ -91,6 +94,11 @@ class Item
     inline Item* item(const QString& name) const
     {
       return m_items.value(name, 0l);
+    }
+
+    inline Item* parent() const
+    {
+      return m_parent;
     }
 
     /**

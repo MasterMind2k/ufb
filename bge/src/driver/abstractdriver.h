@@ -49,6 +49,7 @@ class AbstractDriver
 
     virtual void unload(Storage::Mesh* mesh) = 0;
     virtual void unload(Storage::Texture* texture) = 0;
+    virtual void unload(Storage::ShaderProgram* shaderProgram) = 0;
 
     virtual void setLight(Scene::Light* light) = 0;
     virtual void resetLighting() = 0;

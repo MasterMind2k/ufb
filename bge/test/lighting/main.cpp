@@ -27,7 +27,7 @@
 BGE::Storage::Mesh* createCube()
 {
   QString name = "cube";
-  BGE::Storage::Mesh* mesh = new BGE::Storage::Mesh(name);
+  BGE::Storage::Mesh* mesh = new BGE::Storage::Mesh("Cube");
   float half = 5;
   // Prepare our vertices
   Vector3f bottomFrontLeft(-half, -half, half);
@@ -61,11 +61,11 @@ int main(int argc, char** argv)
 {
   QApplication app(argc, argv);
 
-  // Make a small cube
-  BGE::Storage::Mesh* cube = createCube();
-
   // Load models and textures
   BGE::Canvas::canvas()->loadResource();
+
+  // Make a small cube
+  BGE::Storage::StorageManager::self()->set(createCube(), "/models/Cube");
 
   // Create camera
   BGE::Canvas::canvas()->createCamera("Global camera")->move(0, -30, 400);
@@ -86,7 +86,7 @@ int main(int argc, char** argv)
   light->move(-150, -80, -200);
   light->setDiffuseColor(Qt::red);
   light->setSpotExponent(50);
-  light->setMesh(cube);
+  light->setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/models/Cube"));
   light->observe(fighter);
   light->setShaderProgram(BGE::Storage::StorageManager::self()->get<BGE::Storage::ShaderProgram*>("/shaders/Shader"));
   movingLight->addChild(light);
@@ -95,7 +95,7 @@ int main(int argc, char** argv)
   light->move(150, 80, -200);
   light->setDiffuseColor(Qt::blue);
   light->setSpotExponent(50);
-  light->setMesh(cube);
+  light->setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/models/Cube"));
   light->observe(fighter);
   light->setShaderProgram(BGE::Storage::StorageManager::self()->get<BGE::Storage::ShaderProgram*>("/shaders/Shader"));
   movingLight->addChild(light);
@@ -104,7 +104,7 @@ int main(int argc, char** argv)
   light->move(-150, 80, 200);
   light->setDiffuseColor(Qt::green);
   light->setSpotExponent(50);
-  light->setMesh(cube);
+  light->setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/models/Cube"));
   light->observe(fighter);
   light->setShaderProgram(BGE::Storage::StorageManager::self()->get<BGE::Storage::ShaderProgram*>("/shaders/Shader"));
   movingLight->addChild(light);
@@ -113,7 +113,7 @@ int main(int argc, char** argv)
   light->move(150, -80, 200);
   light->setDiffuseColor(Qt::yellow);
   light->setSpotExponent(50);
-  light->setMesh(cube);
+  light->setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/models/Cube"));
   light->observe(fighter);
   light->setShaderProgram(BGE::Storage::StorageManager::self()->get<BGE::Storage::ShaderProgram*>("/shaders/Shader"));
   movingLight->addChild(light);

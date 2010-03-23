@@ -10,7 +10,6 @@
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
  ***************************************************************************/
-
 #ifndef __BGE_DRIVER_GL1_H
 #define __BGE_DRIVER_GL1_H
 
@@ -34,6 +33,7 @@ class GL1 : public AbstractDriver
 
     void unload(Storage::Mesh* mesh);
     void unload(Storage::Texture* texture);
+    inline void unload(Storage::ShaderProgram* shaderProgram) {/* Ignore */};
 
     void setLight(Scene::Light* light);
     void resetLighting();

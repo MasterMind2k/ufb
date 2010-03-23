@@ -10,7 +10,6 @@
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
  ***************************************************************************/
-
 #include "gl1.h"
 
 #include "canvas.h"
@@ -159,6 +158,15 @@ void GL1::unload(Storage::Mesh* mesh)
   mesh->setBindId(0);
 }
 
+void GL1::unload(Storage::Texture* texture)
+{
+  if (!texture || !texture->bindId())
+    return;
+
+  Canvas::canvas()->deleteTexture(texture->bindId());
+  texture->setBindId(0);
+}
+
 void GL1::setLight(Scene::Light *light)
 {
   if (m_usedLights >= GL_MAX_LIGHTS) {
@@ -202,15 +210,6 @@ void GL1::resetLighting()
     glDisable(GL_LIGHT0 + i);
 
   m_usedLights = 0;
-}
-
-void GL1::unload(Storage::Texture* texture)
-{
-  if (!texture || !texture->bindId())
-    return;
-
-  Canvas::canvas()->deleteTexture(texture->bindId());
-  texture->setBindId(0);
 }
 
 void GL1::setTransformMatrix(const Transform3f& transform)

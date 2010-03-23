@@ -15,6 +15,8 @@
 #include <QtCore/QQueue>
 #include <QtCore/QSet>
 
+#include "driver/abstractdriver.h"
+
 #include "storage/storagemanager.h"
 #include "storage/shader.h"
 
@@ -51,4 +53,14 @@ bool ShaderProgram::prepareProgram()
   m_shaders += shaders;
 
   return true;
+}
+
+void ShaderProgram::bind()
+{
+  Driver::AbstractDriver::self()->bind(this);
+}
+
+void ShaderProgram::unload()
+{
+  Driver::AbstractDriver::self()->unload(this);
 }

@@ -89,15 +89,3 @@ void Renderer::renderScene()
 
   Driver::AbstractDriver::self()->resetLighting();
 }
-
-void Renderer::unbindObject(Scene::Object* object)
-{
-  if (!object->mesh())
-    return;
-
-  // Unbind mesh
-  if (object->mesh())
-    object->mesh()->unload();
-  if (object->texture())
-    object->texture()->unload();
-}
