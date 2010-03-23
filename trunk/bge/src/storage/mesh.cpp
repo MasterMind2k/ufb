@@ -118,7 +118,13 @@ void Mesh::addRectangle(const QString& objectName, const Vector3f& bottomLeft, c
 
 void Mesh::bind()
 {
+  Item::bind();
   Driver::AbstractDriver::self()->bind(this);
+}
+
+void Mesh::unbind()
+{
+  Driver::AbstractDriver::self()->unbind(this);
 }
 
 void Mesh::unload()

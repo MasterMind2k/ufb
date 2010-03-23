@@ -22,6 +22,11 @@ void Texture::bind()
   Driver::AbstractDriver::self()->bind(this);
 }
 
+void Texture::unbind()
+{
+  Driver::AbstractDriver::self()->unbind(this);
+}
+
 void Texture::unload()
 {
   Driver::AbstractDriver::self()->unload(this);

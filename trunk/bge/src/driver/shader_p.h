@@ -39,6 +39,7 @@
 #define glGetAttribLocation _glGetAttribLocation
 #define glVertexAttribPointer _glVertexAttribPointer
 #define glEnableVertexAttribArray _glEnableVertexAttribArray
+#define glDisableVertexAttribArray _glDisableVertexAttribArray
 
 typedef GLuint (APIENTRY *glCreateShader_t) (GLenum type);
 typedef void (APIENTRY *glShaderSource_t) (GLuint shader, GLsizei count, const GLchar** strings, const GLint* length);
@@ -60,6 +61,7 @@ typedef void (APIENTRY *glGetProgramInfoLog_t) (GLuint program, int maxLen, int*
 typedef GLint (APIENTRY *glGetAttribLocation_t) (GLuint program, const GLchar* name);
 typedef void (APIENTRY *glVertexAttribPointer_t) (GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid* pointer);
 typedef void (APIENTRY *glEnableVertexAttribArray_t) (GLuint index);
+typedef void (APIENTRY *glDisableVertexAttribArray_t) (GLuint index);
 
 /* Shader */
 glCreateShader_t _glCreateShader = 0l;
@@ -85,6 +87,7 @@ glGetProgramInfoLog_t _glGetProgramInfoLog = 0l;
 glGetAttribLocation_t _glGetAttribLocation = 0l;
 glVertexAttribPointer_t _glVertexAttribPointer = 0l;
 glEnableVertexAttribArray_t _glEnableVertexAttribArray = 0l;
+glDisableVertexAttribArray_t _glDisableVertexAttribArray = 0l;
 
 GLenum VERTEX_SHADER;
 GLenum FRAGMENT_SHADER;
@@ -97,66 +100,37 @@ void getShaderFunctions()
 {
   Canvas::canvas()->makeCurrent();
   const QGLContext* context = Canvas::canvas()->context();
+
+  /* Shader */
   _glCreateShader = (glCreateShader_t) context->getProcAddress("glCreateShader");
+  if (!_glCreateShader)
+    return;
+  _glShaderSource = (glShaderSource_t) context->getProcAddress("glShaderSource");
+  _glCompileShader = (glCompileShader_t) context->getProcAddress("glCompileShader");
+  _glDeleteShader = (glDeleteShader_t) context->getProcAddress("glDeleteShader");
 
-  if (!_glCreateShader) {
-    /** @TODO update ARB */
-    /* Shader */
-    _glCreateShader = (glCreateShader_t) context->getProcAddress("glCreateShaderObjectARB");
-    if (!_glCreateShader)
-      return;
+  /* Shader program */
+  _glCreateProgram = (glCreateProgram_t) context->getProcAddress("glCreateProgram");
+  _glAttachShader =  (glAttachShader_t) context->getProcAddress("glAttachShader");
+  _glDetachShader = (glDetachShader_t) context->getProcAddress("glDetachShader");
+  _glLinkProgram = (glLinkProgram_t) context->getProcAddress("glLinkProgram");
+  _glUseProgram = (glUseProgram_t) context->getProcAddress("glUseProgram");
+  _glDeleteProgram = (glDeleteProgram_t) context->getProcAddress("glDeleteProgram");
 
-    _glShaderSource = (glShaderSource_t) context->getProcAddress("glShaderSourceARB");
-    _glCompileShader = (glCompileShader_t) context->getProcAddress("glCompileShaderARB");
-    _glDeleteShader = (glDeleteShader_t) context->getProcAddress("glDeleteObjectARB");
+  /* Getters */
+  _glGetShaderiv = (glGetShaderiv_t) context->getProcAddress("glGetShaderiv");
+  _glGetProgramiv = (glGetProgramiv_t) context->getProcAddress("glGetProgramiv");
+  _glGetShaderInfoLog = (glGetShaderInfoLog_t) context->getProcAddress("glGetShaderInfoLog");
+  _glGetProgramInfoLog = (glGetProgramInfoLog_t) context->getProcAddress("glGetProgramInfoLog");
 
-    /* Shader program */
-    _glCreateProgram = (glCreateProgram_t) context->getProcAddress("glCreateProgramObjectARB");
-    _glAttachShader =  (glAttachShader_t) context->getProcAddress("glAttachObjectARB");
-    _glDetachShader = (glDetachShader_t) context->getProcAddress("glDetachObjectARB");
-    _glLinkProgram = (glLinkProgram_t) context->getProcAddress("glLinkProgramARB");
-    _glUseProgram = (glUseProgram_t) context->getProcAddress("glUseProgramObjectARB");
-    _glDeleteProgram = (glDeleteProgram_t) context->getProcAddress("glDeleteObjectARB");
+  /* Binders */
+  _glGetAttribLocation = (glGetAttribLocation_t) context->getProcAddress("glGetAttribLocation");
+  _glVertexAttribPointer = (glVertexAttribPointer_t) context->getProcAddress("glVertexAttribPointer");
+  _glEnableVertexAttribArray = (glEnableVertexAttribArray_t) context->getProcAddress("glEnableVertexAttribArray");
+  _glDisableVertexAttribArray = (glDisableVertexAttribArray_t) context->getProcAddress("glDisableVertexAttribArray");
 
-    /* Getters */
-    _glGetShaderiv = (glGetShaderiv_t) context->getProcAddress("glGetObjectParameterivARB");
-    _glGetProgramiv = (glGetProgramiv_t) _glGetShaderiv;
-
-    /* Binders */
-    _glGetAttribLocation = (glGetAttribLocation_t) context->getProcAddress("glGetAttribLocationARB");
-    _glVertexAttribPointer = (glVertexAttribPointer_t) context->getProcAddress("glVertexAttribPointerARB");
-    _glEnableVertexAttribArray = (glEnableVertexAttribArray_t) context->getProcAddress("glEnableVertexAttribArrayARB");
-
-    VERTEX_SHADER = GL_VERTEX_SHADER_ARB;
-    FRAGMENT_SHADER = GL_FRAGMENT_SHADER_ARB;
-  } else {
-    /* Shader */
-    _glShaderSource = (glShaderSource_t) context->getProcAddress("glShaderSource");
-    _glCompileShader = (glCompileShader_t) context->getProcAddress("glCompileShader");
-    _glDeleteShader = (glDeleteShader_t) context->getProcAddress("glDeleteShader");
-
-    /* Shader program */
-    _glCreateProgram = (glCreateProgram_t) context->getProcAddress("glCreateProgram");
-    _glAttachShader =  (glAttachShader_t) context->getProcAddress("glAttachShader");
-    _glDetachShader = (glDetachShader_t) context->getProcAddress("glDetachShader");
-    _glLinkProgram = (glLinkProgram_t) context->getProcAddress("glLinkProgram");
-    _glUseProgram = (glUseProgram_t) context->getProcAddress("glUseProgram");
-    _glDeleteProgram = (glDeleteProgram_t) context->getProcAddress("glDeleteProgram");
-
-    /* Getters */
-    _glGetShaderiv = (glGetShaderiv_t) context->getProcAddress("glGetShaderiv");
-    _glGetProgramiv = (glGetProgramiv_t) context->getProcAddress("glGetProgramiv");
-    _glGetShaderInfoLog = (glGetShaderInfoLog_t) context->getProcAddress("glGetShaderInfoLog");
-    _glGetProgramInfoLog = (glGetProgramInfoLog_t) context->getProcAddress("glGetProgramInfoLog");
-
-    /* Binders */
-    _glGetAttribLocation = (glGetAttribLocation_t) context->getProcAddress("glGetAttribLocation");
-    _glVertexAttribPointer = (glVertexAttribPointer_t) context->getProcAddress("glVertexAttribPointer");
-    _glEnableVertexAttribArray = (glEnableVertexAttribArray_t) context->getProcAddress("glEnableVertexAttribArray");
-
-    VERTEX_SHADER = GL_VERTEX_SHADER;
-    FRAGMENT_SHADER = GL_FRAGMENT_SHADER;
-  }
+  VERTEX_SHADER = GL_VERTEX_SHADER;
+  FRAGMENT_SHADER = GL_FRAGMENT_SHADER;
 
   hasShaders = true;
 }

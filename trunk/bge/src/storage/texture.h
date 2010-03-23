@@ -41,6 +41,7 @@ class Texture : public Item
     }
 
     void bind();
+    void unbind();
     void unload();
 
   private:
