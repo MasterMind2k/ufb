@@ -169,10 +169,10 @@ void VBOManager::prepareObjectBuffer(Scene::Object *object)
       Face face = *i++;
       quint32 primitive;
       switch (face.first) {
-        case Mesh::Quads:
+        case Storage::Mesh::Quads:
           primitive = GL_QUADS;
           break;
-        case Mesh::Triangles:
+        case Storage::Mesh::Triangles:
           primitive = GL_TRIANGLES;
           break;
       }

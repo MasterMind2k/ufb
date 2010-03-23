@@ -17,17 +17,17 @@
 #include "scene/light.h"
 #include "scene/camera.h"
 
-#include "storage/storage.h"
+#include "storage/storagemanager.h"
 #include "storage/mesh.h"
 #include "storage/texture.h"
 #include "storage/shaderprogram.h"
 
 #include "movinglight.h"
 
-BGE::Mesh* createCube()
+BGE::Storage::Mesh* createCube()
 {
   QString name = "cube";
-  BGE::Mesh* mesh = new BGE::Mesh(name);
+  BGE::Storage::Mesh* mesh = new BGE::Storage::Mesh(name);
   float half = 5;
   // Prepare our vertices
   Vector3f bottomFrontLeft(-half, -half, half);
@@ -62,7 +62,7 @@ int main(int argc, char** argv)
   QApplication app(argc, argv);
 
   // Make a small cube
-  BGE::Mesh* cube = createCube();
+  BGE::Storage::Mesh* cube = createCube();
 
   // Load models and textures
   BGE::Canvas::canvas()->loadResource();
@@ -74,9 +74,9 @@ int main(int argc, char** argv)
 
   // Add our model
   BGE::Scene::Object* fighter = new BGE::Scene::Object;
-  fighter->setShaderProgram(BGE::Storage::self()->get<BGE::ShaderProgram*>("/shaders/Shader"));
-  fighter->setMesh(BGE::Storage::self()->get<BGE::Mesh*>("/models/Fighter"));
-  fighter->setTexture(BGE::Storage::self()->get<BGE::Texture*>("/textures/Fighter"));
+  fighter->setShaderProgram(BGE::Storage::StorageManager::self()->get<BGE::Storage::ShaderProgram*>("/shaders/Shader"));
+  fighter->setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/models/Fighter"));
+  fighter->setTexture(BGE::Storage::StorageManager::self()->get<BGE::Storage::Texture*>("/textures/Fighter"));
   BGE::Canvas::canvas()->addSceneObject(fighter);
 
   // Create lights
@@ -88,7 +88,7 @@ int main(int argc, char** argv)
   light->setSpotExponent(50);
   light->setMesh(cube);
   light->observe(fighter);
-  light->setShaderProgram(BGE::Storage::self()->get<BGE::ShaderProgram*>("/shaders/Shader"));
+  light->setShaderProgram(BGE::Storage::StorageManager::self()->get<BGE::Storage::ShaderProgram*>("/shaders/Shader"));
   movingLight->addChild(light);
 
   light = BGE::Canvas::canvas()->createLight("Blue light");
@@ -97,7 +97,7 @@ int main(int argc, char** argv)
   light->setSpotExponent(50);
   light->setMesh(cube);
   light->observe(fighter);
-  light->setShaderProgram(BGE::Storage::self()->get<BGE::ShaderProgram*>("/shaders/Shader"));
+  light->setShaderProgram(BGE::Storage::StorageManager::self()->get<BGE::Storage::ShaderProgram*>("/shaders/Shader"));
   movingLight->addChild(light);
 
   light = BGE::Canvas::canvas()->createLight("Green light");
@@ -106,7 +106,7 @@ int main(int argc, char** argv)
   light->setSpotExponent(50);
   light->setMesh(cube);
   light->observe(fighter);
-  light->setShaderProgram(BGE::Storage::self()->get<BGE::ShaderProgram*>("/shaders/Shader"));
+  light->setShaderProgram(BGE::Storage::StorageManager::self()->get<BGE::Storage::ShaderProgram*>("/shaders/Shader"));
   movingLight->addChild(light);
 
   light = BGE::Canvas::canvas()->createLight("Yellow light");
@@ -115,7 +115,7 @@ int main(int argc, char** argv)
   light->setSpotExponent(50);
   light->setMesh(cube);
   light->observe(fighter);
-  light->setShaderProgram(BGE::Storage::self()->get<BGE::ShaderProgram*>("/shaders/Shader"));
+  light->setShaderProgram(BGE::Storage::StorageManager::self()->get<BGE::Storage::ShaderProgram*>("/shaders/Shader"));
   movingLight->addChild(light);
   BGE::Canvas::canvas()->addSceneObject(movingLight);
 

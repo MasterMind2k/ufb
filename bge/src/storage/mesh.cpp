@@ -15,6 +15,7 @@
 #include <QtCore/QMap>
 
 using namespace BGE;
+using namespace BGE::Storage;
 
 void Mesh::addVertices(const QString& name, const VectorList& vertices)
 {

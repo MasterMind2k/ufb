@@ -13,4 +13,5 @@
 #include "texture.h"
 
 using namespace BGE;
+using namespace BGE::Storage;
 

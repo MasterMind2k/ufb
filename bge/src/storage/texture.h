@@ -10,20 +10,20 @@
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
  ***************************************************************************/
-#ifndef __BGE_TEXTURE_H
-#define __BGE_TEXTURE_H
+#ifndef __BGE_STORAGE_TEXTURE_H
+#define __BGE_STORAGE_TEXTURE_H
 
 #include "storage/item.h"
 
 #include <QtGui/QImage>
 
 namespace BGE {
+namespace Storage {
 
-class Texture : public BGE::Item
+class Texture : public Item
 {
   public:
-    inline Texture(const QString& name) : Item(name)
-    {}
+    inline Texture(const QString& name) : Item(name) {}
 
     /**
      * Sets a texture image.
@@ -44,6 +44,7 @@ class Texture : public BGE::Item
     QImage m_texture;
 };
 
+}
 }
 
 #endif

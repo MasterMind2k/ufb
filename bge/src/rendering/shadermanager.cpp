@@ -32,7 +32,7 @@ ShaderManager::ShaderManager()
   getShaderFunctions();
 }
 
-void ShaderManager::bindProgram(ShaderProgram* shaderProgram)
+void ShaderManager::bindProgram(Storage::ShaderProgram* shaderProgram)
 {
   if (!shaderProgram || shaderProgram->hasFailed())
     return;
@@ -44,15 +44,15 @@ void ShaderManager::bindProgram(ShaderProgram* shaderProgram)
 
   shaderProgram->bind(glCreateProgram());
 
-  foreach (Shader* shader, shaderProgram->shaders()) {
+  foreach (Storage::Shader* shader, shaderProgram->shaders()) {
     shader->incrementReferenceCounter();
     if (!shader->bindId()) {
       // Bind and compile shader
       switch (shader->type()) {
-        case Shader::VertexShader:
+        case Storage::Shader::VertexShader:
           shader->bind(glCreateShader(VERTEX_SHADER));
           break;
-        case Shader::FragmentShader:
+        case Storage::Shader::FragmentShader:
           shader->bind(glCreateShader(FRAGMENT_SHADER));
           break;
         default:
@@ -108,14 +108,14 @@ void ShaderManager::bindProgram(ShaderProgram* shaderProgram)
   }
 }
 
-void ShaderManager::unbindProgram(ShaderProgram *shaderProgram)
+void ShaderManager::unbindProgram(Storage::ShaderProgram *shaderProgram)
 {
   if (!shaderProgram || !shaderProgram->bindId())
     return;
 
   // Unbind all shaders
   if (!shaderProgram->decrementReferenceCounter()) {
-    foreach (Shader* shader, shaderProgram->shaders()) {
+    foreach (Storage::Shader* shader, shaderProgram->shaders()) {
       // Deattaches shader
       glDetachShader(shaderProgram->bindId(), shader->bindId());
       // Unbinds it
@@ -130,7 +130,7 @@ void ShaderManager::unbindProgram(ShaderProgram *shaderProgram)
   }
 }
 
-void ShaderManager::bindAttribute(const QString &name, quint32 size, quint32 stride, quint32 offset, ShaderProgram* program)
+void ShaderManager::bindAttribute(const QString &name, quint32 size, quint32 stride, quint32 offset, Storage::ShaderProgram* program)
 {
   if (!program)
     return;
@@ -145,7 +145,7 @@ void ShaderManager::bindAttribute(const QString &name, quint32 size, quint32 str
   glVertexAttribPointer(loc, size, GL_FLOAT, GL_FALSE, stride, (void*) offset);
 }
 
-void ShaderManager::useProgram(ShaderProgram* shaderProgram)
+void ShaderManager::useProgram(Storage::ShaderProgram* shaderProgram)
 {
   if (!shaderProgram)
     return;

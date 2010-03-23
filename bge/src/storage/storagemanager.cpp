@@ -11,7 +11,7 @@
  *   GNU General Public License for more details.                          *
  ***************************************************************************/
 
-#include "storage.h"
+#include "storagemanager.h"
 
 #include <QtCore/QDir>
 #include <QtCore/QStack>
@@ -27,20 +27,21 @@
 #include "storage/shader.h"
 
 using namespace BGE;
+using namespace BGE::Storage;
 
-Storage* Storage::m_self = 0l;
+StorageManager* StorageManager::m_self = 0l;
 
-Storage::Storage()
+StorageManager::StorageManager()
 {
   m_root = new Item("/");
 }
 
-Storage::~Storage()
+StorageManager::~StorageManager()
 {
   delete m_root;
 }
 
-void Storage::load()
+void StorageManager::load()
 {
   QStack<QFileInfo> dirs;
   dirs += QDir(":/bge_resources").entryInfoList().toVector();
@@ -93,7 +94,7 @@ void Storage::load()
   }
 }
 
-Item* Storage::get(const QString &path) const
+Item* StorageManager::get(const QString &path) const
 {
   if (!path.startsWith("/") || path.endsWith("/"))
     return 0l;

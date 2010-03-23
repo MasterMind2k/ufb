@@ -15,7 +15,8 @@
 #include <QtCore/QRegExp>
 
 using namespace BGE;
-using namespace BGE::Loader;
+using namespace BGE::Storage;
+using namespace BGE::Storage::Loader;
 
 QString AbstractLoader::name() const
 {

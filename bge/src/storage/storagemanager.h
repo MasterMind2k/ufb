@@ -11,29 +11,30 @@
  *   GNU General Public License for more details.                          *
  ***************************************************************************/
 
-#ifndef __BGE_STORAGE_H
-#define __BGE_STORAGE_H
+#ifndef __BGE_STORAGE_STORAGEMANAGER_H
+#define __BGE_STORAGE_STORAGEMANAGER_H
 
 #include <QtCore/QString>
 
 namespace BGE {
+namespace Storage {
 class Item;
 
-class Storage
+class StorageManager
 {
   public:
     /**
      * Instance "getter" method.
      */
-    inline static Storage* self()
+    inline static StorageManager* self()
     {
       if (!m_self)
-        m_self = new Storage;
+        m_self = new StorageManager;
 
       return m_self;
     }
 
-    ~Storage();
+    ~StorageManager();
 
     /**
      * Loads the data from the :/bge_resources directory.
@@ -54,13 +55,14 @@ class Storage
     }
 
   private:
-    static Storage* m_self;
+    static StorageManager* m_self;
     Item* m_root;
 
     /* It's a singleton class */
-    Storage();
+    StorageManager();
 };
 
+}
 }
 
 #endif

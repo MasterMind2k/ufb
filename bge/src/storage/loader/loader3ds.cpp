@@ -21,7 +21,8 @@
 #include "storage/mesh.h"
 
 using namespace BGE;
-using namespace BGE::Loader;
+using namespace BGE::Storage;
+using namespace BGE::Storage::Loader;
 
 Item* Loader3DS::load()
 {

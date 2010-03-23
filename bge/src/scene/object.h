@@ -20,10 +20,13 @@
 
 namespace BGE {
 class Canvas;
+
+namespace Storage {
 class Mesh;
 class Texture;
 class Shader;
 class ShaderProgram;
+}
 
 namespace Rendering
 {
@@ -283,14 +286,14 @@ class Object
     /**
      * Sets the mesh.
      */
-    inline void setMesh(Mesh* mesh)
+    inline void setMesh(Storage::Mesh* mesh)
     {
       m_mesh = mesh;
     }
     /**
      * Gets the mesh.
      */
-    inline Mesh* mesh() const
+    inline Storage::Mesh* mesh() const
     {
       return m_mesh;
     }
@@ -298,14 +301,14 @@ class Object
     /**
      * Sets the texture.
      */
-    inline void setTexture(Texture* texture)
+    inline void setTexture(Storage::Texture* texture)
     {
       m_texture = texture;
     }
     /**
      * Gets the texture.
      */
-    inline Texture* texture() const
+    inline Storage::Texture* texture() const
     {
       return m_texture;
     }
@@ -345,12 +348,12 @@ class Object
       return m_observed;
     }
 
-    void setShaderProgram(ShaderProgram* shaderProgram);
+    void setShaderProgram(Storage::ShaderProgram* shaderProgram);
     inline void removeShaderProgram()
     {
       m_shaderProgram = 0l;
     }
-    inline ShaderProgram* shaderProgram() const
+    inline Storage::ShaderProgram* shaderProgram() const
     {
       return m_shaderProgram;
     }
@@ -376,12 +379,12 @@ class Object
     Object* m_parent;
     bool m_transformModified;
 
-    Mesh* m_mesh;
-    Texture* m_texture;
+    Storage::Mesh* m_mesh;
+    Storage::Texture* m_texture;
 
     Object* m_observed;
 
-    ShaderProgram* m_shaderProgram;
+    Storage::ShaderProgram* m_shaderProgram;
 
     /* Be very careful in these classes!!! */
     friend class BGE::Canvas;

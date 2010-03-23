@@ -10,14 +10,15 @@
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
  ***************************************************************************/
-#ifndef __BGE_LOADER_LOADER3DS_H
-#define __BGE_LOADER_LOADER3DS_H
+#ifndef __BGE_STORAGE_LOADER_LOADER3DS_H
+#define __BGE_STORAGE_LOADER_LOADER3DS_H
 
 #include "storage/loader/abstractloader.h"
 
 class QFile;
 
 namespace BGE {
+namespace Storage {
 namespace Loader {
 
 class Loader3DS : public AbstractLoader
@@ -31,6 +32,7 @@ class Loader3DS : public AbstractLoader
     QString readString(QFile& file) const;
 };
 
+}
 }
 }
 

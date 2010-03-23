@@ -246,7 +246,7 @@ void DirectRenderer::bindMesh(Scene::Object* object)
       QVector<quint16> idxs = face.second;
       switch (face.first) {
         // Quads rendering
-        case Mesh::Quads:
+        case Storage::Mesh::Quads:
           foreach (quint16 idx, idxs) {
             // Prepare normal vectors
             if (hasNormals)
@@ -262,7 +262,7 @@ void DirectRenderer::bindMesh(Scene::Object* object)
           break;
 
         // Triangles rendering
-        case Mesh::Triangles:
+        case Storage::Mesh::Triangles:
           // Prepare vertices
           verticesTemp << vertices.at(idxs.at(0)) << vertices.at(idxs.at(1)) << vertices.at(idxs.at(2));
           // Prepare texture mappings

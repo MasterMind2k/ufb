@@ -15,10 +15,11 @@
 #include <QtCore/QQueue>
 #include <QtCore/QSet>
 
-#include "storage/storage.h"
+#include "storage/storagemanager.h"
 #include "storage/shader.h"
 
 using namespace BGE;
+using namespace BGE::Storage;
 
 bool ShaderProgram::prepareProgram()
 {
@@ -33,7 +34,7 @@ bool ShaderProgram::prepareProgram()
     Shader* shader = queue.dequeue();
 
     foreach (QString import, shader->dependencies()) {
-      Shader* shaderDependancy = Storage::self()->get<Shader*>(import);
+      Shader* shaderDependancy = StorageManager::self()->get<Shader*>(import);
       if (!shaderDependancy) {
         qWarning("BGE::ShaderProgram::prepareProgram(): Shader program '%s' cannot be imported. Shader module '%s' is missing.", name().toUtf8().data(), import.toUtf8().data());
         return false;

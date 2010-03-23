@@ -10,16 +10,17 @@
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
  ***************************************************************************/
-#ifndef __BGE_SHADER_H
-#define __BGE_SHADER_H
+#ifndef __BGE_STORAGE_SHADER_H
+#define __BGE_STORAGE_SHADER_H
 
 #include "storage/item.h"
 
 #include <QtCore/QStringList>
 
 namespace BGE {
+namespace Storage {
 
-class Shader : public BGE::Item
+class Shader : public Item
 {
   public:
     enum Type {
@@ -27,7 +28,7 @@ class Shader : public BGE::Item
       FragmentShader
     };
 
-    Shader(const QString& name);
+    inline Shader(const QString& name) : Item(name) {}
 
     inline void setShaderSource(const QString& source, Type type)
     {
@@ -62,6 +63,7 @@ class Shader : public BGE::Item
     Type m_type;
 };
 
+}
 }
 
 #endif

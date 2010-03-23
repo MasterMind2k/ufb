@@ -15,7 +15,8 @@
 #include "storage/texture.h"
 
 using namespace BGE;
-using namespace BGE::Loader;
+using namespace BGE::Storage;
+using namespace BGE::Storage::Loader;
 
 Item* TextureLoader::load()
 {

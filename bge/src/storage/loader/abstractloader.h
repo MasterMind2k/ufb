@@ -10,12 +10,13 @@
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
  ***************************************************************************/
-#ifndef __BGE_LOADER_ABSTRACTLOADER_H
-#define __BGE_LOADER_ABSTRACTLOADER_H
+#ifndef __BGE_STORAGE_LOADER_ABSTRACTLOADER_H
+#define __BGE_STORAGE_LOADER_ABSTRACTLOADER_H
 
 #include <QtCore/QString>
 
 namespace BGE {
+namespace Storage {
 class Item;
 namespace Loader {
 
@@ -40,6 +41,7 @@ class AbstractLoader
     QString m_filename;
 };
 
+}
 }
 }
 

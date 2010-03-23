@@ -106,7 +106,7 @@ void Object::lookAt(Object *object)
   setOrientation(rotation);
 }
 
-void Object::setShaderProgram(ShaderProgram *shaderProgram)
+void Object::setShaderProgram(Storage::ShaderProgram *shaderProgram)
 {
   if (m_shaderProgram)
     qWarning("BGE::Scene::Object::setShaderProgram(): Replacing shader program!");

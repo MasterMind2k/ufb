@@ -10,8 +10,8 @@
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
  ***************************************************************************/
-#ifndef __BGE_MESH_H
-#define __BGE_MESH_H
+#ifndef __BGE_STORAGE_MESH_H
+#define __BGE_STORAGE_MESH_H
 
 #include <QtCore/QMultiMap>
 #include <QtCore/QVector>
@@ -25,6 +25,7 @@
 #include "global.h"
 
 namespace BGE {
+namespace Storage {
 
 class Mesh : public Item
 {
@@ -139,12 +140,13 @@ class Mesh : public Item
 };
 
 }
+}
 
-inline uint qHash(BGE::Mesh::Primitives primitive)
+inline uint qHash(BGE::Storage::Mesh::Primitives primitive)
 {
   return (uint) primitive;
 }
 
-typedef QPair<BGE::Mesh::Primitives, QVector<quint16> > Face;
+typedef QPair<BGE::Storage::Mesh::Primitives, QVector<quint16> > Face;
 
 #endif

@@ -13,6 +13,7 @@
 #include "item.h"
 
 using namespace BGE;
+using namespace BGE::Storage;
 
 bool Item::removeItem(const QString& name)
 {
