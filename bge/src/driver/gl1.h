@@ -42,6 +42,10 @@ class GL1 : public AbstractDriver
 
     void draw(Scene::Object* object);
 
+    void init();
+    void clear();
+    void setProjection(const QMatrix4x4& transform);
+
   private:
     quint8 m_usedLights;
 };

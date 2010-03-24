@@ -363,10 +363,13 @@ class Object
      * This method gets called _before_ transform matrices get updated. Reimplement
      * it to add your own transforms.
      */
-    virtual inline void calculateTransforms() {}
+    virtual inline void calculateTransforms(qint32 timeDiff)
+    {
+      Q_UNUSED(timeDiff);
+    }
 
   private:
-    void prepareTransforms();
+    void prepareTransforms(qint32 timeDiff);
 
     Transform3f m_transform;
     Transform3f m_globalTransform;

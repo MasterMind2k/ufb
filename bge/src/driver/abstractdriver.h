@@ -17,6 +17,7 @@
 #include "global.h"
 
 class QString;
+class QMatrix4x4;
 
 namespace BGE {
 
@@ -57,6 +58,10 @@ class AbstractDriver
     virtual void setTransformMatrix(const Transform3f& transform) = 0;
 
     virtual void draw(Scene::Object* object) = 0;
+
+    virtual void init() = 0;
+    virtual void clear() = 0;
+    virtual void setProjection(const QMatrix4x4& transform) = 0;
 
   protected:
     inline AbstractDriver() {}

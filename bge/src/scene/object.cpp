@@ -122,14 +122,14 @@ void Object::setShaderProgram(Storage::ShaderProgram *shaderProgram)
   m_shaderProgram = shaderProgram;
 }
 
-void Object::prepareTransforms()
+void Object::prepareTransforms(qint32 timeDiff)
 {
   // Calculate the observing transforms
   if (m_observed && (m_observed->isTransformModified() || isTransformModified()))
     lookAt(m_observed);
 
   // Calculate any additional transformations
-  calculateTransforms();
+  calculateTransforms(timeDiff);
 
   // Refresh the transform matrices
   if (isTransformModified()) {
@@ -159,6 +159,6 @@ void Object::prepareTransforms()
       child->m_transformModified = true;
 
     // Make the recursion
-    child->prepareTransforms();
+    child->prepareTransforms(timeDiff);
   }
 }

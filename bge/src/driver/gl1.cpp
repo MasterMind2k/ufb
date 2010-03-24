@@ -12,6 +12,8 @@
  ***************************************************************************/
 #include "gl1.h"
 
+#include <QtGui/QMatrix4x4>
+
 #include "canvas.h"
 
 #include "scene/object.h"
@@ -227,4 +229,30 @@ void GL1::draw(Scene::Object* object)
 
   if (hasTexture)
     glDisable(GL_TEXTURE_2D);
+}
+
+void GL1::init()
+{
+  glClearColor(0, 0, 0, 0);
+  glShadeModel(GL_SMOOTH);
+  glEnable(GL_DEPTH_TEST);
+
+  glEnable(GL_LIGHTING);
+  glEnable(GL_COLOR_MATERIAL);
+  glEnable(GL_CULL_FACE);
+  glEnable(GL_NORMALIZE);
+}
+
+void GL1::clear()
+{
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glMatrixMode(GL_MODELVIEW);
+  glLoadIdentity();
+}
+
+void GL1::setProjection(const QMatrix4x4& transform)
+{
+  glMatrixMode(GL_PROJECTION);
+  glLoadMatrixd(transform.data());
+  glMatrixMode(GL_MODELVIEW);
 }
