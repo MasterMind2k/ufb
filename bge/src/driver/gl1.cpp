@@ -248,6 +248,7 @@ void GL1::setTransformMatrix(const Transform3f& transform)
 void GL1::draw(Scene::Object* object)
 {
   bool hasTexture = object->texture() && object->texture()->bindId();
+
   if (hasTexture)
     glEnable(GL_TEXTURE_2D);
 
@@ -264,7 +265,6 @@ void GL1::init()
   glEnable(GL_DEPTH_TEST);
 
   glEnable(GL_LIGHTING);
-  glEnable(GL_COLOR_MATERIAL);
   glEnable(GL_CULL_FACE);
   glEnable(GL_NORMALIZE);
 }
