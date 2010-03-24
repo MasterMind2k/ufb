@@ -23,6 +23,7 @@
 
 USING_PART_OF_NAMESPACE_EIGEN
 using Eigen::Transform3f;
+using Eigen::Transform3d;
 using Eigen::Quaternionf;
 using Eigen::AngleAxisf;
 using Eigen::Scaling3f;

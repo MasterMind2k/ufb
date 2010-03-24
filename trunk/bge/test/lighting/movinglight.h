@@ -24,7 +24,7 @@ class MovingLight :  public QObject, public BGE::Scene::Object
     explicit MovingLight();
 
   private:
-    void calculateTransforms();
+    void calculateTransforms(qint32 timeDiff);
 
   private slots:
     void change();

@@ -24,7 +24,7 @@ class MovingCube : public QObject, public BGE::Scene::Object
     MovingCube(int seed);
 
   private:
-    void calculateTransforms();
+    void calculateTransforms(qint32 timeDiff);
 
     Vector3f m_direction;
     AngleAxisf m_rotation;

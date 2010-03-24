@@ -150,21 +150,13 @@ class Canvas : public QGLWidget
     void loadResource(const QString& fileName = QString());
 
   private:
-    /* Reimplemented methods */
-    void initializeGL();
-    void resizeGL(int w, int h);
-    void paintGL();
-
-    void keyPressEvent(QKeyEvent* event);
-    void mouseMoveEvent(QMouseEvent* event);
-    void mousePressEvent(QMouseEvent* event);
-
     /* Really private stuff */
-    Canvas();
-
     Scene::Object* m_scene;
     Rendering::Renderer* m_renderer;
     AbstractController* m_controller;
+    QTime *m_time;
+    QTimer *m_timer;
+    qint32 m_totalElapsed;
 
     QHash<QString, Scene::Camera*> m_cameras;
     Scene::Camera* m_activeCamera;
@@ -173,9 +165,21 @@ class Canvas : public QGLWidget
 
     bool m_showFPS;
     quint64 m_frames;
-    quint64 m_fps;
+    qreal m_fps;
 
     static Canvas* m_self;
+
+    Canvas();
+
+
+    /* Reimplemented methods */
+    void initializeGL();
+    void resizeGL(int w, int h);
+    void paintGL();
+
+    void keyPressEvent(QKeyEvent* event);
+    void mouseMoveEvent(QMouseEvent* event);
+    void mousePressEvent(QMouseEvent* event);
 
   private slots:
     void cleanup();

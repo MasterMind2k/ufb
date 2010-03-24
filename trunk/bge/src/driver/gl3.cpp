@@ -12,6 +12,8 @@
  ***************************************************************************/
 #include "gl3.h"
 
+#include <QtGui/QMatrix4x4>
+
 #include "canvas.h"
 
 #include "scene/object.h"
@@ -192,6 +194,32 @@ void GL3::draw(Scene::Object *object)
   unbindAttribute(object->shaderProgram(), "Vertex");
   unbindAttribute(object->shaderProgram(), "Normal");
   unbindAttribute(object->shaderProgram(), "TexCoord");
+}
+
+void GL3::init()
+{
+  glClearColor(0, 0, 0, 0);
+  glShadeModel(GL_SMOOTH);
+  glEnable(GL_DEPTH_TEST);
+
+  glEnable(GL_LIGHTING);
+  glEnable(GL_COLOR_MATERIAL);
+  glEnable(GL_CULL_FACE);
+  glEnable(GL_NORMALIZE);
+}
+
+void GL3::clear()
+{
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glMatrixMode(GL_MODELVIEW);
+  glLoadIdentity();
+}
+
+void GL3::setProjection(const QMatrix4x4& transform)
+{
+  glMatrixMode(GL_PROJECTION);
+  glLoadMatrixd(transform.data());
+  glMatrixMode(GL_MODELVIEW);
 }
 
 void GL3::load(Storage::Mesh *mesh)

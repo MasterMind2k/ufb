@@ -15,11 +15,14 @@
 #include "rendering/renderer.h"
 
 #include <QtCore/QTimer>
+#include <QtCore/QTime>
 #include <QtCore/QResource>
 
 #include <QtGui/QKeyEvent>
 #include <QtGui/QMatrix4x4>
 #include <QtGui/QApplication>
+
+#include "driver/abstractdriver.h"
 
 #include "scene/object.h"
 #include "scene/camera.h"
@@ -28,9 +31,6 @@
 #include "storage/storagemanager.h"
 
 #include "abstractcontroller.h"
-
-#include <QtDebug>
-#include <QtOpenGL/QGLShaderProgram>
 
 using namespace BGE;
 
@@ -41,17 +41,14 @@ Canvas::Canvas()
 {
   m_frames = 0;
   m_fps = 0;
+  m_totalElapsed = 0;
 
-  // Setting up a timer for "game loop"
-  QTimer* timer = new QTimer(this);
-  timer->setSingleShot(false);
-  timer->setInterval(30);
-  timer->start();
+  m_timer = new QTimer(this);
+  m_timer->setSingleShot(false);
+  m_timer->setInterval(0);
 
-  QTimer* fps = new QTimer(this);
-  fps->setSingleShot(false);
-  fps->setInterval(1000);
-  fps->start();
+  m_time = new QTime;
+  m_time->start();
 
   // Initialize scene graph and set active camera to none
   m_scene = new Scene::Object;
@@ -64,8 +61,7 @@ Canvas::Canvas()
   // Needed to "block" any idiotic loading of a idiotic shaders :D
   QGL::setPreferredPaintEngine(QPaintEngine::OpenGL);
 
-  connect(timer, SIGNAL(timeout()), SLOT(updateGL()));
-  connect(fps, SIGNAL(timeout()), SLOT(updateFPS()));
+  connect(m_timer, SIGNAL(timeout()), SLOT(updateGL()));
   connect(QApplication::instance(), SIGNAL(aboutToQuit()), SLOT(cleanup()));
 }
 
@@ -83,18 +79,11 @@ Canvas* Canvas::canvas()
 }
 
 void Canvas::initializeGL()
-{  // Creating a renderer
+{
+  // Creating a renderer
   m_renderer = new Rendering::Renderer;
 
-  // This initialization method could/should be moved to Rendering API
-  glClearColor(0, 0, 0, 0);
-  glShadeModel(GL_SMOOTH);
-  glEnable(GL_DEPTH_TEST);
-
-  glEnable(GL_LIGHTING);
-  glEnable(GL_COLOR_MATERIAL);
-  glEnable(GL_CULL_FACE);
-  glEnable(GL_NORMALIZE);
+  Driver::AbstractDriver::self()->init();
 }
 
 void Canvas::resizeGL(int w, int h)
@@ -104,20 +93,23 @@ void Canvas::resizeGL(int w, int h)
   // Default perspective setup
   QMatrix4x4 perspective;
   perspective.perspective(80, (qreal) w / (qreal) h, 0.1, 1000.0);
-  glMatrixMode(GL_PROJECTION);
-  glLoadMatrixd(perspective.data());
-  glMatrixMode(GL_MODELVIEW);
+  //glLoadMatrixd(perspective.data());
+  Driver::AbstractDriver::self()->setProjection(perspective);
 }
 
 void Canvas::paintGL()
 {
-  // Reset the matrix and other stuff
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  glMatrixMode(GL_MODELVIEW);
-  glLoadIdentity();
+  m_timer->stop();
+
+  // Reset the scene
+  Driver::AbstractDriver::self()->clear();
+
+  qint32 elapsed = m_time->restart();
+  m_totalElapsed += elapsed;
 
   // Calculate all the transforms (recursive)
-  m_scene->prepareTransforms();
+  if (elapsed > 0)
+    m_scene->prepareTransforms(elapsed);
 
   // Enqueue objects for rendering
   /// @TODO Culling comes here somewhere :D (someday)
@@ -136,12 +128,17 @@ void Canvas::paintGL()
   m_renderer->renderScene();
 
   m_frames++;
+  if (m_totalElapsed >= 1000)
+    updateFPS();
 
   // 2D painting
   QPainter painter(this);
   painter.setPen(Qt::white);
   painter.drawText(width() / 2, height() - 3, "FPS: " + QString::number(m_fps));
   painter.end();
+
+  // Set next rendering
+  m_timer->start();
 }
 
 void Canvas::setController(AbstractController* controller)
@@ -253,10 +250,12 @@ void Canvas::cleanup()
 
   // Delete the storage
   delete Storage::StorageManager::self();
+  delete m_time;
 }
 
 void Canvas::updateFPS()
 {
-  m_fps = m_frames;
+  m_fps = ((qreal) m_frames / m_totalElapsed) * 1000.0;
   m_frames = 0;
+  m_totalElapsed = 0;
 }

@@ -30,10 +30,10 @@ MovingCube::MovingCube(int seed)
   change();
 }
 
-void MovingCube::calculateTransforms()
+void MovingCube::calculateTransforms(qint32 timeDiff)
 {
-  move(m_direction);
-  rotate(m_rotation);
+  move(m_direction * timeDiff / 30.0);
+  rotate(AngleAxisf(m_rotation.angle() * timeDiff / 30.0, m_rotation.axis()));
 }
 
 void MovingCube::change()
