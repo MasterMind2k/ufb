@@ -67,6 +67,26 @@ void drawTriangles(const VectorList& vertices, const VectorList& normals, const 
   glEnd();
 }
 
+void setMaterial(Storage::Material* material)
+{
+  if (!material)
+    return;
+
+  Vector4f color(material->ambient().redF(), material->ambient().greenF(), material->ambient().blueF(), material->ambient().alphaF());
+  glMaterialfv(GL_FRONT, GL_AMBIENT, color.data());
+
+  color = Vector4f(material->diffuse().redF(), material->diffuse().greenF(), material->diffuse().blueF(), material->diffuse().alphaF());
+  glMaterialfv(GL_FRONT, GL_DIFFUSE, color.data());
+
+  color = Vector4f(material->specular().redF(), material->specular().greenF(), material->specular().blueF(), material->specular().alphaF());
+  glMaterialfv(GL_FRONT, GL_SPECULAR, color.data());
+
+  color = Vector4f(material->emission().redF(), material->emission().greenF(), material->emission().blueF(), material->emission().alphaF());
+  glMaterialfv(GL_FRONT, GL_EMISSION, color.data());
+
+  glMateriali(GL_FRONT, GL_SHININESS, material->shininess());
+}
+
 GL1::GL1()
 {
   m_usedLights = 0;
@@ -90,13 +110,18 @@ void GL1::bind(Storage::Mesh *mesh)
     QVector<Vector3f> vertices = mesh->vertices(meshObject);
     QVector<Vector3f> normals = mesh->normals(meshObject);
     QVector<Vector2f> textureMaps = mesh->textureMaps(meshObject);
+    FaceMaterial materials = mesh->faceMaterials(meshObject);
     bool hasTexturesMapping = !textureMaps.isEmpty();
 
+    quint16 i = 0;
     foreach (Face face, mesh->faces(meshObject)) {
       // Temporary lists and vectors
       VectorList verticesTemp;
       QVector<Vector2f> textureMapTemp;
       VectorList normalsTemp;
+
+      // Setup material
+      setMaterial(materials.value(i++));
 
       QVector<quint16> idxs = face.second;
       switch (face.first) {
@@ -111,6 +136,7 @@ void GL1::bind(Storage::Mesh *mesh)
             if (hasTexturesMapping)
               textureMapTemp << textureMaps.at(idx);
           }
+
           // Render
           drawQuads(verticesTemp, normalsTemp, textureMapTemp);
           break;

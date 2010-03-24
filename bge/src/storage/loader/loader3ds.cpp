@@ -34,9 +34,22 @@ Item* Loader3DS::load()
 
   Mesh* mesh = new Mesh(name());
 
+  // Material hash
+  QHash<QString, Material*> materials;
+
   // Temporary variables
   VectorList vertices;
   QString objectName;
+  Material* material = 0l;
+  QString materialName;
+  QHash<QString, QList<quint16> > faceMaterials;
+
+  enum MaterialState {
+    Ambient,
+    Diffuse,
+    Specular,
+    Shininess
+  } materialState;
 
   // Used the format definition from
   // http://jerome.jouvie.free.fr/OpenGl/Projects/3dsInfo.txt
@@ -54,6 +67,8 @@ Item* Loader3DS::load()
       case 0x3D3D:
       // Triangular mesh
       case 0x4100:
+      // Material block
+      case 0xAFFF:
         // Nothing to do :)
         break;
 
@@ -107,6 +122,22 @@ Item* Loader3DS::load()
         break;
       }
 
+      // Faces material list
+      case 0x4130: {
+        QString materialName = readString(modelFile);
+        quint16 facesNum = *(quint16*) modelFile.read(2).data();
+
+        QList<quint16> idxs;
+        for (quint16 i = 0; i < facesNum; i++) {
+          quint16 faceIdx = *(quint16*) modelFile.read(2).data();
+          idxs << faceIdx;
+        }
+        faceMaterials.insert(materialName, idxs);
+
+        qDebug("BGE::Loader::Loader3DS::parse(): Parsed %d material mappings for faces.", facesNum);
+        break;
+      }
+
       // Mapping coordinates list for each vertex
       case 0x4140: {
         quint16 verticesNumber = *(quint16*) modelFile.read(2).data();
@@ -122,10 +153,93 @@ Item* Loader3DS::load()
         break;
       }
 
+      // Material name
+      case 0xA000: {
+        materialName = readString(modelFile);
+        material = new Material;
+        materials.insert(materialName, material);
+
+        qDebug("BGE::Storage::Loader:Loader3DS::parse(): Parsing material '%s'.", materialName.toUtf8().data());
+        break;
+      }
+
+      // Material ambient color
+      case 0xA010: {
+        materialState = Ambient;
+
+        qDebug("BGE::Storage::Loader::Loader3DS::parse(): Parsing material '%s' ambient color.", materialName.toUtf8().data());
+        break;
+      }
+
+      // Material diffuse color
+      case 0xA020 : {
+        materialState = Diffuse;
+
+        qDebug("BGE::Storage::Loader::Loader3DS::parse(): Parsing material '%s' diffuse color.", materialName.toUtf8().data());
+        break;
+      }
+
+      // Material specular color
+      case 0xA030 : {
+        materialState = Specular;
+
+        qDebug("BGE::Storage::Loader::Loader3DS::parse(): Parsing material '%s' specular color.", materialName.toUtf8().data());
+        break;
+      }
+
+      // Material shininess
+      case 0xA040 : {
+        materialState = Shininess;
+
+        qDebug("BGE::Storage::Loader::Loader3DS::parse(): Parsing material '%s' shininess.", materialName.toUtf8().data());
+        break;
+      }
+
+      // Color (byte)
+      case 0x0011: {
+        quint8 red = *(quint8*) modelFile.read(1).data();
+        quint8 green = *(quint8*) modelFile.read(1).data();
+        quint8 blue = *(quint8*) modelFile.read(1).data();
+        QColor color(red, green, blue);
+        switch (materialState) {
+          case Ambient:
+            material->setAmbient(color);
+            break;
+          case Diffuse:
+            material->setDiffuse(color);
+            break;
+          case Specular:
+            material->setSpecular(color);
+            break;
+          default:
+            break;
+        }
+
+        qDebug("BGE::Storage::Loader::Loader3DS::parse(): Parsed color (%d, %d, %d).", red, green, blue);
+        break;
+      }
+
+      // Percent (int format)
+      case 0x0030 : {
+        quint16 percent = *(quint16*) modelFile.read(2).data();
+        if (materialState != Shininess)
+          break;
+        material->setShininess(percent);
+
+        qDebug("BGE::Storage::Loader::Loader3DS::parse(): Parsed procent (%d).", percent);
+        break;
+      }
+
       // A complete chunk skip
       default:
         modelFile.seek(modelFile.pos() + length - 6);
     }
+  }
+
+  // Add last materials
+  foreach (QString materialName, faceMaterials.keys()) {
+    foreach (quint16 idx, faceMaterials.value(materialName))
+      mesh->addFaceMaterial(objectName, idx, materials.value(materialName));
   }
 
   return mesh;
