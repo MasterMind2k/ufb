@@ -183,8 +183,8 @@ void GL3::draw(Scene::Object *object)
     return;
 
   bindAttribute(object->shaderProgram(), "Vertex", 3, GL_FLOAT, sizeof(BufferElement), VERTEX_OFFSET);
-  bindAttribute(object->shaderProgram(), "Normal", 3, GL_FLOAT, sizeof(BufferElement), VERTEX_OFFSET);
-  bindAttribute(object->shaderProgram(), "TexCoord", 3, GL_FLOAT, sizeof(BufferElement), VERTEX_OFFSET);
+  bindAttribute(object->shaderProgram(), "Normal", 3, GL_FLOAT, sizeof(BufferElement), NORMAL_OFFSET);
+  bindAttribute(object->shaderProgram(), "TexCoord", 3, GL_FLOAT, sizeof(BufferElement), UV_OFFSET);
 
   foreach (Plan plan, m_plans.value(object->mesh()->bindId()))
     glDrawElements(plan.primitive, plan.count, GL_UNSIGNED_SHORT, (GLushort*)0 + plan.offset);
