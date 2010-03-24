@@ -93,7 +93,6 @@ void Canvas::resizeGL(int w, int h)
   // Default perspective setup
   QMatrix4x4 perspective;
   perspective.perspective(80, (qreal) w / (qreal) h, 0.1, 1000.0);
-  //glLoadMatrixd(perspective.data());
   Driver::AbstractDriver::self()->setProjection(perspective);
 }
 

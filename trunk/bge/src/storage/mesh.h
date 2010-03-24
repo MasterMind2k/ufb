@@ -26,6 +26,84 @@
 
 namespace BGE {
 namespace Storage {
+class Material;
+}
+}
+
+typedef QHash<quint16, BGE::Storage::Material*> FaceMaterial;
+
+namespace BGE {
+namespace Storage {
+
+class Material
+{
+  public:
+    inline Material()
+    {
+      /* Default values */
+      m_ambient = QColor(0.2, 0.2, 0.2, 1.0);
+      m_diffuse = QColor(0.8, 0.8, 0.8, 1.0);
+      m_specular = m_emission = QColor(0, 0, 0, 0);
+      m_shininess = 0;
+    }
+
+    inline Material(const QColor& ambient, const QColor& diffuse, const QColor& specular, const QColor& emission, float shininess)
+    {
+      m_ambient = ambient;
+      m_diffuse = diffuse;
+      m_specular = specular;
+      m_emission = emission;
+      m_shininess = shininess;
+    }
+
+    inline void setAmbient(const QColor& ambient)
+    {
+      m_ambient = ambient;
+    }
+    inline const QColor& ambient() const
+    {
+      return m_ambient;
+    }
+    inline const QColor& setDiffuse(const QColor& diffuse)
+    {
+      m_diffuse = diffuse;
+    }
+    inline const QColor& diffuse() const
+    {
+      return m_diffuse;
+    }
+    inline void setSpecular(const QColor& specular)
+    {
+      m_specular = specular;
+    }
+    inline const QColor& specular() const
+    {
+      return m_specular;
+    }
+    inline void setEmission(const QColor& emission)
+    {
+      m_emission = emission;
+    }
+    inline const QColor& emission() const
+    {
+      return m_emission;
+    }
+    inline void setShininess(quint32 shininess)
+    {
+      m_shininess = shininess;
+    }
+    inline quint32 shininess() const
+    {
+      return m_shininess;
+    }
+
+  private:
+    QColor m_ambient;
+    QColor m_diffuse;
+    QColor m_specular;
+    QColor m_emission;
+    quint32 m_shininess;
+};
 
 class Mesh : public Item
 {
@@ -107,6 +185,17 @@ class Mesh : public Item
       return m_textureMaps.value(name);
     }
 
+    inline void addFaceMaterial(const QString& name, quint16 face, Material* material)
+    {
+      FaceMaterial temp = m_materials.value(name);
+      temp.insert(face, material);
+      m_materials.insert(name, temp);
+    }
+    inline FaceMaterial faceMaterials(const QString& name)
+    {
+      return m_materials.value(name);
+    }
+
     /**
      * Adds the object name to the list.
      */
@@ -137,6 +226,8 @@ class Mesh : public Item
     QHash<QString, QVector<Vector3f> > m_vertices;
     /* Faces */
     QHash<QString, QList<QPair<Primitives, QVector<quint16> > > > m_faces;
+    /* Materials */
+    QHash<QString, FaceMaterial > m_materials;
     /* Normal vectors */
     QHash<QString, QVector<Vector3f> > m_normals;
     /* The uv texture mapping */

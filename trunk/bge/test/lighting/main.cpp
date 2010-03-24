@@ -84,7 +84,8 @@ int main(int argc, char** argv)
 
   BGE::Scene::Light* light = BGE::Canvas::canvas()->createLight("Red light");
   light->move(-150, -80, -200);
-  light->setDiffuseColor(Qt::red);
+  light->setDiffuseColor(QColor(0.5 * 255, 0, 0));
+  light->setSpecularColor(QColor(0.8 * 255, 0, 0));
   light->setSpotExponent(50);
   light->setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/models/Cube"));
   light->observe(fighter);
@@ -93,7 +94,8 @@ int main(int argc, char** argv)
 
   light = BGE::Canvas::canvas()->createLight("Blue light");
   light->move(150, 80, -200);
-  light->setDiffuseColor(Qt::blue);
+  light->setDiffuseColor(QColor(0, 0, 0.5 * 255));
+  light->setSpecularColor(QColor(0, 0, 0.8 * 255));
   light->setSpotExponent(50);
   light->setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/models/Cube"));
   light->observe(fighter);
@@ -102,7 +104,8 @@ int main(int argc, char** argv)
 
   light = BGE::Canvas::canvas()->createLight("Green light");
   light->move(-150, 80, 200);
-  light->setDiffuseColor(Qt::green);
+  light->setDiffuseColor(QColor(0, 0.5 * 255, 0));
+  light->setSpecularColor(QColor(0, 0.8 * 255, 0));
   light->setSpotExponent(50);
   light->setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/models/Cube"));
   light->observe(fighter);
@@ -111,7 +114,8 @@ int main(int argc, char** argv)
 
   light = BGE::Canvas::canvas()->createLight("Yellow light");
   light->move(150, -80, 200);
-  light->setDiffuseColor(Qt::yellow);
+  light->setDiffuseColor(QColor(0.5 * 255, 0.5 * 255, 0));
+  light->setSpecularColor(QColor(0.8 * 255, 0.8 * 255, 0));
   light->setSpotExponent(50);
   light->setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/models/Cube"));
   light->observe(fighter);
