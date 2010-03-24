@@ -18,6 +18,9 @@
 #include <QtCore/QHash>
 
 namespace BGE {
+namespace Storage {
+class Material;
+}
 namespace Driver {
 
 class GL3 : public AbstractDriver
@@ -53,6 +56,7 @@ class GL3 : public AbstractDriver
       quint32 primitive;
       quint32 count;
       quint32 offset;
+      Storage::Material* material;
     };
     quint8 m_usedLights;
     QHash<quint32, quint32> m_indices;
@@ -63,6 +67,8 @@ class GL3 : public AbstractDriver
 
     static void bindAttribute(Storage::ShaderProgram* shaderProgram, QString name, qint32 size, quint32 type, quint32 stride, quint32 offset);
     static void unbindAttribute(Storage::ShaderProgram* shaderProgram, QString name);
+
+    static void setMaterial(Storage::Material *material);
 
     static char** prepareShaderSource(const QString &source, qint32 &count, qint32 **length);
 };

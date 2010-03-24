@@ -188,8 +188,15 @@ void GL3::draw(Scene::Object *object)
   bindAttribute(object->shaderProgram(), "Normal", 3, GL_FLOAT, sizeof(BufferElement), NORMAL_OFFSET);
   bindAttribute(object->shaderProgram(), "TexCoord", 3, GL_FLOAT, sizeof(BufferElement), UV_OFFSET);
 
-  foreach (Plan plan, m_plans.value(object->mesh()->bindId()))
+  Storage::Material* currentMaterial = 0l;
+  foreach (Plan plan, m_plans.value(object->mesh()->bindId())) {
+    if (currentMaterial != plan.material) {
+      setMaterial(plan.material);
+      currentMaterial = plan.material;
+    }
+
     glDrawElements(plan.primitive, plan.count, GL_UNSIGNED_SHORT, (GLushort*)0 + plan.offset);
+  }
 
   unbindAttribute(object->shaderProgram(), "Vertex");
   unbindAttribute(object->shaderProgram(), "Normal");
@@ -203,7 +210,6 @@ void GL3::init()
   glEnable(GL_DEPTH_TEST);
 
   glEnable(GL_LIGHTING);
-  glEnable(GL_COLOR_MATERIAL);
   glEnable(GL_CULL_FACE);
   glEnable(GL_NORMALIZE);
 }
@@ -229,16 +235,18 @@ void GL3::load(Storage::Mesh *mesh)
   glBindBuffer(GL_ARRAY_BUFFER, bindId);
   mesh->setBindId(bindId);
 
-  // Make vertices, normals and faces list
+  // Make vertices, normals, faces, etc. lists
   QList<Vector3f> vertices;
   QList<Vector3f> normals;
   QList<Vector2f> textureMaps;
   QList<Face> faces;
+  QList<Storage::Material*> materials;
   foreach (QString objectName, mesh->objects()) {
     vertices += mesh->vertices(objectName).toList();
     normals += mesh->normals(objectName).toList();
     textureMaps += mesh->textureMaps(objectName).toList();
     faces += mesh->faces(objectName);
+    materials += mesh->faceMaterials(objectName).values();
   }
 
   // Process vertices and normals
@@ -284,9 +292,8 @@ void GL3::load(Storage::Mesh *mesh)
   {
     quint32 size = 0;
     QList<Face>::const_iterator i = faces.constBegin();
+    QList<Storage::Material*>::const_iterator j = materials.constBegin();
     QList<Face>::const_iterator end = faces.constEnd();
-    quint32 currentPrimitive = 0;
-    quint32 count = 0;
     QList<Plan> plans;
     QVector<quint16> idxs;
     while (i != end) {
@@ -301,29 +308,19 @@ void GL3::load(Storage::Mesh *mesh)
           break;
       }
 
-      // Save the plan
-      if (currentPrimitive != primitive) {
-        if (currentPrimitive) {
-          Plan plan;
-          plan.primitive = primitive;
-          plan.count = count;
-          plan.offset = size - count;
-          plans << plan;
-          count = 0;
-        }
-        currentPrimitive = primitive;
-      }
-
       idxs += face.second;
-      count += face.second.size();
       size += face.second.size();
+
+      Plan plan;
+      plan.count = face.second.size();
+      plan.primitive = primitive;
+      plan.offset = size - plan.count;
+      if (!materials.isEmpty())
+        plan.material = *j++;
+      else
+        plan.material = 0l;
+      plans << plan;
     }
-    // And the last plan
-    Plan plan;
-    plan.count = count;
-    plan.primitive = currentPrimitive;
-    plan.offset = size - count;
-    plans << plan;
     m_plans.insert(mesh->bindId(), plans);
 
     quint32 padding = 0;
@@ -430,6 +427,32 @@ void GL3::unbindAttribute(Storage::ShaderProgram *shaderProgram, QString name)
   GLint loc = glGetAttribLocation(shaderProgram->bindId(), name.toAscii().data());
   if (loc != -1)
     glDisableVertexAttribArray(loc);
+}
+
+void GL3::setMaterial(Storage::Material* material)
+{
+  bool deleteAfter = false;
+  if (!material) {
+    material = new Storage::Material;
+    deleteAfter = true;
+  }
+
+  Vector4f color(material->ambient().redF(), material->ambient().greenF(), material->ambient().blueF(), material->ambient().alphaF());
+  glMaterialfv(GL_FRONT, GL_AMBIENT, color.data());
+
+  color = Vector4f(material->diffuse().redF(), material->diffuse().greenF(), material->diffuse().blueF(), material->diffuse().alphaF());
+  glMaterialfv(GL_FRONT, GL_DIFFUSE, color.data());
+
+  color = Vector4f(material->specular().redF(), material->specular().greenF(), material->specular().blueF(), material->specular().alphaF());
+  glMaterialfv(GL_FRONT, GL_SPECULAR, color.data());
+
+  color = Vector4f(material->emission().redF(), material->emission().greenF(), material->emission().blueF(), material->emission().alphaF());
+  glMaterialfv(GL_FRONT, GL_EMISSION, color.data());
+
+  glMateriali(GL_FRONT, GL_SHININESS, material->shininess());
+
+  if (deleteAfter)
+    delete material;
 }
 
 char** GL3::prepareShaderSource(const QString &source, qint32 &count, qint32 **length)
