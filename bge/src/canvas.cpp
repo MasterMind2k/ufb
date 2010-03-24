@@ -61,6 +61,9 @@ Canvas::Canvas()
 
   setAutoFillBackground(false);
 
+  // Needed to "block" any idiotic loading of a idiotic shaders :D
+  QGL::setPreferredPaintEngine(QPaintEngine::OpenGL);
+
   connect(timer, SIGNAL(timeout()), SLOT(updateGL()));
   connect(fps, SIGNAL(timeout()), SLOT(updateFPS()));
   connect(QApplication::instance(), SIGNAL(aboutToQuit()), SLOT(cleanup()));
