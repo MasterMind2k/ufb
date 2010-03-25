@@ -13,6 +13,7 @@
 #include <QtGui/QApplication>
 
 #include "canvas.h"
+#include "abstractcontroller.h"
 
 #include "scene/light.h"
 #include "scene/camera.h"
@@ -57,6 +58,28 @@ BGE::Storage::Mesh* createCube()
   return mesh;
 }
 
+class Controller : public BGE::AbstractController
+{
+  public:
+  Controller(const QList<BGE::Scene::Camera*> &cameras)
+    {
+      m_cameras = cameras;
+      m_current = 0;
+    }
+
+  private:
+    quint8 m_current;
+    QList<BGE::Scene::Camera*> m_cameras;
+    void keyPressed(QKeyEvent *event)
+    {
+      if (event->key() == Qt::Key_Space) {
+        m_current++;
+        m_current %= m_cameras.size();
+        BGE::Canvas::canvas()->activateCamera(m_cameras.at(m_current)->name());
+      }
+    }
+};
+
 int main(int argc, char** argv)
 {
   QApplication app(argc, argv);
@@ -67,10 +90,22 @@ int main(int argc, char** argv)
   // Make a small cube
   BGE::Storage::StorageManager::self()->set(createCube(), "/models");
 
-  // Create camera
-  BGE::Canvas::canvas()->createCamera("Global camera")->move(0, -30, 400);
-  BGE::Canvas::canvas()->addSceneObject(BGE::Canvas::canvas()->camera("Global camera"));
-  BGE::Canvas::canvas()->activateCamera("Global camera");
+  QList<BGE::Scene::Camera*> cameras;
+  // Create cameras
+  BGE::Canvas::canvas()->createCamera("First camera")->move(0, -30, 400);
+  BGE::Canvas::canvas()->addSceneObject(BGE::Canvas::canvas()->camera("First camera"));
+  cameras << BGE::Canvas::canvas()->camera("First camera");
+  BGE::Canvas::canvas()->activateCamera("First camera");
+
+  BGE::Canvas::canvas()->createCamera("Second camera")->move(0, 300, 50);
+  BGE::Canvas::canvas()->camera("Second camera")->rotateX(-60);
+  BGE::Canvas::canvas()->addSceneObject(BGE::Canvas::canvas()->camera("Second camera"));
+  cameras << BGE::Canvas::canvas()->camera("Second camera");
+
+  BGE::Canvas::canvas()->createCamera("Third camera")->move(350, 0, -300);
+  BGE::Canvas::canvas()->camera("Third camera")->rotateY(130);
+  BGE::Canvas::canvas()->addSceneObject(BGE::Canvas::canvas()->camera("Third camera"));
+  cameras << BGE::Canvas::canvas()->camera("Third camera");
 
   // Add our model
   BGE::Scene::Object* fighter = new BGE::Scene::Object;
@@ -122,6 +157,8 @@ int main(int argc, char** argv)
   light->setShaderProgram(BGE::Storage::StorageManager::self()->get<BGE::Storage::ShaderProgram*>("/shaders/Shader"));
   movingLight->addChild(light);
   BGE::Canvas::canvas()->addSceneObject(movingLight);
+
+  BGE::Canvas::canvas()->setController(new Controller(cameras));
 
   BGE::Canvas::canvas()->show();
 
