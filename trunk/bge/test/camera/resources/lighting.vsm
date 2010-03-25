@@ -4,23 +4,38 @@ varying vec3 normal, lightDir, halfVector;
 in vec3 in_Vertex;
 in vec3 in_Normal;
 
+uniform mat4 ModelViewMatrix;
+uniform mat3 NormalMatrix;
+
+struct LightStruct {
+  vec4 position;
+  /* Colors */
+  vec4 ambient;
+  vec4 diffuse;
+  vec4 specular;
+  /* Attenuations */
+  float constant;
+  float linear;
+  float quadratic;
+  /* Spot properties */
+  float spot_cutoff;
+  float spot_exponent;
+  vec3 spot_direction;
+};
+
+uniform LightStruct Lights0;
+
 void calculateLighting()
-{ 
-  /* first transform the normal into eye space and 
-  normalize the result */
-  normal = normalize(gl_NormalMatrix * in_Normal);
-    
-  /* now normalize the light's direction. Note that 
-  according to the OpenGL specification, the light 
-  is stored in eye space. Also since we're talking about 
-  a directional light, the position field is actually direction */
-  lightDir = normalize(vec3(gl_LightSource[0].position));
-  
-  /* Normalize the halfVector to pass it to the fragment shader */
-  halfVector = normalize(gl_LightSource[0].halfVector.xyz);
-          
-  /* Compute the diffuse, ambient and globalAmbient terms */
-  diffuse = gl_FrontMaterial.diffuse * gl_LightSource[0].diffuse;
-  ambient = gl_FrontMaterial.ambient * gl_LightSource[0].ambient;
+{
+  normal = normalize(NormalMatrix * in_Normal);
+
+  lightDir = normalize(vec3(Lights0.position));
+
+  vec3 eye = vec3(0, 0, 1);
+  vec4 ecPos = ModelViewMatrix * vec4(in_Vertex, 1.0);
+  halfVector = normalize(eye + lightDir);
+
+  diffuse = gl_FrontMaterial.diffuse * Lights0.diffuse;
+  ambient = gl_FrontMaterial.ambient * Lights0.ambient;
   ambient += gl_LightModel.ambient * gl_FrontMaterial.ambient;
 }
