@@ -72,7 +72,6 @@ int main(int argc, char** argv)
   // Create global camera
   BGE::Scene::Camera* camera = BGE::Canvas::canvas()->createCamera("Global camera");
   camera->move(0, 0, 30);
-  //camera->rotateX(-M_PI / 2);
   cameras.addCamera(camera);
   BGE::Canvas::canvas()->addSceneObject(camera);
   BGE::Canvas::canvas()->activateCamera("Global camera");
@@ -96,7 +95,7 @@ int main(int argc, char** argv)
   child->move(-2, -2, 2);
   movingCube->addChild(child);
   camera = BGE::Canvas::canvas()->createCamera("First moving camera");
-  camera->move(1.2, 1.2, -1.2);
+  camera->move(0.5, 0.5, -0.5);
   child->addChild(camera);
   camera->observe(movingCube);
   cameras.addCamera(camera);
@@ -109,7 +108,7 @@ int main(int argc, char** argv)
   child->move(2, -2, 2);
   movingCube->addChild(child);
   camera = BGE::Canvas::canvas()->createCamera("Second moving camera");
-  camera->move(-1.2, 1.2, -1.2);
+  camera->move(-0.5, 0.5, -0.5);
   child->addChild(camera);
   camera->observe(movingCube);
   cameras.addCamera(camera);
@@ -122,7 +121,7 @@ int main(int argc, char** argv)
   child->move(-2, 2, -2);
   movingCube->addChild(child);
   camera = BGE::Canvas::canvas()->createCamera("Third moving camera");
-  camera->move(1.2, -1.2, 1.2);
+  camera->move(0.5, -0.5, 0.5);
   child->addChild(camera);
   camera->observe(movingCube);
   cameras.addCamera(camera);
@@ -136,7 +135,7 @@ int main(int argc, char** argv)
   movingCube->addChild(child);
   BGE::Canvas::canvas()->addSceneObject(movingCube);
   camera = BGE::Canvas::canvas()->createCamera("Fourth moving camera");
-  camera->move(-1.2, -1.2, 1.2);
+  camera->move(-0.5, -0.5, 0.5);
   child->addChild(camera);
   camera->observe(movingCube);
   cameras.addCamera(camera);
@@ -149,10 +148,9 @@ int main(int argc, char** argv)
   bigCube->move(10, 10, -10);
   // Camera
   camera = BGE::Canvas::canvas()->createCamera("First static camera");
-  camera->move(-3.1, -3.1, 3.1);
-  BGE::Canvas::canvas()->addSceneObject(camera);
   camera->observe(movingCube);
   cameras.addCamera(camera);
+  bigCube->addChild(camera);
   BGE::Canvas::canvas()->addSceneObject(bigCube);
 
   bigCube = new BGE::Scene::Object;
@@ -162,10 +160,9 @@ int main(int argc, char** argv)
   bigCube->move(10, -10, -10);
   // Camera
   camera = BGE::Canvas::canvas()->createCamera("Second static camera");
-  camera->move(-3.1, 3.1, 3.1);
-  BGE::Canvas::canvas()->addSceneObject(camera);
   camera->observe(movingCube);
   cameras.addCamera(camera);
+  bigCube->addChild(camera);
   BGE::Canvas::canvas()->addSceneObject(bigCube);
 
   bigCube = new BGE::Scene::Object;
@@ -175,10 +172,9 @@ int main(int argc, char** argv)
   bigCube->move(-10, 10, -10);
   // Camera
   camera = BGE::Canvas::canvas()->createCamera("Third static camera");
-  camera->move(3.1, -3.1, 3.1);
-  BGE::Canvas::canvas()->addSceneObject(camera);
   camera->observe(movingCube);
   cameras.addCamera(camera);
+  bigCube->addChild(camera);
   BGE::Canvas::canvas()->addSceneObject(bigCube);
 
   bigCube = new BGE::Scene::Object;
@@ -188,10 +184,9 @@ int main(int argc, char** argv)
   bigCube->move(-10, -10, -10);
   // Camera
   camera = BGE::Canvas::canvas()->createCamera("Fourth static camera");
-  camera->move(3.1, 3.1, 3.1);
-  BGE::Canvas::canvas()->addSceneObject(camera);
   camera->observe(movingCube);
   cameras.addCamera(camera);
+  bigCube->addChild(camera);
   BGE::Canvas::canvas()->addSceneObject(bigCube);
 
   bigCube = new BGE::Scene::Object;
@@ -201,10 +196,9 @@ int main(int argc, char** argv)
   bigCube->move(10, 10, 10);
   // Camera
   camera = BGE::Canvas::canvas()->createCamera("Fifth static camera");
-  camera->move(-3.1, -3.1, -3.1);
-  BGE::Canvas::canvas()->addSceneObject(camera);
   camera->observe(movingCube);
   cameras.addCamera(camera);
+  bigCube->addChild(camera);
   BGE::Canvas::canvas()->addSceneObject(bigCube);
 
   bigCube = new BGE::Scene::Object;
@@ -214,10 +208,9 @@ int main(int argc, char** argv)
   bigCube->move(10, -10, 10);
   // Camera
   camera = BGE::Canvas::canvas()->createCamera("Sixth static camera");
-  camera->move(-3.1, 3.1, -3.1);
-  BGE::Canvas::canvas()->addSceneObject(camera);
   camera->observe(movingCube);
   cameras.addCamera(camera);
+  bigCube->addChild(camera);
   BGE::Canvas::canvas()->addSceneObject(bigCube);
 
   bigCube = new BGE::Scene::Object;
@@ -227,10 +220,9 @@ int main(int argc, char** argv)
   bigCube->move(-10, 10, 10);
   // Camera
   camera = BGE::Canvas::canvas()->createCamera("Seventh static camera");
-  camera->move(3.1, -3.1, -3.1);
-  BGE::Canvas::canvas()->addSceneObject(camera);
   camera->observe(movingCube);
   cameras.addCamera(camera);
+  bigCube->addChild(camera);
   BGE::Canvas::canvas()->addSceneObject(bigCube);
 
   bigCube = new BGE::Scene::Object;
@@ -240,10 +232,9 @@ int main(int argc, char** argv)
   bigCube->move(-10, -10, 10);
   // Camera
   camera = BGE::Canvas::canvas()->createCamera("Eigth static camera");
-  camera->move(3.1, 3.1, -3.1);
-  BGE::Canvas::canvas()->addSceneObject(camera);
   camera->observe(movingCube);
   cameras.addCamera(camera);
+  bigCube->addChild(camera);
   BGE::Canvas::canvas()->addSceneObject(bigCube);
 
   // Show the canvas

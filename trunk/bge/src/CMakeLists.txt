@@ -12,10 +12,12 @@ add_subdirectory(storage)
 
 set(bge_SRCS
   canvas.cpp
+  recorder.cpp
 )
 
 set(bge_QHDRS
   canvas.h
+  recorder.h
 )
 
 set(bge_HDRS

@@ -31,6 +31,7 @@
 #include "storage/storagemanager.h"
 
 #include "abstractcontroller.h"
+#include "recorder.h"
 
 using namespace BGE;
 
@@ -42,6 +43,20 @@ Canvas::Canvas()
   m_frames = 0;
   m_fps = 0;
   m_totalElapsed = 0;
+  m_timeSinceSnap = 0;
+
+  // Setup recording if necessary
+  QStringList args = QApplication::instance()->arguments();
+  QString recordString = args.value(args.indexOf(QRegExp("record=*", Qt::CaseInsensitive, QRegExp::Wildcard)));
+  m_recorder = 0l;
+  if (!recordString.isEmpty()) {
+    m_recorder = new Recorder(this);
+    QDir recordOutputDir;
+    recordOutputDir.setPath(recordString.split("=").last());
+    m_recorder->setOutput(recordOutputDir);
+    m_recorder->start();
+    qDebug("BGE::Canvas(): Recording...");
+  }
 
   m_timer = new QTimer(this);
   m_timer->setSingleShot(false);
@@ -105,6 +120,7 @@ void Canvas::paintGL()
 
   qint32 elapsed = m_time->restart();
   m_totalElapsed += elapsed;
+  m_timeSinceSnap += elapsed;
 
   // Calculate all the transforms (recursive)
   if (elapsed > 0)
@@ -135,6 +151,12 @@ void Canvas::paintGL()
   painter.setPen(Qt::white);
   painter.drawText(width() / 2, height() - 3, "FPS: " + QString::number(m_fps));
   painter.end();
+
+  if (m_recorder && m_timeSinceSnap >= 40) {
+    m_timeSinceSnap = 0;
+    QImage img = grabFrameBuffer();
+    m_recorder->enqueueImage(img);
+  }
 
   // Set next rendering
   m_timer->start();
@@ -243,6 +265,11 @@ void Canvas::mousePressEvent(QMouseEvent* event)
 
 void Canvas::cleanup()
 {
+  m_timer->setSingleShot(true);
+
+  if (m_recorder)
+    m_recorder->stop();
+
   // Delete the scene
   delete m_scene;
   delete m_renderer;
@@ -250,6 +277,9 @@ void Canvas::cleanup()
   // Delete the storage
   delete Storage::StorageManager::self();
   delete m_time;
+
+  if (m_recorder)
+    m_recorder->wait();
 }
 
 void Canvas::updateFPS()
