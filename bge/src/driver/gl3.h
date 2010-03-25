@@ -16,6 +16,7 @@
 #include "driver/abstractdriver.h"
 
 #include <QtCore/QHash>
+#include <QtCore/QVector>
 
 namespace BGE {
 namespace Storage {
@@ -26,6 +27,7 @@ namespace Driver {
 class GL3 : public AbstractDriver
 {
   public:
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     GL3();
 
     void bind(Storage::Mesh* mesh);
@@ -58,9 +60,28 @@ class GL3 : public AbstractDriver
       quint32 offset;
       Storage::Material* material;
     };
-    quint8 m_usedLights;
+    struct Light {
+      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+      Vector4f position;
+      // Colors
+      Vector4f ambient;
+      Vector4f diffuse;
+      Vector4f specular;
+      // Attenuations
+      float constant;
+      float linear;
+      float quadratic;
+      // Spot properties
+      float spot_cutoff;
+      float spot_exponent;
+      Vector3f spot_direction;
+    };
     QHash<quint32, quint32> m_indices;
     QHash<quint32, QList<Plan> > m_plans;
+    Matrix4f m_projectionMatrix;
+    Transform3f m_transform;
+    Matrix3f m_normalMatrix;
+    QList<Light> m_lights;
 
     void load(Storage::Mesh* mesh);
     void load(Storage::ShaderProgram* shaderProgram);
@@ -68,9 +89,51 @@ class GL3 : public AbstractDriver
     static void bindAttribute(Storage::ShaderProgram* shaderProgram, QString name, qint32 size, quint32 type, quint32 stride, quint32 offset);
     static void unbindAttribute(Storage::ShaderProgram* shaderProgram, QString name);
 
+    static void bindUniformAttribute(Storage::ShaderProgram* shaderProgram, const QString& name, const QVector<float>& values);
+    static void bindUniformAttribute(Storage::ShaderProgram* shaderProgram, const QString& name, const QList<Vector2f>& values);
+    static void bindUniformAttribute(Storage::ShaderProgram* shaderProgram, const QString& name, const QList<Vector3f>& values);
+    static void bindUniformAttribute(Storage::ShaderProgram* shaderProgram, const QString& name, const QList<Vector4f>& values);
+    static void bindUniformAttribute(Storage::ShaderProgram* shaderProgram, const QString& name, const QList<Matrix2f>& values);
+    static void bindUniformAttribute(Storage::ShaderProgram* shaderProgram, const QString& name, const QList<Matrix3f>& values);
+    static void bindUniformAttribute(Storage::ShaderProgram* shaderProgram, const QString& name, const QList<Matrix4f>& values);
+
+    inline static void bindUniformAttribute(Storage::ShaderProgram* shaderProgram, const QString &name, float values)
+    {
+      QVector<float> params;
+      params << values;
+      bindUniformAttribute(shaderProgram, name, params);
+    }
+    inline static void bindUniformAttribute(Storage::ShaderProgram* shaderProgram, const QString &name, const Vector3f& values)
+    {
+      QList<Vector3f> params;
+      params << values;
+      bindUniformAttribute(shaderProgram, name, params);
+    }
+    inline static void bindUniformAttribute(Storage::ShaderProgram* shaderProgram, const QString &name, const Vector4f& values)
+    {
+      QList<Vector4f> params;
+      params << values;
+      bindUniformAttribute(shaderProgram, name, params);
+    }
+    inline static void bindUniformAttribute(Storage::ShaderProgram* shaderProgram, const QString &name, const Matrix4f& values)
+    {
+      QList<Matrix4f> params;
+      params << values;
+      bindUniformAttribute(shaderProgram, name, params);
+    }
+    inline static void bindUniformAttribute(Storage::ShaderProgram* shaderProgram, const QString &name, const Matrix3f& values)
+    {
+      QList<Matrix3f> params;
+      params << values;
+      bindUniformAttribute(shaderProgram, name, params);
+    }
+    static void bindUniformAttribute(Storage::ShaderProgram* shaderProgram, const QString& name, int value);
+
     static void setMaterial(Storage::Material *material);
 
     static char** prepareShaderSource(const QString &source, qint32 &count, qint32 **length);
+
+    void loadLights(Storage::ShaderProgram *shaderProgram);
 };
 
 }

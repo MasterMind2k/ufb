@@ -2,16 +2,20 @@
 use /shaders/vertex/lighting;
 in vec3 in_Vertex;
 in vec2 in_TexCoord;
+
+uniform mat4 ProjectionMatrix;
+uniform mat4 ModelViewMatrix;
+
 varying vec2 var_TexCoord;
 
 void calculateLighting();
 
 void main()
-{ 
+{
   calculateLighting();
-  gl_Position = gl_ModelViewProjectionMatrix * vec4(in_Vertex, 1.0);
+  gl_Position = ProjectionMatrix * ModelViewMatrix * vec4(in_Vertex, 1.0);
   var_TexCoord = in_TexCoord;
-} 
+}
 [fragment]
 use /shaders/fragment/lighting;
 

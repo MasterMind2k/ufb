@@ -2,12 +2,15 @@
 use /shaders/vertex/lighting;
 in vec3 in_Vertex;
 
+uniform mat4 ModelViewMatrix;
+uniform mat4 ProjectionMatrix;
+
 void calculateLighting();
 
 void main()
 {
   calculateLighting();
-  gl_Position = gl_ModelViewProjectionMatrix * vec4(in_Vertex, 1.0);
+  gl_Position = ProjectionMatrix * ModelViewMatrix * vec4(in_Vertex, 1.0);
 }
 
 [fragment]

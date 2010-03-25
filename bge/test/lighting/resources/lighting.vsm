@@ -1,30 +1,100 @@
-varying vec4 diffuse[5], ambientGlobal, ambient[5];
-varying vec3 normal, lightDir[5], halfVector[5];
-varying float dist[5];
+varying vec4 diffuse0, diffuse1, diffuse2, diffuse3;
+varying vec4 ambientGlobal;
+varying vec4 ambient0, ambient1, ambient2, ambient3;
+
+varying vec3 normal;
+varying vec3 lightDir0, lightDir1, lightDir2, lightDir3;
+varying vec3 halfVector0, halfVector1, halfVector2, halfVector3;
+
+varying float dist0, dist1, dist2, dist3;
+
+uniform mat4 ModelViewMatrix;
+uniform mat3 NormalMatrix;
+
+struct LightStruct {
+  vec4 position;
+  /* Colors */
+  vec4 ambient;
+  vec4 diffuse;
+  vec4 specular;
+  /* Attenuations */
+  float constant;
+  float linear;
+  float quadratic;
+  /* Spot properties */
+  float spot_cutoff;
+  float spot_exponent;
+  vec3 spot_direction;
+};
+
+uniform LightStruct Lights0;
+uniform LightStruct Lights1;
+uniform LightStruct Lights2;
+uniform LightStruct Lights3;
 
 in vec3 in_Vertex;
 in vec3 in_Normal;
 
+void light0(in vec4 ecPos, in vec3 eye)
+{
+  vec3 aux = vec3(Lights0.position - ecPos);
+  lightDir0 = normalize(aux);
+  dist0 = length(aux);
+
+  halfVector0 = normalize(eye + lightDir0);
+
+  diffuse0 = gl_FrontMaterial.diffuse * Lights0.diffuse;
+  ambient0 = gl_FrontMaterial.ambient * Lights0.ambient;
+}
+
+void light1(in vec4 ecPos, in vec3 eye)
+{
+  vec3 aux = vec3(Lights1.position - ecPos);
+  lightDir1 = normalize(aux);
+  dist1 = length(aux);
+
+  halfVector1 = normalize(eye + lightDir1);
+
+  diffuse1 = gl_FrontMaterial.diffuse * Lights1.diffuse;
+  ambient1 = gl_FrontMaterial.ambient * Lights1.ambient;
+}
+
+void light2(in vec4 ecPos, in vec3 eye)
+{
+  vec3 aux = vec3(Lights2.position - ecPos);
+  lightDir2 = normalize(aux);
+  dist2 = length(aux);
+
+  halfVector2 = normalize(eye + lightDir2);
+
+  diffuse2 = gl_FrontMaterial.diffuse * Lights2.diffuse;
+  ambient2 = gl_FrontMaterial.ambient * Lights2.ambient;
+}
+
+void light3(in vec4 ecPos, in vec3 eye)
+{
+  vec3 aux = vec3(Lights3.position - ecPos);
+  lightDir3 = normalize(aux);
+  dist3 = length(aux);
+
+  halfVector3 = normalize(eye + lightDir3);
+
+  diffuse3 = gl_FrontMaterial.diffuse * Lights3.diffuse;
+  ambient3 = gl_FrontMaterial.ambient * Lights3.ambient;
+}
+
 void calculateLighting()
 {
-  normal = normalize(gl_NormalMatrix * in_Normal);
-    
-  /* these are the new lines of code to compute the light's direction */
-  vec4 ecPos = gl_ModelViewMatrix * vec4(in_Vertex, 1.0);
-  for (int i = 0; i < 5; i++) {
-    vec3 aux = vec3(gl_LightSource[i].position - ecPos);
-    lightDir[i] = normalize(aux);
-    dist[i] = length(aux);
-  
-    halfVector[i] = normalize(gl_LightSource[i].halfVector.xyz);
-    
-    /* Compute the diffuse, ambient and globalAmbient terms */
-    diffuse[i] = gl_FrontMaterial.diffuse * gl_LightSource[i].diffuse;
-    
-    /* The ambient terms have been separated since one of them */
-    /* suffers attenuation */
-    ambient[i] = gl_FrontMaterial.ambient * gl_LightSource[i].ambient;
-  }
+  normal = normalize(NormalMatrix * in_Normal);
+  vec3 eye = vec3(0, 0, 1);
+
+  vec4 ecPos = ModelViewMatrix * vec4(in_Vertex, 1.0);
+
+  light0(ecPos, eye);
+  light1(ecPos, eye);
+  light2(ecPos, eye);
+  light3(ecPos, eye);
+
   ambientGlobal = gl_LightModel.ambient * gl_FrontMaterial.ambient;
 }
 

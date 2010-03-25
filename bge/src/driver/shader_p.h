@@ -41,6 +41,17 @@
 #define glEnableVertexAttribArray _glEnableVertexAttribArray
 #define glDisableVertexAttribArray _glDisableVertexAttribArray
 
+/* Uniform variables */
+#define glGetUniformLocation _glGetUniformLocation
+#define glUniform1i _glUniform1i
+#define glUniform1fv _glUniform1fv
+#define glUniform2fv _glUniform2fv
+#define glUniform3fv _glUniform3fv
+#define glUniform4fv _glUniform4fv
+#define glUniformMatrix2fv _glUniformMatrix2fv
+#define glUniformMatrix3fv _glUniformMatrix3fv
+#define glUniformMatrix4fv _glUniformMatrix4fv
+
 typedef GLuint (APIENTRY *glCreateShader_t) (GLenum type);
 typedef void (APIENTRY *glShaderSource_t) (GLuint shader, GLsizei count, const GLchar** strings, const GLint* length);
 typedef void (APIENTRY *glCompileShader_t) (GLuint shader);
@@ -62,6 +73,16 @@ typedef GLint (APIENTRY *glGetAttribLocation_t) (GLuint program, const GLchar* n
 typedef void (APIENTRY *glVertexAttribPointer_t) (GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid* pointer);
 typedef void (APIENTRY *glEnableVertexAttribArray_t) (GLuint index);
 typedef void (APIENTRY *glDisableVertexAttribArray_t) (GLuint index);
+
+typedef GLint (APIENTRY *glGetUniformLocation_t) (GLuint program, const char* name);
+typedef void (APIENTRY *glUniform1i_t) (GLint location, GLint value);
+typedef void (APIENTRY *glUniform1fv_t) (GLint location, GLsizei count, GLfloat *value);
+typedef void (APIENTRY *glUniform2fv_t) (GLint location, GLsizei count, GLfloat *value);
+typedef void (APIENTRY *glUniform3fv_t) (GLint location, GLsizei count, GLfloat *value);
+typedef void (APIENTRY *glUniform4fv_t) (GLint location, GLsizei count, GLfloat *value);
+typedef void (APIENTRY *glUniformMatrix2fv_t) (GLint location, GLsizei count, GLboolean transpose, GLfloat *value);
+typedef void (APIENTRY *glUniformMatrix3fv_t) (GLint location, GLsizei count, GLboolean transpose, GLfloat *value);
+typedef void (APIENTRY *glUniformMatrix4fv_t) (GLint location, GLsizei count, GLboolean transpose, GLfloat *value);
 
 /* Shader */
 glCreateShader_t _glCreateShader = 0l;
@@ -88,6 +109,17 @@ glGetAttribLocation_t _glGetAttribLocation = 0l;
 glVertexAttribPointer_t _glVertexAttribPointer = 0l;
 glEnableVertexAttribArray_t _glEnableVertexAttribArray = 0l;
 glDisableVertexAttribArray_t _glDisableVertexAttribArray = 0l;
+
+/* Uniform binding functions */
+glGetUniformLocation_t _glGetUniformLocation = 0l;
+glUniform1i_t _glUniform1i = 0l;
+glUniform1fv_t _glUniform1fv = 0l;
+glUniform2fv_t _glUniform2fv = 0l;
+glUniform3fv_t _glUniform3fv = 0l;
+glUniform4fv_t _glUniform4fv = 0l;
+glUniformMatrix2fv_t _glUniformMatrix2fv = 0l;
+glUniformMatrix3fv_t _glUniformMatrix3fv = 0l;
+glUniformMatrix4fv_t _glUniformMatrix4fv = 0l;
 
 GLenum VERTEX_SHADER;
 GLenum FRAGMENT_SHADER;
@@ -128,6 +160,17 @@ void getShaderFunctions()
   _glVertexAttribPointer = (glVertexAttribPointer_t) context->getProcAddress("glVertexAttribPointer");
   _glEnableVertexAttribArray = (glEnableVertexAttribArray_t) context->getProcAddress("glEnableVertexAttribArray");
   _glDisableVertexAttribArray = (glDisableVertexAttribArray_t) context->getProcAddress("glDisableVertexAttribArray");
+
+  /* Uniforms */
+  _glGetUniformLocation = (glGetUniformLocation_t) context->getProcAddress("glGetUniformLocation");
+  _glUniform1i = (glUniform1i_t) context->getProcAddress("glUniform1i");
+  _glUniform1fv = (glUniform1fv_t) context->getProcAddress("glUniform1fv");
+  _glUniform2fv = (glUniform2fv_t) context->getProcAddress("glUniform2fv");
+  _glUniform3fv = (glUniform3fv_t) context->getProcAddress("glUniform3fv");
+  _glUniform4fv = (glUniform4fv_t) context->getProcAddress("glUniform4fv");
+  _glUniformMatrix2fv = (glUniformMatrix2fv_t) context->getProcAddress("glUniformMatrix2fv");
+  _glUniformMatrix3fv = (glUniformMatrix3fv_t) context->getProcAddress("glUniformMatrix3fv");
+  _glUniformMatrix4fv = (glUniformMatrix4fv_t) context->getProcAddress("glUniformMatrix4fv");
 
   VERTEX_SHADER = GL_VERTEX_SHADER;
   FRAGMENT_SHADER = GL_FRAGMENT_SHADER;
