@@ -222,6 +222,7 @@ void GL1::setLight(Scene::Light *light)
   glLightf(lightId, GL_QUADRATIC_ATTENUATION, light->quadraticAttenuation());
   // Spot properties
   if (light->isPositional() && light->isSpot()) {
+    glLightfv(lightId, GL_SPOT_DIRECTION, Vector3f(0, 0, -1).data());
     glLightf(lightId, GL_SPOT_CUTOFF, light->spotCutOff());
     glLightf(lightId, GL_SPOT_EXPONENT, light->spotExponent());
   } else {
