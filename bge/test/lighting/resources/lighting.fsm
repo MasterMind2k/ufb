@@ -1,12 +1,12 @@
-varying vec4 diffuse0, diffuse1, diffuse2, diffuse3;
-varying vec4 ambientGlobal;
-varying vec4 ambient0, ambient1, ambient2, ambient3;
+in vec4 diffuse0, diffuse1, diffuse2, diffuse3;
+in vec4 ambientGlobal;
+in vec4 ambient0, ambient1, ambient2, ambient3;
 
-varying vec3 normal;
-varying vec3 lightDir0, lightDir1, lightDir2, lightDir3;
-varying vec3 halfVector0, halfVector1, halfVector2, halfVector3;
+in vec3 normal;
+in vec3 lightDir0, lightDir1, lightDir2, lightDir3;
+in vec3 halfVector0, halfVector1, halfVector2, halfVector3;
 
-varying float dist0, dist1, dist2, dist3;
+in float dist0, dist1, dist2, dist3;
 
 struct LightStruct {
   vec4 position;
@@ -24,10 +24,18 @@ struct LightStruct {
   vec3 spot_direction;
 };
 
+struct MaterialStruct {
+  vec4 ambient;
+  vec4 diffuse;
+  vec4 specular;
+  int shininess;
+};
+
 uniform LightStruct Lights0;
 uniform LightStruct Lights1;
 uniform LightStruct Lights2;
 uniform LightStruct Lights3;
+uniform MaterialStruct Material;
 
 vec4 light0(in vec3 n)
 {
@@ -41,33 +49,22 @@ vec4 light0(in vec3 n)
   if (NdotL > 0.0) {
     if (Lights0.spot_cutoff != 180) {
       spotEffect = dot(normalize(Lights0.spot_direction), normalize(-lightDir0));
+    } else {
+      spotEffect = 1.0;
+    }
       if (spotEffect > cos(Lights0.spot_cutoff)) {
 
         spotEffect = pow(spotEffect, Lights0.spot_exponent);
         att = spotEffect / (Lights0.constant +
               Lights0.linear * dist0 +
               Lights0.quadratic * dist0 * dist0);
-
         color += att * (diffuse0 * NdotL + ambient0);
+
         halfV = normalize(halfVector0);
         NdotHV = max(dot(n, halfV), 0.0);
-        color += att * gl_FrontMaterial.specular *
-                 Lights0.specular *
-                 pow(NdotHV, gl_FrontMaterial.shininess);
+        color += att * Material.specular * Lights0.specular * pow(NdotHV, Material.shininess);
       }
-    } else {
 
-      att = 1.0 / (Lights0.constant +
-            Lights0.linear * dist0 +
-            Lights0.quadratic * dist0 * dist0);
-      color += att * (diffuse0 * NdotL + ambient0);
-
-
-      halfV = normalize(halfVector0);
-      NdotHV = max(dot(n, halfV), 0.0);
-      color += att * gl_FrontMaterial.specular * Lights0.specular *
-                pow(NdotHV, gl_FrontMaterial.shininess);
-    }
   }
 
   return color;
@@ -85,33 +82,22 @@ vec4 light1(in vec3 n)
   if (NdotL > 0.0) {
     if (Lights1.spot_cutoff != 180) {
       spotEffect = dot(normalize(Lights1.spot_direction), normalize(-lightDir1));
+    } else {
+      spotEffect = 1.0;
+    }
       if (spotEffect > cos(Lights1.spot_cutoff)) {
 
         spotEffect = pow(spotEffect, Lights1.spot_exponent);
         att = spotEffect / (Lights1.constant +
               Lights1.linear * dist1 +
               Lights1.quadratic * dist1 * dist1);
-
         color += att * (diffuse1 * NdotL + ambient1);
+
         halfV = normalize(halfVector1);
         NdotHV = max(dot(n, halfV), 0.0);
-        color += att * gl_FrontMaterial.specular *
-                 Lights1.specular *
-                 pow(NdotHV, gl_FrontMaterial.shininess);
+        color += att * Material.specular * Lights1.specular * pow(NdotHV, Material.shininess);
       }
-    } else {
 
-      att = 1.0 / (Lights1.constant +
-            Lights1.linear * dist1 +
-            Lights1.quadratic * dist1 * dist1);
-      color += att * (diffuse1 * NdotL + ambient1);
-
-
-      halfV = normalize(halfVector1);
-      NdotHV = max(dot(n, halfV), 0.0);
-      color += att * gl_FrontMaterial.specular * Lights1.specular *
-                pow(NdotHV, gl_FrontMaterial.shininess);
-    }
   }
 
   return color;
@@ -142,7 +128,7 @@ vec4 light2(in vec3 n)
 
         halfV = normalize(halfVector2);
         NdotHV = max(dot(n, halfV), 0.0);
-        color += att * gl_FrontMaterial.specular * Lights2.specular * pow(NdotHV, gl_FrontMaterial.shininess);
+        color += att * Material.specular * Lights2.specular * pow(NdotHV, Material.shininess);
       }
 
   }
@@ -175,7 +161,7 @@ vec4 light3(in vec3 n)
 
         halfV = normalize(halfVector3);
         NdotHV = max(dot(n, halfV), 0.0);
-        color += att * gl_FrontMaterial.specular * Lights3.specular * pow(NdotHV, gl_FrontMaterial.shininess);
+        color += att * Material.specular * Lights3.specular * pow(NdotHV, Material.shininess);
       }
 
   }

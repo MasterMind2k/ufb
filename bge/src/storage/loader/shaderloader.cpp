@@ -34,7 +34,7 @@ QStringList parseSource(QString& source)
     length += matcher.matchedLength();
   }
 
-  source = source.mid(length + 1);
+  source = source.mid(length + 1).simplified();
 
   return modules;
 }

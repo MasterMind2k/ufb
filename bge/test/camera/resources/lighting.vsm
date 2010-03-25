@@ -1,5 +1,5 @@
-varying vec4 diffuse, ambient;
-varying vec3 normal, lightDir, halfVector;
+out vec4 diffuse, ambient;
+out vec3 normal, lightDir, halfVector;
 
 in vec3 in_Vertex;
 in vec3 in_Normal;
@@ -23,7 +23,15 @@ struct LightStruct {
   vec3 spot_direction;
 };
 
+struct MaterialStruct {
+  vec4 ambient;
+  vec4 diffuse;
+  vec4 specular;
+  int shininess;
+};
+
 uniform LightStruct Lights0;
+uniform MaterialStruct Material;
 
 void calculateLighting()
 {
@@ -35,7 +43,8 @@ void calculateLighting()
   vec4 ecPos = ModelViewMatrix * vec4(in_Vertex, 1.0);
   halfVector = normalize(eye + lightDir);
 
-  diffuse = gl_FrontMaterial.diffuse * Lights0.diffuse;
-  ambient = gl_FrontMaterial.ambient * Lights0.ambient;
-  ambient += gl_LightModel.ambient * gl_FrontMaterial.ambient;
+  diffuse = Material.diffuse * Lights0.diffuse;
+  ambient = Material.ambient * Lights0.ambient;
+  /* Hardcode global ambient */
+  ambient += vec4(0.2, 0.2, 0.2, 1.0) * Material.ambient;
 }

@@ -12,12 +12,14 @@ void main()
   calculateLighting();
   gl_Position = ProjectionMatrix * ModelViewMatrix * vec4(in_Vertex, 1.0);
 }
+
 [fragment]
 use /shaders/fragment/lighting;
 
 vec4 calculateLighting();
+out vec4 out_Color;
 
 void main()
 {
-  gl_FragColor = calculateLighting();
+  out_Color = calculateLighting();
 }
