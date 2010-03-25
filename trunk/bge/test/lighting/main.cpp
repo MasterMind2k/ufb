@@ -83,40 +83,40 @@ int main(int argc, char** argv)
   MovingLight* movingLight = new MovingLight;
 
   BGE::Scene::Light* light = BGE::Canvas::canvas()->createLight("Red light");
-  light->move(-150, -80, -200);
+  light->move(-150, -180, -200);
   light->setDiffuseColor(QColor(0.5 * 255, 0, 0));
   light->setSpecularColor(QColor(0.8 * 255, 0, 0));
-  light->setSpotExponent(50);
+  light->setSpotExponent(25);
   light->setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/models/Cube"));
   light->observe(fighter);
   light->setShaderProgram(BGE::Storage::StorageManager::self()->get<BGE::Storage::ShaderProgram*>("/shaders/Shader"));
   movingLight->addChild(light);
 
   light = BGE::Canvas::canvas()->createLight("Blue light");
-  light->move(150, 80, -200);
+  light->move(150, 80, -250);
   light->setDiffuseColor(QColor(0, 0, 0.5 * 255));
   light->setSpecularColor(QColor(0, 0, 0.8 * 255));
-  light->setSpotExponent(50);
+  light->setSpotExponent(25);
   light->setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/models/Cube"));
   light->observe(fighter);
   light->setShaderProgram(BGE::Storage::StorageManager::self()->get<BGE::Storage::ShaderProgram*>("/shaders/Shader"));
   movingLight->addChild(light);
 
   light = BGE::Canvas::canvas()->createLight("Green light");
-  light->move(-150, 80, 200);
+  light->move(-150, 80, 250);
   light->setDiffuseColor(QColor(0, 0.5 * 255, 0));
   light->setSpecularColor(QColor(0, 0.8 * 255, 0));
-  light->setSpotExponent(50);
+  light->setSpotExponent(25);
   light->setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/models/Cube"));
   light->observe(fighter);
   light->setShaderProgram(BGE::Storage::StorageManager::self()->get<BGE::Storage::ShaderProgram*>("/shaders/Shader"));
   movingLight->addChild(light);
 
   light = BGE::Canvas::canvas()->createLight("Yellow light");
-  light->move(150, -80, 200);
+  light->move(150, -180, 200);
   light->setDiffuseColor(QColor(0.5 * 255, 0.5 * 255, 0));
   light->setSpecularColor(QColor(0.8 * 255, 0.8 * 255, 0));
-  light->setSpotExponent(50);
+  light->setSpotExponent(25);
   light->setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/models/Cube"));
   light->observe(fighter);
   light->setShaderProgram(BGE::Storage::StorageManager::self()->get<BGE::Storage::ShaderProgram*>("/shaders/Shader"));

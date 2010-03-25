@@ -138,13 +138,7 @@ void GL3::setLight(Scene::Light *light)
   Vector4f tempPos(0, 0, 0, 1);
   if (!light->isPositional())
     tempPos = Vector4f(light->globalPosition().x(), light->globalPosition().y(), light->globalPosition().z(), 0);
-
-  if (light->isPositional() && light->isSpot())
-    tempPos = m_projectionMatrix * tempPos;
-  else
-    tempPos = m_transform.matrix() * tempPos;
-
-  temp.position = tempPos;
+  temp.position = m_transform * tempPos;
 
   temp.ambient = Vector4f(light->ambientColor().redF(), light->ambientColor().greenF(), light->ambientColor().blueF(), light->ambientColor().alphaF());
   temp.diffuse = Vector4f(light->diffuseColor().redF(), light->diffuseColor().greenF(), light->diffuseColor().blueF(), light->diffuseColor().alphaF());
@@ -157,7 +151,7 @@ void GL3::setLight(Scene::Light *light)
   else
     temp.spot_cutoff = 180;
   temp.spot_exponent = light->spotExponent();
-  temp.spot_direction = Transform3f(m_projectionMatrix).rotation() * m_transform.rotation() * Vector3f(0, 0, -1);
+  temp.spot_direction = m_transform.rotation() * Vector3f(0, 0, -1);
   m_lights << temp;
 }
 
