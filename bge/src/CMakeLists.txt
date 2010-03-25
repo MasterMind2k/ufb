@@ -22,6 +22,7 @@ set(bge_QHDRS
 
 set(bge_HDRS
   global.h
+  abstractcontroller.h
 )
 
 qt4_wrap_cpp(bge_MOC ${bge_QHDRS})

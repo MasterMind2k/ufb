@@ -96,6 +96,13 @@ class Canvas : public QGLWidget
       return m_cameras.value(name);
     }
     /**
+     * Returns the list of all cameras.
+     */
+    inline QList<Scene::Camera*> cameras() const
+    {
+      return m_cameras.values();
+    }
+    /**
      * Activates the specified camera. Returns false if the camera doesn't
      * exist.
      *

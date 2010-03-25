@@ -29,7 +29,7 @@ MovingLight::MovingLight()
 
 void MovingLight::calculateTransforms(qint32 timeDiff)
 {
-  rotateY((M_PI / 150.0) * (qreal) timeDiff / 30.0);
+  rotateY(1.0 * (qreal) timeDiff / 30.0);
 }
 
 void MovingLight::change()

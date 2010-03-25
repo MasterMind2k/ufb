@@ -109,37 +109,37 @@ class Object
     /**
      * Wrapper method for convenience.
      *
-     * @param angle Angle in radians
+     * @param angle Angle in degress
      *
      * @see rotate
      */
     inline void rotateX(qreal angle)
     {
-      AngleAxisf rotation(angle, Vector3f::UnitX());
+      AngleAxisf rotation(angle * M_PI / 180, Vector3f::UnitX());
       rotate(rotation);
     }
     /**
      * Wrapper method for convenience.
      *
-     * @param angle Angle in radians
+     * @param angle Angle in degress
      *
      * @see rotate
      */
     inline void rotateY(qreal angle)
     {
-      AngleAxisf rotation(angle, Vector3f::UnitY());
+      AngleAxisf rotation(angle * M_PI / 180, Vector3f::UnitY());
       rotate(rotation);
     }
     /**
      * Wrapper method for convenience.
      *
-     * @param angle Angle in radians
+     * @param angle Angle in degress
      *
      * @see rotate
      */
     inline void rotateZ(qreal angle)
     {
-      AngleAxisf rotation(angle, Vector3f::UnitZ());
+      AngleAxisf rotation(angle * M_PI / 180, Vector3f::UnitZ());
       rotate(rotation);
     }
 
