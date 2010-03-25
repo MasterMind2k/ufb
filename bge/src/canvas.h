@@ -14,12 +14,14 @@
 #define __BGE_CANVAS_H
 
 #include <QtCore/QHash>
+#include <QtCore/QDir>
 
 #include <QtOpenGL/QGLWidget>
 
 namespace BGE {
 
 class AbstractController;
+class Recorder;
 namespace Scene
 {
 class Object;
@@ -157,6 +159,9 @@ class Canvas : public QGLWidget
     QTime *m_time;
     QTimer *m_timer;
     qint32 m_totalElapsed;
+
+    Recorder *m_recorder;
+    quint32 m_timeSinceSnap;
 
     QHash<QString, Scene::Camera*> m_cameras;
     Scene::Camera* m_activeCamera;
