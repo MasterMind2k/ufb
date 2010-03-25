@@ -16,10 +16,12 @@ void main()
 [fragment]
 use /shaders/fragment/lighting;
 
+out vec4 out_Color;
+
 vec4 calculateLighting();
 
 void main()
 {
-  gl_FragColor = calculateLighting();
+  out_Color = calculateLighting();
 }
 

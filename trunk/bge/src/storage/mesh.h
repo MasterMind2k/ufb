@@ -41,8 +41,8 @@ class Material
     inline Material()
     {
       /* Default values */
-      m_ambient = QColor(0.2, 0.2, 0.2, 1.0);
-      m_diffuse = QColor(0.8, 0.8, 0.8, 1.0);
+      m_ambient = QColor(0.2 * 255, 0.2 * 255, 0.2 * 255, 255);
+      m_diffuse = QColor(0.8 * 255, 0.8 * 255, 0.8 * 255, 255);
       m_specular = m_emission = QColor(0, 0, 0, 0);
       m_shininess = 0;
     }
@@ -88,11 +88,11 @@ class Material
     {
       return m_emission;
     }
-    inline void setShininess(quint32 shininess)
+    inline void setShininess(qint32 shininess)
     {
       m_shininess = shininess;
     }
-    inline quint32 shininess() const
+    inline qint32 shininess() const
     {
       return m_shininess;
     }
@@ -102,7 +102,7 @@ class Material
     QColor m_diffuse;
     QColor m_specular;
     QColor m_emission;
-    quint32 m_shininess;
+    qint32 m_shininess;
 };
 
 class Mesh : public Item

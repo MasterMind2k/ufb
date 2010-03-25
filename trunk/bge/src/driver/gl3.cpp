@@ -80,11 +80,6 @@ void GL3::bind(Storage::ShaderProgram *shaderProgram)
     load(shaderProgram);
 
   glUseProgram(shaderProgram->bindId());
-
-
-  bindUniformAttribute(shaderProgram, "ProjectionMatrix", m_projectionMatrix);
-  bindUniformAttribute(shaderProgram, "ModelViewMatrix", m_transform.matrix());
-  bindUniformAttribute(shaderProgram, "NormalMatrix", m_normalMatrix);
 }
 
 void GL3::unbind(Storage::Mesh *mesh)
@@ -176,14 +171,19 @@ void GL3::draw(Scene::Object *object)
 
   loadLights(object->shaderProgram());
 
+  bindUniformAttribute(object->shaderProgram(), "ProjectionMatrix", m_projectionMatrix);
+  bindUniformAttribute(object->shaderProgram(), "ModelViewMatrix", m_transform.matrix());
+  bindUniformAttribute(object->shaderProgram(), "NormalMatrix", m_normalMatrix);
+
   bindAttribute(object->shaderProgram(), "Vertex", 3, GL_FLOAT, sizeof(BufferElement), VERTEX_OFFSET);
   bindAttribute(object->shaderProgram(), "Normal", 3, GL_FLOAT, sizeof(BufferElement), NORMAL_OFFSET);
   bindAttribute(object->shaderProgram(), "TexCoord", 3, GL_FLOAT, sizeof(BufferElement), UV_OFFSET);
 
   Storage::Material* currentMaterial = 0l;
+  setMaterial(currentMaterial, object->shaderProgram());
   foreach (Plan plan, m_plans.value(object->mesh()->bindId())) {
     if (currentMaterial != plan.material) {
-      setMaterial(plan.material);
+      setMaterial(plan.material, object->shaderProgram());
       currentMaterial = plan.material;
     }
 
@@ -532,7 +532,7 @@ void GL3::bindUniformAttribute(Storage::ShaderProgram *shaderProgram, const QStr
     glUniform1i(loc, value);
 }
 
-void GL3::setMaterial(Storage::Material* material)
+void GL3::setMaterial(Storage::Material *material, Storage::ShaderProgram *shaderProgram)
 {
   bool deleteAfter = false;
   if (!material) {
@@ -541,18 +541,18 @@ void GL3::setMaterial(Storage::Material* material)
   }
 
   Vector4f color(material->ambient().redF(), material->ambient().greenF(), material->ambient().blueF(), material->ambient().alphaF());
-  glMaterialfv(GL_FRONT, GL_AMBIENT, color.data());
+  bindUniformAttribute(shaderProgram, "Material.ambient", color);
 
   color = Vector4f(material->diffuse().redF(), material->diffuse().greenF(), material->diffuse().blueF(), material->diffuse().alphaF());
-  glMaterialfv(GL_FRONT, GL_DIFFUSE, color.data());
+  bindUniformAttribute(shaderProgram, "Material.diffuse", color);
 
   color = Vector4f(material->specular().redF(), material->specular().greenF(), material->specular().blueF(), material->specular().alphaF());
-  glMaterialfv(GL_FRONT, GL_SPECULAR, color.data());
+  bindUniformAttribute(shaderProgram, "Material.specular", color);
 
   color = Vector4f(material->emission().redF(), material->emission().greenF(), material->emission().blueF(), material->emission().alphaF());
-  glMaterialfv(GL_FRONT, GL_EMISSION, color.data());
+  bindUniformAttribute(shaderProgram, "Material.emission", color);
 
-  glMateriali(GL_FRONT, GL_SHININESS, material->shininess());
+  bindUniformAttribute(shaderProgram, "Material.shininess", material->shininess());
 
   if (deleteAfter)
     delete material;

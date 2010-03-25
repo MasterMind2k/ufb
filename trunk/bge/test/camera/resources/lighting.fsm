@@ -1,5 +1,5 @@
-varying vec4 diffuse, ambient;
-varying vec3 normal, lightDir, halfVector;
+in vec4 diffuse, ambient;
+in vec3 normal, lightDir, halfVector;
 
 struct LightStruct {
   vec4 position;
@@ -17,7 +17,15 @@ struct LightStruct {
   vec3 spot_direction;
 };
 
+struct MaterialStruct {
+  vec4 ambient;
+  vec4 diffuse;
+  vec4 specular;
+  int shininess;
+};
+
 uniform LightStruct Lights0;
+uniform MaterialStruct Material;
 
 vec4 calculateLighting()
 {
@@ -34,9 +42,9 @@ vec4 calculateLighting()
     color += diffuse * NdotL;
     halfV = normalize(halfVector);
     NdotHV = max(dot(n, halfV), 0.0);
-    color += gl_FrontMaterial.specular *
+    color += Material.specular *
              Lights0.specular *
-             pow(NdotHV, gl_FrontMaterial.shininess);
+             pow(NdotHV, Material.shininess);
   }
 
   return color;

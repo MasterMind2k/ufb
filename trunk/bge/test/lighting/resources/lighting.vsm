@@ -1,12 +1,12 @@
-varying vec4 diffuse0, diffuse1, diffuse2, diffuse3;
-varying vec4 ambientGlobal;
-varying vec4 ambient0, ambient1, ambient2, ambient3;
+out vec4 diffuse0, diffuse1, diffuse2, diffuse3;
+out vec4 ambientGlobal;
+out vec4 ambient0, ambient1, ambient2, ambient3;
 
-varying vec3 normal;
-varying vec3 lightDir0, lightDir1, lightDir2, lightDir3;
-varying vec3 halfVector0, halfVector1, halfVector2, halfVector3;
+out vec3 normal;
+out vec3 lightDir0, lightDir1, lightDir2, lightDir3;
+out vec3 halfVector0, halfVector1, halfVector2, halfVector3;
 
-varying float dist0, dist1, dist2, dist3;
+out float dist0, dist1, dist2, dist3;
 
 uniform mat4 ModelViewMatrix;
 uniform mat3 NormalMatrix;
@@ -27,10 +27,18 @@ struct LightStruct {
   vec3 spot_direction;
 };
 
+struct MaterialStruct {
+  vec4 ambient;
+  vec4 diffuse;
+  vec4 specular;
+  int shininess;
+};
+
 uniform LightStruct Lights0;
 uniform LightStruct Lights1;
 uniform LightStruct Lights2;
 uniform LightStruct Lights3;
+uniform MaterialStruct Material;
 
 in vec3 in_Vertex;
 in vec3 in_Normal;
@@ -43,8 +51,8 @@ void light0(in vec4 ecPos, in vec3 eye)
 
   halfVector0 = normalize(eye + lightDir0);
 
-  diffuse0 = gl_FrontMaterial.diffuse * Lights0.diffuse;
-  ambient0 = gl_FrontMaterial.ambient * Lights0.ambient;
+  diffuse0 = Material.diffuse * Lights0.diffuse;
+  ambient0 = Material.ambient * Lights0.ambient;
 }
 
 void light1(in vec4 ecPos, in vec3 eye)
@@ -55,8 +63,8 @@ void light1(in vec4 ecPos, in vec3 eye)
 
   halfVector1 = normalize(eye + lightDir1);
 
-  diffuse1 = gl_FrontMaterial.diffuse * Lights1.diffuse;
-  ambient1 = gl_FrontMaterial.ambient * Lights1.ambient;
+  diffuse1 = Material.diffuse * Lights1.diffuse;
+  ambient1 = Material.ambient * Lights1.ambient;
 }
 
 void light2(in vec4 ecPos, in vec3 eye)
@@ -67,8 +75,8 @@ void light2(in vec4 ecPos, in vec3 eye)
 
   halfVector2 = normalize(eye + lightDir2);
 
-  diffuse2 = gl_FrontMaterial.diffuse * Lights2.diffuse;
-  ambient2 = gl_FrontMaterial.ambient * Lights2.ambient;
+  diffuse2 = Material.diffuse * Lights2.diffuse;
+  ambient2 = Material.ambient * Lights2.ambient;
 }
 
 void light3(in vec4 ecPos, in vec3 eye)
@@ -79,8 +87,8 @@ void light3(in vec4 ecPos, in vec3 eye)
 
   halfVector3 = normalize(eye + lightDir3);
 
-  diffuse3 = gl_FrontMaterial.diffuse * Lights3.diffuse;
-  ambient3 = gl_FrontMaterial.ambient * Lights3.ambient;
+  diffuse3 = Material.diffuse * Lights3.diffuse;
+  ambient3 = Material.ambient * Lights3.ambient;
 }
 
 void calculateLighting()
@@ -95,6 +103,7 @@ void calculateLighting()
   light2(ecPos, eye);
   light3(ecPos, eye);
 
-  ambientGlobal = gl_LightModel.ambient * gl_FrontMaterial.ambient;
+  /* Just hardcode the default global ambient color (aka gl_LightModel.ambient) */
+  ambientGlobal = vec4(0.2, 0.2, 0.2, 1.0) * Material.ambient;
 }
 
