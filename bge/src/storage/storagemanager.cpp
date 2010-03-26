@@ -108,10 +108,8 @@ Item* StorageManager::get(const QString &path) const
     // The looked for item does not exist
     if (!node)
       return 0l;
-    if (node->isDir() && i == splited.size() - 1)
-      return 0l;
 
-    if (!node->isDir() && i == splited.size() - 1)
+    if (i == splited.size() - 1)
       return node;
   }
 }

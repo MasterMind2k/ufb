@@ -55,6 +55,12 @@ BGE::Storage::Mesh* createCube()
   mesh->addRectangle(name, topFrontLeft, topFrontRight, topBehindLeft, topBehindRight);
 
   mesh->calculateNormals("cube");
+  mesh->addFaceMaterial(name, 0, "side");
+  mesh->addFaceMaterial(name, 1, "side");
+  mesh->addFaceMaterial(name, 2, "side");
+  mesh->addFaceMaterial(name, 3, "side");
+  mesh->addFaceMaterial(name, 4, "side");
+  mesh->addFaceMaterial(name, 5, "side");
   return mesh;
 }
 
@@ -89,6 +95,28 @@ int main(int argc, char** argv)
 
   // Make a small cube
   BGE::Storage::StorageManager::self()->set(createCube(), "/models");
+  // Make materials for cubes
+  {
+    BGE::Storage::Material* material = new BGE::Storage::Material("Red light");
+    material->setEmission(QColor(0.2 * 255, 0.2 * 255, 0.2 * 255, 255));
+    material->setFaceName("side");
+    BGE::Storage::StorageManager::self()->set(material, "/materials/");
+
+    material = new BGE::Storage::Material("Blue light");
+    material->setEmission(QColor(0.5 * 255, 0.5 * 255, 0.5 * 255, 255));
+    material->setFaceName("side");
+    BGE::Storage::StorageManager::self()->set(material, "/materials/");
+
+    material = new BGE::Storage::Material("Green light");
+    material->setEmission(QColor(0.5 * 255, 0.5 * 255, 0.5 * 255, 255));
+    material->setFaceName("side");
+    BGE::Storage::StorageManager::self()->set(material, "/materials/");
+
+    material = new BGE::Storage::Material("Yellow light");
+    material->setEmission(QColor(0.5 * 255, 0.5 * 255, 0.5 * 255, 255));
+    material->setFaceName("side");
+    BGE::Storage::StorageManager::self()->set(material, "/materials/");
+  }
 
   QList<BGE::Scene::Camera*> cameras;
   // Create cameras
@@ -112,6 +140,9 @@ int main(int argc, char** argv)
   fighter->setShaderProgram(BGE::Storage::StorageManager::self()->get<BGE::Storage::ShaderProgram*>("/shaders/Textured"));
   fighter->setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/models/Fighter"));
   fighter->setTexture(BGE::Storage::StorageManager::self()->get<BGE::Storage::Texture*>("/textures/Fighter"));
+  // Add materials
+  fighter->setMaterial(BGE::Storage::StorageManager::self()->get<BGE::Storage::Material*>("/models/Fighter/sf-01"));
+  fighter->setMaterial(BGE::Storage::StorageManager::self()->get<BGE::Storage::Material*>("/models/Fighter/sf-01-g"));
   BGE::Canvas::canvas()->addSceneObject(fighter);
 
   // Create lights
@@ -123,6 +154,7 @@ int main(int argc, char** argv)
   light->setSpecularColor(QColor(0.8 * 255, 0, 0));
   light->setSpotExponent(25);
   light->setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/models/Cube"));
+  light->setMaterial(BGE::Storage::StorageManager::self()->get<BGE::Storage::Material*>("/materials/Red light"));
   light->observe(fighter);
   light->setShaderProgram(BGE::Storage::StorageManager::self()->get<BGE::Storage::ShaderProgram*>("/shaders/Shader"));
   movingLight->addChild(light);
@@ -133,6 +165,7 @@ int main(int argc, char** argv)
   light->setSpecularColor(QColor(0, 0, 0.8 * 255));
   light->setSpotExponent(25);
   light->setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/models/Cube"));
+  light->setMaterial(BGE::Storage::StorageManager::self()->get<BGE::Storage::Material*>("/materials/Blue light"));
   light->observe(fighter);
   light->setShaderProgram(BGE::Storage::StorageManager::self()->get<BGE::Storage::ShaderProgram*>("/shaders/Shader"));
   movingLight->addChild(light);
@@ -143,6 +176,7 @@ int main(int argc, char** argv)
   light->setSpecularColor(QColor(0, 0.8 * 255, 0));
   light->setSpotExponent(25);
   light->setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/models/Cube"));
+  light->setMaterial(BGE::Storage::StorageManager::self()->get<BGE::Storage::Material*>("/materials/Green light"));
   light->observe(fighter);
   light->setShaderProgram(BGE::Storage::StorageManager::self()->get<BGE::Storage::ShaderProgram*>("/shaders/Shader"));
   movingLight->addChild(light);
@@ -153,6 +187,7 @@ int main(int argc, char** argv)
   light->setSpecularColor(QColor(0.8 * 255, 0.8 * 255, 0));
   light->setSpotExponent(25);
   light->setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/models/Cube"));
+  light->setMaterial(BGE::Storage::StorageManager::self()->get<BGE::Storage::Material*>("/materials/Yellow light"));
   light->observe(fighter);
   light->setShaderProgram(BGE::Storage::StorageManager::self()->get<BGE::Storage::ShaderProgram*>("/shaders/Shader"));
   movingLight->addChild(light);

@@ -18,6 +18,8 @@
 
 #include "global.h"
 
+#include "storage/material.h"
+
 namespace BGE {
 class Canvas;
 
@@ -299,6 +301,21 @@ class Object
     }
 
     /**
+     * Sets the material.
+     */
+    inline void setMaterial(Storage::Material* material)
+    {
+      m_materials.insert(material->faceName(), material);
+    }
+    /**
+     * Gets the mesh.
+     */
+    inline const QHash<QString, Storage::Material*>& materials() const
+    {
+      return m_materials;
+    }
+
+    /**
      * Sets the texture.
      */
     inline void setTexture(Storage::Texture* texture)
@@ -383,6 +400,7 @@ class Object
     bool m_transformModified;
 
     Storage::Mesh* m_mesh;
+    QHash<QString, Storage::Material*> m_materials;
     Storage::Texture* m_texture;
 
     Object* m_observed;

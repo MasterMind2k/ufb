@@ -30,7 +30,6 @@ class Item
     inline Item(const QString& name)
     {
       m_name = name;
-      m_isDir = false;
       m_bindId = 0;
       m_refCount = 0;
       m_parent = 0l;
@@ -45,16 +44,6 @@ class Item
         item->unload();
         delete item;
       }
-    }
-
-    /**
-     * Self explanatory.
-     *
-     * @return @c true Item contains sub items
-     */
-    inline bool isDir() const
-    {
-      return m_isDir;
     }
 
     /**
@@ -76,7 +65,6 @@ class Item
       if (!item)
         return;
       m_items.insert(item->name(), item);
-      m_isDir = true;
       item->m_parent = this;
     }
     /**
@@ -151,7 +139,6 @@ class Item
 
   private:
     QString m_name;
-    bool m_isDir;
     QHash<QString, Item*> m_items;
     Item* m_parent;
     quint32 m_bindId;

@@ -13,9 +13,12 @@
 #ifndef __BGE_DRIVER_GL1_H
 #define __BGE_DRIVER_GL1_H
 
+#include <QtCore/QHash>
+
 #include "driver/abstractdriver.h"
 
 namespace BGE {
+
 namespace Driver {
 
 class GL1 : public AbstractDriver
@@ -24,10 +27,18 @@ class GL1 : public AbstractDriver
     GL1();
 
     void bind(Storage::Mesh* mesh);
+    inline void bind(const QHash<QString, Storage::Material*> &materials)
+    {
+      m_materials = materials;
+    }
     void bind(Storage::Texture* texture);
     inline void bind(Storage::ShaderProgram* shaderProgram) {/* Ignore */}
 
     inline void unbind(Storage::Mesh* mesh) {/* Ignore */}
+    inline void unbind(const QHash<QString, Storage::Material*> &materials)
+    {
+      m_materials.clear();
+    }
     inline void unbind(Storage::Texture* texture) {/* Ignore */}
     inline void unbind(Storage::ShaderProgram* shaderProgram) {/* Ignore */}
 
@@ -48,6 +59,7 @@ class GL1 : public AbstractDriver
 
   private:
     quint8 m_usedLights;
+    QHash<QString, Storage::Material*> m_materials;
 };
 
 }

@@ -30,80 +30,10 @@ class Material;
 }
 }
 
-typedef QHash<quint16, BGE::Storage::Material*> FaceMaterial;
+typedef QHash<quint16, QString> FaceMaterial;
 
 namespace BGE {
 namespace Storage {
-
-class Material
-{
-  public:
-    inline Material()
-    {
-      /* Default values */
-      m_ambient = QColor(0.2 * 255, 0.2 * 255, 0.2 * 255, 255);
-      m_diffuse = QColor(0.8 * 255, 0.8 * 255, 0.8 * 255, 255);
-      m_specular = m_emission = QColor(0, 0, 0, 0);
-      m_shininess = 0;
-    }
-
-    inline Material(const QColor& ambient, const QColor& diffuse, const QColor& specular, const QColor& emission, float shininess)
-    {
-      m_ambient = ambient;
-      m_diffuse = diffuse;
-      m_specular = specular;
-      m_emission = emission;
-      m_shininess = shininess;
-    }
-
-    inline void setAmbient(const QColor& ambient)
-    {
-      m_ambient = ambient;
-    }
-    inline const QColor& ambient() const
-    {
-      return m_ambient;
-    }
-    inline const QColor& setDiffuse(const QColor& diffuse)
-    {
-      m_diffuse = diffuse;
-    }
-    inline const QColor& diffuse() const
-    {
-      return m_diffuse;
-    }
-    inline void setSpecular(const QColor& specular)
-    {
-      m_specular = specular;
-    }
-    inline const QColor& specular() const
-    {
-      return m_specular;
-    }
-    inline void setEmission(const QColor& emission)
-    {
-      m_emission = emission;
-    }
-    inline const QColor& emission() const
-    {
-      return m_emission;
-    }
-    inline void setShininess(qint32 shininess)
-    {
-      m_shininess = shininess;
-    }
-    inline qint32 shininess() const
-    {
-      return m_shininess;
-    }
-
-  private:
-    QColor m_ambient;
-    QColor m_diffuse;
-    QColor m_specular;
-    QColor m_emission;
-    qint32 m_shininess;
-};
 
 class Mesh : public Item
 {
@@ -185,10 +115,10 @@ class Mesh : public Item
       return m_textureMaps.value(name);
     }
 
-    inline void addFaceMaterial(const QString& name, quint16 face, Material* material)
+    inline void addFaceMaterial(const QString& name, quint16 face, const QString& materialName)
     {
       FaceMaterial temp = m_materials.value(name);
-      temp.insert(face, material);
+      temp.insert(face, materialName);
       m_materials.insert(name, temp);
     }
     inline FaceMaterial faceMaterials(const QString& name)

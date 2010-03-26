@@ -19,6 +19,7 @@
 #include "global.h"
 
 #include "storage/mesh.h"
+#include "storage/material.h"
 
 using namespace BGE;
 using namespace BGE::Storage;
@@ -156,7 +157,8 @@ Item* Loader3DS::load()
       // Material name
       case 0xA000: {
         materialName = readString(modelFile);
-        material = new Material;
+        material = new Material(materialName);
+        mesh->addItem(material);
         materials.insert(materialName, material);
 
         qDebug("BGE::Storage::Loader:Loader3DS::parse(): Parsing material '%s'.", materialName.toUtf8().data());
@@ -239,7 +241,7 @@ Item* Loader3DS::load()
   // Add last materials
   foreach (QString materialName, faceMaterials.keys()) {
     foreach (quint16 idx, faceMaterials.value(materialName))
-      mesh->addFaceMaterial(objectName, idx, materials.value(materialName));
+      mesh->addFaceMaterial(objectName, idx, materialName);
   }
 
   return mesh;
