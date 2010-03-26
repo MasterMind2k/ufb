@@ -139,6 +139,12 @@ int main(int argc, char** argv)
   BGE::Canvas::canvas()->addSceneObject(BGE::Canvas::canvas()->camera("Third camera"));
   cameras << BGE::Canvas::canvas()->camera("Third camera");
 
+  BGE::Canvas::canvas()->createCamera("Fourth camera")->move(-150, -300, 50);
+  BGE::Canvas::canvas()->camera("Fourth camera")->rotateX(80);
+  BGE::Canvas::canvas()->camera("Fourth camera")->rotateY(-20);
+  BGE::Canvas::canvas()->addSceneObject(BGE::Canvas::canvas()->camera("Fourth camera"));
+  cameras << BGE::Canvas::canvas()->camera("Fourth camera");
+
   // Add our model
   BGE::Scene::Object* fighter = new BGE::Scene::Object;
   fighter->setShaderProgram(BGE::Storage::StorageManager::self()->get<BGE::Storage::ShaderProgram*>("/shaders/Textured"));
