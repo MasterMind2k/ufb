@@ -91,6 +91,8 @@ class GL3 : public AbstractDriver
     Matrix3f m_normalMatrix;
     QList<Light> m_lights;
     QHash<QString, Storage::Material*> m_materials;
+    static const quint8 m_maxLights = 4;
+    quint8 m_renderedLights;
 
     void load(Storage::Mesh* mesh);
     void load(Storage::ShaderProgram* shaderProgram);

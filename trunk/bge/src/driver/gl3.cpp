@@ -46,6 +46,7 @@ GL3::GL3()
 {
   getShaderFunctions();
   getBufferFunctions();
+  m_renderedLights = 0;
 }
 
 void GL3::bind(Storage::Mesh *mesh)
@@ -170,30 +171,35 @@ void GL3::draw(Scene::Object *object)
   if (!object->shaderProgram())
     return;
 
-  loadLights(object->shaderProgram());
-
   bindUniformAttribute(object->shaderProgram(), "ProjectionMatrix", m_projectionMatrix);
   bindUniformAttribute(object->shaderProgram(), "ModelViewMatrix", m_transform.matrix());
   bindUniformAttribute(object->shaderProgram(), "NormalMatrix", m_normalMatrix);
 
-  bindAttribute(object->shaderProgram(), "Vertex", 3, GL_FLOAT, sizeof(BufferElement), VERTEX_OFFSET);
-  bindAttribute(object->shaderProgram(), "Normal", 3, GL_FLOAT, sizeof(BufferElement), NORMAL_OFFSET);
-  bindAttribute(object->shaderProgram(), "TexCoord", 3, GL_FLOAT, sizeof(BufferElement), UV_OFFSET);
+  while (m_lights.size() > m_renderedLights) {
 
-  Storage::Material* currentMaterial = 0l;
-  setMaterial(currentMaterial, object->shaderProgram());
-  foreach (Plan plan, m_plans.value(object->mesh()->bindId())) {
-    if (currentMaterial != m_materials.value(plan.materialName)) {
-      currentMaterial = m_materials.value(plan.materialName);
-      setMaterial(currentMaterial, object->shaderProgram());
+    loadLights(object->shaderProgram());
+
+    bindAttribute(object->shaderProgram(), "Vertex", 3, GL_FLOAT, sizeof(BufferElement), VERTEX_OFFSET);
+    bindAttribute(object->shaderProgram(), "Normal", 3, GL_FLOAT, sizeof(BufferElement), NORMAL_OFFSET);
+    bindAttribute(object->shaderProgram(), "TexCoord", 3, GL_FLOAT, sizeof(BufferElement), UV_OFFSET);
+
+    Storage::Material* currentMaterial = 0l;
+    setMaterial(currentMaterial, object->shaderProgram());
+    foreach (Plan plan, m_plans.value(object->mesh()->bindId())) {
+      if (currentMaterial != m_materials.value(plan.materialName)) {
+        currentMaterial = m_materials.value(plan.materialName);
+        setMaterial(currentMaterial, object->shaderProgram());
+      }
+
+      glDrawElements(plan.primitive, plan.count, GL_UNSIGNED_SHORT, (GLushort*)0 + plan.offset);
     }
-
-    glDrawElements(plan.primitive, plan.count, GL_UNSIGNED_SHORT, (GLushort*)0 + plan.offset);
   }
 
   unbindAttribute(object->shaderProgram(), "Vertex");
   unbindAttribute(object->shaderProgram(), "Normal");
   unbindAttribute(object->shaderProgram(), "TexCoord");
+
+  m_renderedLights = 0;
 }
 
 void GL3::init()
@@ -579,8 +585,14 @@ char** GL3::prepareShaderSource(const QString &source, qint32 &count, qint32 **l
 
 void GL3::loadLights(Storage::ShaderProgram *shaderProgram)
 {
-  quint32 i = 0;
-  foreach (Light light, m_lights) {
+  //quint32 i = 0;
+  //foreach (Light light, m_lights) {
+  quint8 offset = m_renderedLights;
+  qint32 size = m_lights.size();
+  for (quint32 i = 0; i < m_maxLights; i++) {
+    if (i + offset >= size)
+      break;
+    Light light = m_lights.at(i + offset);
     bindUniformAttribute(shaderProgram, QString("Lights%0.position").arg(i), light.position);
     bindUniformAttribute(shaderProgram, QString("Lights%0.ambient").arg(i), light.ambient);
     bindUniformAttribute(shaderProgram, QString("Lights%0.diffuse").arg(i), light.diffuse);
@@ -591,7 +603,6 @@ void GL3::loadLights(Storage::ShaderProgram *shaderProgram)
     bindUniformAttribute(shaderProgram, QString("Lights%0.spot_cutoff").arg(i), light.spot_cutoff);
     bindUniformAttribute(shaderProgram, QString("Lights%0.spot_exponent").arg(i), light.spot_exponent);
     bindUniformAttribute(shaderProgram, QString("Lights%0.spot_direction").arg(i), light.spot_direction);
-    i++;
+    m_renderedLights++;
   }
-  bindUniformAttribute(shaderProgram, "UsedLights", m_lights.size());
 }
