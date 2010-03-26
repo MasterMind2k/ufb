@@ -44,6 +44,14 @@ void Mesh::addFace(const QString &name, Primitives primitive, const QVector<quin
   m_faces.insert(name, temp);
 }
 
+void Mesh::addFaces(const QString &name, const QList<Face> &faces)
+{
+  if (!m_objects.contains(name))
+    m_objects << name;
+
+  m_faces.insert(name, faces);
+}
+
 void Mesh::calculateNormals(const QString& name)
 {
   if (!m_objects.contains(name))
