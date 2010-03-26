@@ -183,10 +183,10 @@ void GL3::draw(Scene::Object *object)
   Storage::Material* currentMaterial = 0l;
   setMaterial(currentMaterial, object->shaderProgram());
   foreach (Plan plan, m_plans.value(object->mesh()->bindId())) {
-    /*if (currentMaterial != plan.material) {
-      setMaterial(plan.material, object->shaderProgram());
-      currentMaterial = plan.material;
-    }*/
+    if (currentMaterial != m_materials.value(plan.materialName)) {
+      currentMaterial = m_materials.value(plan.materialName);
+      setMaterial(currentMaterial, object->shaderProgram());
+    }
 
     glDrawElements(plan.primitive, plan.count, GL_UNSIGNED_SHORT, (GLushort*)0 + plan.offset);
   }
@@ -227,12 +227,14 @@ void GL3::load(Storage::Mesh *mesh)
   QList<Vector3f> vertices;
   QList<Vector3f> normals;
   QList<Vector2f> textureMaps;
+  QStringList materials;
   QList<Face> faces;
   foreach (QString objectName, mesh->objects()) {
     vertices += mesh->vertices(objectName).toList();
     normals += mesh->normals(objectName).toList();
     textureMaps += mesh->textureMaps(objectName).toList();
     faces += mesh->faces(objectName);
+    materials += mesh->faceMaterials(objectName).values();
   }
 
   // Process vertices and normals
@@ -278,6 +280,7 @@ void GL3::load(Storage::Mesh *mesh)
   {
     quint32 size = 0;
     QList<Face>::const_iterator i = faces.constBegin();
+    QStringList::const_iterator j = materials.constBegin();
     QList<Face>::const_iterator end = faces.constEnd();
     QList<Plan> plans;
     QVector<quint16> idxs;
@@ -300,6 +303,10 @@ void GL3::load(Storage::Mesh *mesh)
       plan.count = face.second.size();
       plan.primitive = primitive;
       plan.offset = size - plan.count;
+
+      if (!materials.isEmpty())
+        plan.materialName = *j++;
+
       plans << plan;
     }
     m_plans.insert(mesh->bindId(), plans);
