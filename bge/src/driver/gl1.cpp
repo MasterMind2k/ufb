@@ -96,14 +96,30 @@ GL1::GL1()
 void GL1::bind(Storage::Mesh *mesh)
 {
   // Return if mesh is already created
-  if (!mesh || mesh->bindId())
+  if (!mesh)
+    return;
+
+  Storage::Material* firstMaterial = 0l;
+  if (!m_materials.isEmpty())
+    firstMaterial = m_materials.values().first();
+  quint32 meshId;
+  if (firstMaterial)
+    meshId = m_meshBindings.value(QPair<quint32, QString> (mesh->bindId(), firstMaterial->name()), 0);
+  else
+    meshId = mesh->bindId();
+  if (meshId)
     return;
 
   // Create the call list
-  quint32 meshId = glGenLists(1);
+  meshId = glGenLists(1);
   glNewList(meshId, GL_COMPILE);
   // Save the id :)
-  mesh->setBindId(meshId);
+  if (!mesh->bindId())
+    mesh->setBindId(meshId);
+  if (m_materials.isEmpty())
+    m_meshBindings.insert(QPair<quint32, QString> (mesh->bindId(), "none"), meshId);
+  else
+    m_meshBindings.insert(QPair<quint32, QString> (mesh->bindId(), firstMaterial->name()), meshId);
 
   Storage::Material *defaultMaterial = new Storage::Material("default");
 
@@ -258,7 +274,17 @@ void GL1::draw(Scene::Object* object)
   if (hasTexture)
     glEnable(GL_TEXTURE_2D);
 
-  glCallList(object->mesh()->bindId());
+  Storage::Material* firstMaterial = 0l;
+  if (!m_materials.isEmpty())
+    firstMaterial = m_materials.values().first();
+
+  quint32 meshId;
+  if (firstMaterial)
+    meshId = m_meshBindings.value(QPair<quint32, QString> (object->mesh()->bindId(), firstMaterial->name()));
+  else
+    meshId = object->mesh()->bindId();
+
+  glCallList(meshId);
 
   if (hasTexture)
     glDisable(GL_TEXTURE_2D);

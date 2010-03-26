@@ -60,6 +60,7 @@ class GL1 : public AbstractDriver
   private:
     quint8 m_usedLights;
     QHash<QString, Storage::Material*> m_materials;
+    QHash<QPair<quint32, QString>, quint32> m_meshBindings;
 };
 
 }

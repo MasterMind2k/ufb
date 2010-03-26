@@ -98,22 +98,22 @@ int main(int argc, char** argv)
   // Make materials for cubes
   {
     BGE::Storage::Material* material = new BGE::Storage::Material("Red light");
-    material->setEmission(QColor(0.2 * 255, 0.2 * 255, 0.2 * 255, 255));
+    material->setEmission(QColor(0.5 * 255, 0, 0, 255));
     material->setFaceName("side");
     BGE::Storage::StorageManager::self()->set(material, "/materials/");
 
     material = new BGE::Storage::Material("Blue light");
-    material->setEmission(QColor(0.5 * 255, 0.5 * 255, 0.5 * 255, 255));
+    material->setEmission(QColor(0, 0, 0.5 * 255, 255));
     material->setFaceName("side");
     BGE::Storage::StorageManager::self()->set(material, "/materials/");
 
     material = new BGE::Storage::Material("Green light");
-    material->setEmission(QColor(0.5 * 255, 0.5 * 255, 0.5 * 255, 255));
+    material->setEmission(QColor(0, 0.5 * 255, 0, 255));
     material->setFaceName("side");
     BGE::Storage::StorageManager::self()->set(material, "/materials/");
 
     material = new BGE::Storage::Material("Yellow light");
-    material->setEmission(QColor(0.5 * 255, 0.5 * 255, 0.5 * 255, 255));
+    material->setEmission(QColor(0.5 * 255, 0.5 * 255, 0, 255));
     material->setFaceName("side");
     BGE::Storage::StorageManager::self()->set(material, "/materials/");
   }
