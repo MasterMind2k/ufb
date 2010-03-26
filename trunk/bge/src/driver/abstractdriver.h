@@ -28,6 +28,7 @@ class Light;
 
 namespace Storage {
 class Mesh;
+class Material;
 class Texture;
 class Shader;
 class ShaderProgram;
@@ -41,10 +42,12 @@ class AbstractDriver
     static AbstractDriver* self();
 
     virtual void bind(Storage::Mesh* mesh) = 0;
+    virtual void bind(const QHash<QString, Storage::Material*> &materials) = 0;
     virtual void bind(Storage::Texture* texture) = 0;
     virtual void bind(Storage::ShaderProgram* shaderProgram) = 0;
 
     virtual void unbind(Storage::Mesh* mesh) = 0;
+    virtual void unbind(const QHash<QString, Storage::Material*> &materials) = 0;
     virtual void unbind(Storage::Texture* texture) = 0;
     virtual void unbind(Storage::ShaderProgram* shaderProgram) = 0;
 

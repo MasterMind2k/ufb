@@ -11,6 +11,7 @@ set(storage_SRCS
   texture.cpp
   shader.cpp
   shaderprogram.cpp
+  material.cpp
 )
 
 add_library(storage ${storage_SRCS})

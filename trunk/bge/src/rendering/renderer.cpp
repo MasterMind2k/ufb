@@ -73,6 +73,8 @@ void Renderer::renderScene()
     if (object->shaderProgram())
       object->shaderProgram()->bind();
 
+    Driver::AbstractDriver::self()->bind(object->materials());
+
     object->mesh()->bind();
     if (object->texture())
       object->texture()->bind();

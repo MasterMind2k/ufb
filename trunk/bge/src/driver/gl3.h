@@ -32,9 +32,11 @@ class GL3 : public AbstractDriver
 
     void bind(Storage::Mesh* mesh);
     void bind(Storage::Texture* texture);
+    void bind(const QHash<QString, Storage::Material*> &materials) {}
     void bind(Storage::ShaderProgram* shaderProgram);
 
     void unbind(Storage::Mesh* mesh);
+    void unbind(const QHash<QString, Storage::Material*> &materials) {}
     inline void unbind(Storage::Texture* texture) {/* Ignore */}
     void unbind(Storage::ShaderProgram* shaderProgram);
 
@@ -58,7 +60,6 @@ class GL3 : public AbstractDriver
       quint32 primitive;
       quint32 count;
       quint32 offset;
-      Storage::Material* material;
     };
     struct Light {
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW

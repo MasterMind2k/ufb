@@ -16,6 +16,8 @@
 
 #include "driver/abstractdriver.h"
 
+#include "storage/material.h"
+
 using namespace BGE;
 using namespace BGE::Storage;
 

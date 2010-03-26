@@ -20,6 +20,7 @@
 #include "scene/light.h"
 
 #include "storage/mesh.h"
+#include "storage/material.h"
 #include "storage/texture.h"
 
 using namespace BGE;
@@ -104,6 +105,8 @@ void GL1::bind(Storage::Mesh *mesh)
   // Save the id :)
   mesh->setBindId(meshId);
 
+  Storage::Material *defaultMaterial = new Storage::Material("default");
+
   // Rendering stuff
   foreach (QString meshObject, mesh->objects()) {
     // Prepare data
@@ -121,7 +124,7 @@ void GL1::bind(Storage::Mesh *mesh)
       VectorList normalsTemp;
 
       // Setup material
-      setMaterial(materials.value(i++));
+      setMaterial(m_materials.value(materials.value(i++), defaultMaterial));
 
       QVector<quint16> idxs = face.second;
       switch (face.first) {
@@ -161,6 +164,8 @@ void GL1::bind(Storage::Mesh *mesh)
       }
     }
   }
+
+  delete defaultMaterial;
 
   glEndList();
 }
