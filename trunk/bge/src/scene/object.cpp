@@ -16,6 +16,7 @@
 
 #include "rendering/renderer.h"
 
+#include "storage/mesh.h"
 #include "storage/shaderprogram.h"
 
 using namespace BGE;
@@ -120,6 +121,29 @@ void Object::setShaderProgram(Storage::ShaderProgram *shaderProgram)
     return;
 
   m_shaderProgram = shaderProgram;
+}
+
+Object* Object::objectify(const QString &objectName)
+{
+  if (!m_mesh || !m_mesh->objects().contains(objectName))
+    return 0l;
+
+  Object *newChild = new Object;
+  Storage::Mesh *mesh = new Storage::Mesh(objectName);
+  mesh->addVertices(objectName, m_mesh->vertices(objectName));
+  mesh->addFaces(objectName, m_mesh->faces(objectName));
+  mesh->addFacesMaterials(objectName, m_mesh->faceMaterials(objectName));
+  mesh->addTextureMaps(objectName, m_mesh->textureMaps(objectName));
+  mesh->calculateNormals(objectName);
+  newChild->setMesh(mesh);
+
+  foreach (QString materialName, m_mesh->faceMaterials(objectName))
+    newChild->setMaterial(materials().value(materialName));
+
+  m_mesh->removeObject(objectName);
+
+  addChild(newChild);
+  return newChild;
 }
 
 void Object::prepareTransforms(qint32 timeDiff)

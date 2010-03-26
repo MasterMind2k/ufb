@@ -75,6 +75,10 @@ class Mesh : public Item
      */
     void addFace(const QString& name, Primitives primitive, const QVector<quint16>& face);
     /**
+     * Adds faces.
+     */
+    void addFaces(const QString &name, const QList<QPair<Primitives, QVector<quint16> > > &faces);
+    /**
      * Gets a list of faces.
      *
      * @note You can use Face type for conviniance.
@@ -108,6 +112,13 @@ class Mesh : public Item
       m_textureMaps.insert(name, temp);
     }
     /**
+     * Adds uv mappings.
+     */
+    inline void addTextureMaps(const QString &name, const QVector<Vector2f> &maps)
+    {
+      m_textureMaps.insert(name, maps);
+    }
+    /**
      * Gets the uv texture mappings.
      */
     inline QVector<Vector2f> textureMaps(const QString& name) const
@@ -120,6 +131,10 @@ class Mesh : public Item
       FaceMaterial temp = m_materials.value(name);
       temp.insert(face, materialName);
       m_materials.insert(name, temp);
+    }
+    inline void addFacesMaterials(const QString &name, const FaceMaterial &facesMaterials)
+    {
+      m_materials.insert(name, facesMaterials);
     }
     inline FaceMaterial faceMaterials(const QString& name)
     {
@@ -139,6 +154,18 @@ class Mesh : public Item
     inline QStringList objects() const
     {
       return m_objects.toList();
+    }
+    /**
+     * Removes an object.
+     */
+    inline void removeObject(const QString &name)
+    {
+      m_objects.remove(name);
+      m_vertices.remove(name);
+      m_faces.remove(name);
+      m_materials.remove(name);
+      m_normals.remove(name);
+      m_textureMaps.remove(name);
     }
 
     /**

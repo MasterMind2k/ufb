@@ -375,6 +375,8 @@ class Object
       return m_shaderProgram;
     }
 
+    Object *objectify(const QString& objectName);
+
   protected:
     /**
      * This method gets called _before_ transform matrices get updated. Reimplement
