@@ -10,31 +10,17 @@
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
  ***************************************************************************/
-#include "cameras.h"
+#ifndef OVERLAY_H
+#define OVERLAY_H
 
-#include <QtCore/QTimer>
+#include "abstractoverlay.h"
 
-#include "canvas.h"
-
-#include "scene/camera.h"
-
-Cameras::Cameras()
- : QObject()
+class Overlay : public BGE::AbstractOverlay
 {
-  m_currentCamera = 1;
+  public:
+    inline Overlay() : AbstractOverlay() {}
 
-  m_timer = new QTimer(this);
-  m_timer->setSingleShot(false);
-  m_timer->setInterval(3000);
-  m_timer->start();
+    void paint(QPainter *painter, qint32 elapsed);
+};
 
-  connect(m_timer, SIGNAL(timeout()), SLOT(changeCamera()));
-}
-
-void Cameras::changeCamera()
-{
-  BGE::Canvas::canvas()->activateCamera(m_cameras.at(m_currentCamera++)->name());
-
-  if (m_currentCamera >= m_cameras.size())
-    m_currentCamera = 0;
-}
+#endif

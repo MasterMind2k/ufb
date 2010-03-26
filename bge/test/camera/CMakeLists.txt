@@ -9,6 +9,7 @@ set(bge_camera_SRCS
   main.cpp
   movingcube.cpp
   cameras.cpp
+  overlay.cpp
 )
 
 set(bge_camera_HDRS

@@ -31,6 +31,7 @@
 #include "storage/storagemanager.h"
 
 #include "abstractcontroller.h"
+#include "abstractoverlay.h"
 #include "recorder.h"
 
 using namespace BGE;
@@ -70,6 +71,7 @@ Canvas::Canvas()
   m_activeCamera = 0l;
 
   m_controller = 0l;
+  m_overlay = 0l;
 
   setAutoFillBackground(false);
 
@@ -148,6 +150,9 @@ void Canvas::paintGL()
 
   // 2D painting
   QPainter painter(this);
+  if (m_overlay)
+    m_overlay->paint(&painter, elapsed);
+
   painter.setPen(Qt::white);
   painter.drawText(width() / 2, height() - 3, "FPS: " + QString::number(m_fps));
   painter.end();
@@ -162,9 +167,10 @@ void Canvas::paintGL()
   m_timer->start();
 }
 
-void Canvas::setController(AbstractController* controller)
+void Canvas::setOverlay(AbstractOverlay *overlay)
 {
-  m_controller = controller;
+  overlay->m_canvas = this;
+  m_overlay = overlay;
 }
 
 Scene::Camera* Canvas::createCamera(const QString &name)

@@ -24,6 +24,7 @@
 
 #include "movingcube.h"
 #include "cameras.h"
+#include "overlay.h"
 
 BGE::Storage::Mesh* createCube()
 {
@@ -75,6 +76,9 @@ int main(int argc, char** argv)
   cameras.addCamera(camera);
   BGE::Canvas::canvas()->addSceneObject(camera);
   BGE::Canvas::canvas()->activateCamera("Global camera");
+
+  // Setup overlay
+  BGE::Canvas::canvas()->setOverlay(new Overlay);
 
   // Our data :D
   BGE::Canvas::canvas()->loadResource();

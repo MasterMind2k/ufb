@@ -24,6 +24,7 @@
 #include "storage/shaderprogram.h"
 
 #include "movinglight.h"
+#include "overlay.h"
 
 BGE::Storage::Mesh* createCube()
 {
@@ -92,6 +93,9 @@ int main(int argc, char** argv)
 
   // Load models and textures
   BGE::Canvas::canvas()->loadResource();
+
+  // Setup overlay
+  BGE::Canvas::canvas()->setOverlay(new Overlay);
 
   // Make a small cube
   BGE::Storage::StorageManager::self()->set(createCube(), "/models");
