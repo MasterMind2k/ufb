@@ -32,11 +32,17 @@ class GL3 : public AbstractDriver
 
     void bind(Storage::Mesh* mesh);
     void bind(Storage::Texture* texture);
-    void bind(const QHash<QString, Storage::Material*> &materials) {}
+    inline void bind(const QHash<QString, Storage::Material*> &materials)
+    {
+      m_materials = materials;
+    }
     void bind(Storage::ShaderProgram* shaderProgram);
 
     void unbind(Storage::Mesh* mesh);
-    void unbind(const QHash<QString, Storage::Material*> &materials) {}
+    inline void unbind(const QHash<QString, Storage::Material*> &materials)
+    {
+      m_materials.clear();
+    }
     inline void unbind(Storage::Texture* texture) {/* Ignore */}
     void unbind(Storage::ShaderProgram* shaderProgram);
 
@@ -59,6 +65,7 @@ class GL3 : public AbstractDriver
     struct Plan {
       quint32 primitive;
       quint32 count;
+      QString materialName;
       quint32 offset;
     };
     struct Light {
@@ -83,6 +90,7 @@ class GL3 : public AbstractDriver
     Transform3f m_transform;
     Matrix3f m_normalMatrix;
     QList<Light> m_lights;
+    QHash<QString, Storage::Material*> m_materials;
 
     void load(Storage::Mesh* mesh);
     void load(Storage::ShaderProgram* shaderProgram);
