@@ -13,6 +13,7 @@ add_subdirectory(storage)
 set(bge_SRCS
   canvas.cpp
   recorder.cpp
+  abstractoverlay.cpp
 )
 
 set(bge_QHDRS

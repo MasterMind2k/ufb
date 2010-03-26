@@ -21,6 +21,7 @@
 namespace BGE {
 
 class AbstractController;
+class AbstractOverlay;
 class Recorder;
 namespace Scene
 {
@@ -70,7 +71,17 @@ class Canvas : public QGLWidget
      *
      * @see AbstractController
      */
-    void setController(AbstractController* controller);
+    inline void setController(AbstractController* controller)
+    {
+      m_controller = controller;
+    }
+
+    /**
+     * Sets the 2D painted overlay.
+     *
+     * @see AbstractOverlay
+     */
+    void setOverlay(AbstractOverlay* overlay);
 
     /**
      * Creates a camera with a name. The camera is _not_ added to the scene.
@@ -163,6 +174,7 @@ class Canvas : public QGLWidget
     Scene::Object* m_scene;
     Rendering::Renderer* m_renderer;
     AbstractController* m_controller;
+    AbstractOverlay* m_overlay;
     QTime *m_time;
     QTimer *m_timer;
     qint32 m_totalElapsed;
