@@ -233,14 +233,12 @@ void GL3::load(Storage::Mesh *mesh)
   QList<Vector3f> vertices;
   QList<Vector3f> normals;
   QList<Vector2f> textureMaps;
-  QStringList materials;
-  QList<Face> faces;
+  QHash<QString, quint16> verticesNum;
   foreach (QString objectName, mesh->objects()) {
     vertices += mesh->vertices(objectName).toList();
     normals += mesh->normals(objectName).toList();
     textureMaps += mesh->textureMaps(objectName).toList();
-    faces += mesh->faces(objectName);
-    materials += mesh->faceMaterials(objectName).values();
+    verticesNum.insert(objectName, mesh->vertices(objectName).size());
   }
 
   // Process vertices and normals
@@ -284,39 +282,50 @@ void GL3::load(Storage::Mesh *mesh)
 
   // Process faces
   {
-    quint32 size = 0;
-    QList<Face>::const_iterator i = faces.constBegin();
-    QStringList::const_iterator j = materials.constBegin();
-    QList<Face>::const_iterator end = faces.constEnd();
-    QList<Plan> plans;
     QVector<quint16> idxs;
-    while (i != end) {
-      Face face = *i++;
-      quint32 primitive;
-      switch (face.first) {
+    quint32 size = 0;
+    quint32 offset = 0;
+    QList<Plan> plans;
+    foreach (QString objectName, mesh->objects()) {
+      QList<Face> faces = mesh->faces(objectName);
+      QList<Face>::const_iterator i = faces.constBegin();
+      QStringList materials = mesh->faceMaterials(objectName).values();
+      QStringList::const_iterator j = materials.constBegin();
+      QList<Face>::const_iterator end = faces.constEnd();
+      while (i != end) {
+        Face face = *i++;
+        quint32 primitive;
+        switch (face.first) {
         case Storage::Mesh::Quads:
           primitive = GL_QUADS;
           break;
         case Storage::Mesh::Triangles:
           primitive = GL_TRIANGLES;
           break;
+        }
+
+        QVector<quint16> temp = face.second;
+        if (offset) {
+          for (quint16 k = 0; k < temp.size(); k++)
+            temp[k] += offset;
+        }
+        idxs += temp;
+        size += face.second.size();
+
+        Plan plan;
+        plan.count = face.second.size();
+        plan.primitive = primitive;
+        plan.offset = size - plan.count;
+
+        if (!materials.isEmpty())
+          plan.materialName = *j++;
+
+        plans << plan;
       }
 
-      idxs += face.second;
-      size += face.second.size();
-
-      Plan plan;
-      plan.count = face.second.size();
-      plan.primitive = primitive;
-      plan.offset = size - plan.count;
-
-      if (!materials.isEmpty())
-        plan.materialName = *j++;
-
-      plans << plan;
+      offset += verticesNum.value(objectName);
     }
     m_plans.insert(mesh->bindId(), plans);
-
     quint32 padding = 0;
     if (size % 32)
       padding = 32 - size % 32;

@@ -138,12 +138,24 @@ Object* Object::objectify(const QString &objectName)
   newChild->setMesh(mesh);
 
   foreach (QString materialName, m_mesh->faceMaterials(objectName))
-    newChild->setMaterial(materials().value(materialName));
+    newChild->addMaterial(materials().value(materialName));
 
   m_mesh->removeObject(objectName);
 
   addChild(newChild);
   return newChild;
+}
+
+void Object::loadMaterialsFromMesh()
+{
+  if (!m_mesh)
+    return;
+
+  foreach (Storage::Item* item, m_mesh->items()) {
+    Storage::Material *material = dynamic_cast<Storage::Material*> (item);
+    if (material)
+      addMaterial(material);
+  }
 }
 
 void Object::prepareTransforms(qint32 timeDiff)

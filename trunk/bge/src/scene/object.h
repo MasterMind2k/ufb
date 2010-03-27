@@ -303,7 +303,7 @@ class Object
     /**
      * Sets the material.
      */
-    inline void setMaterial(Storage::Material* material)
+    inline void addMaterial(Storage::Material* material)
     {
       m_materials.insert(material->faceName(), material);
     }
@@ -376,6 +376,8 @@ class Object
     }
 
     Object *objectify(const QString& objectName);
+
+    void loadMaterialsFromMesh();
 
   protected:
     /**

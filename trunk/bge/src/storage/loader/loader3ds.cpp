@@ -43,7 +43,7 @@ Item* Loader3DS::load()
   QString objectName;
   Material* material = 0l;
   QString materialName;
-  QHash<QString, QList<quint16> > faceMaterials;
+  QHash<QString, FaceMaterial> faceMaterials;
 
   enum MaterialState {
     Ambient,
@@ -128,12 +128,12 @@ Item* Loader3DS::load()
         QString materialName = readString(modelFile);
         quint16 facesNum = *(quint16*) modelFile.read(2).data();
 
-        QList<quint16> idxs;
+        FaceMaterial mat = faceMaterials.value(objectName);
         for (quint16 i = 0; i < facesNum; i++) {
           quint16 faceIdx = *(quint16*) modelFile.read(2).data();
-          idxs << faceIdx;
+          mat.insert(faceIdx, materialName);
         }
-        faceMaterials.insert(materialName, idxs);
+        faceMaterials.insert(objectName, mat);
 
         qDebug("BGE::Loader::Loader3DS::parse(): Parsed %d material mappings for faces.", facesNum);
         break;
@@ -238,11 +238,9 @@ Item* Loader3DS::load()
     }
   }
 
-  // Add last materials
-  foreach (QString materialName, faceMaterials.keys()) {
-    foreach (quint16 idx, faceMaterials.value(materialName))
-      mesh->addFaceMaterial(objectName, idx, materialName);
-  }
+  // Add materials
+  foreach (QString objectName, faceMaterials.keys())
+    mesh->addFacesMaterials(objectName, faceMaterials.value(objectName));
 
   return mesh;
 }

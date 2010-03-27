@@ -128,7 +128,7 @@ class Mesh : public Item
 
     inline void addFaceMaterial(const QString& name, quint16 face, const QString& materialName)
     {
-      FaceMaterial temp = m_materials.value(name);
+      QHash<quint16, QString> temp = m_materials.value(name);
       temp.insert(face, materialName);
       m_materials.insert(name, temp);
     }
