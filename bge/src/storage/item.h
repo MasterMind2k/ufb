@@ -83,6 +83,13 @@ class Item
     {
       return m_items.value(name, 0l);
     }
+    /**
+     * Gets all it's items.
+     */
+    inline QList<Item*> items() const
+    {
+      return m_items.values();
+    }
 
     inline Item* parent() const
     {
