@@ -43,7 +43,8 @@ class Mesh : public Item
      */
     enum Primitives {
       Quads,
-      Triangles
+      Triangles,
+      Polygons
     };
 
     inline Mesh(const QString& name) : Item(name) {}
@@ -92,6 +93,15 @@ class Mesh : public Item
      * Calculates and sets the normals.
      */
     void calculateNormals(const QString& name);
+    /**
+     * Adds the normals. If you have valid normals, please not recalculate them.
+     */
+    inline void addNormals(const QString &name, const QVector<Vector3f> &normals)
+    {
+      QVector<Vector3f> temp = m_normals.value(name);
+      temp += normals;
+      m_normals.insert(name, temp);
+    }
     /**
      * Gets the normals.
      */

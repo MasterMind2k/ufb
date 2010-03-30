@@ -45,7 +45,7 @@ void Renderer::renderScene()
     move.translate(-camera->globalPosition());
 
     // Calculate camera rotation
-    rotation.rotate(camera->orientation().inverse());
+    rotation *= camera->orientation().inverse();
 
     // And do some fixing for local camera
     if (camera->parent() != Canvas::canvas()->scene()) {

@@ -7,6 +7,7 @@ set(loader_SRCS
   loader3ds.cpp
   textureloader.cpp
   shaderloader.cpp
+  objloader.cpp
 )
 
 add_library(loader ${loader_SRCS})

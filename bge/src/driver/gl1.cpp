@@ -68,6 +68,27 @@ void drawTriangles(const VectorList& vertices, const VectorList& normals, const 
   glEnd();
 }
 
+void drawPolygon(const VectorList& vertices, const VectorList& normals, const QVector<Vector2f>& textureMaps)
+{
+  bool addTextureMapping = !textureMaps.isEmpty();
+
+  glBegin(GL_POLYGON);
+
+  for (quint16 i = 0; i < vertices.size(); i++) {
+    Vector3f vertex = vertices.at(i);
+    // Set normal vector
+    if (!normals.at(i).isZero())
+      glNormal3fv(normals.at(i).data());
+    // Set texture mapping
+    if (addTextureMapping)
+      glTexCoord2fv(textureMaps.at(i).data());
+    // Set vertex
+    glVertex3fv(vertex.data());
+  }
+
+  glEnd();
+}
+
 void setMaterial(Storage::Material* material)
 {
   if (!material)
@@ -173,6 +194,21 @@ void GL1::bind(Storage::Mesh *mesh)
           }
           // Render
           drawTriangles(verticesTemp, normalsTemp, textureMapTemp);
+          break;
+
+        // Triangles rendering
+        case Storage::Mesh::Polygons:
+          foreach (quint16 idx, idxs) {
+            // Prepare vertices
+            verticesTemp << vertices.at(idx);
+            // Prepare normal vectors
+            normalsTemp << normals.at(idx);
+            // Prepare texture mappings
+            if (hasTexturesMapping)
+              textureMapTemp << textureMaps.at(idx);
+          }
+          // Render
+          drawPolygon(verticesTemp, normalsTemp, textureMapTemp);
           break;
 
         default:
