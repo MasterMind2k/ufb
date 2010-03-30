@@ -18,6 +18,7 @@
 #include <QtCore/QHash>
 
 #include "storage/loader/loader3ds.h"
+#include "storage/loader/objloader.h"
 #include "storage/loader/textureloader.h"
 #include "storage/loader/shaderloader.h"
 
@@ -68,15 +69,19 @@ void StorageManager::load()
 
       if (filename.endsWith(".3ds", Qt::CaseInsensitive)) {
         // Load 3ds
-        qDebug("BGE::Storage::load(): Loading model '%s'", absoluteFilePath.toUtf8().data());
+        qDebug("BGE::Storage::StorageManager::load(): Loading model '%s'", absoluteFilePath.toUtf8().data());
         loader = new Loader::Loader3DS(absoluteFilePath);
+      } else if (filename.endsWith(".obj", Qt::CaseInsensitive)) {
+        // Load obj
+        qDebug("BGE::Storage::StorageManager::load(): Loading model '%s'", absoluteFilePath.toUtf8().data());
+        loader = new Loader::ObjLoader(absoluteFilePath);
       } else if (filename.endsWith(".png", Qt::CaseInsensitive) || filename.endsWith(".jpg", Qt::CaseInsensitive)) {
         // Load texture
-        qDebug("BGE::Storage::load(): Loading texture '%s'", absoluteFilePath.toUtf8().data());
+        qDebug("BGE::Storage::StorageManager::load(): Loading texture '%s'", absoluteFilePath.toUtf8().data());
         loader = new Loader::TextureLoader(absoluteFilePath);
       } else if (filename.endsWith(".vsm") || filename.endsWith(".fsm") || filename.endsWith(".sp")) {
         // Load shaders
-        qDebug("BGE::Storage::load(): Loading shader '%s'", absoluteFilePath.toUtf8().data());
+        qDebug("BGE::Storage::StorageManager::load(): Loading shader '%s'", absoluteFilePath.toUtf8().data());
         loader = new Loader::ShaderLoader(absoluteFilePath);
       }
 
