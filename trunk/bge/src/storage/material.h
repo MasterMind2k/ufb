@@ -33,7 +33,7 @@ class Material : public Item
       m_faceName = name;
     }
 
-  inline Material(const QString& name, const QColor& ambient, const QColor& diffuse, const QColor& specular, const QColor& emission, float shininess) : Item(name)
+  inline Material(const QString& name, const QColor& ambient, const QColor& diffuse, const QColor& specular, const QColor& emission, qint32 shininess) : Item(name)
     {
       m_ambient = ambient;
       m_diffuse = diffuse;

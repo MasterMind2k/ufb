@@ -138,7 +138,7 @@ class Mesh : public Item
 
     inline void addFaceMaterial(const QString& name, quint16 face, const QString& materialName)
     {
-      QHash<quint16, QString> temp = m_materials.value(name);
+      FaceMaterial temp = m_materials.value(name);
       temp.insert(face, materialName);
       m_materials.insert(name, temp);
     }
@@ -194,7 +194,7 @@ class Mesh : public Item
     /* Faces */
     QHash<QString, QList<QPair<Primitives, QVector<quint16> > > > m_faces;
     /* Materials */
-    QHash<QString, FaceMaterial > m_materials;
+    QHash<QString, FaceMaterial> m_materials;
     /* Normal vectors */
     QHash<QString, QVector<Vector3f> > m_normals;
     /* The uv texture mapping */
