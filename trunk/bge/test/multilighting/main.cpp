@@ -76,7 +76,7 @@ int main(int argc, char** argv)
   BGE::Storage::StorageManager::self()->set(material, "/materials/");
 
   // Setup camera
-  BGE::Canvas::canvas()->createCamera("Global camera")->move(0, 250, 0);
+  BGE::Canvas::canvas()->createCamera("Global camera")->move(0, 500, 0);
   BGE::Canvas::canvas()->camera("Global camera")->rotateX(-90);
   BGE::Canvas::canvas()->activateCamera("Global camera");
   BGE::Canvas::canvas()->addSceneObject(BGE::Canvas::canvas()->camera("Global camera"));
@@ -85,6 +85,7 @@ int main(int argc, char** argv)
   BGE::Scene::Object *object = new BGE::Scene::Object;
   object->setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/models/Surface"));
   object->setShaderProgram(BGE::Storage::StorageManager::self()->get<BGE::Storage::ShaderProgram*>("/shaders/Object"));
+  object->move(-150, 0, 150);
   BGE::Canvas::canvas()->addSceneObject(object);
 
   // First R2-D2
