@@ -1,5 +1,7 @@
 # This file uses centimeters as units for non-parametric coordinates.
 
+mtllib terrain.mtl
+g default
 v -147.629524 0.112740 166.474201
 v -141.558548 2.349624 168.705484
 v -131.907345 3.474896 170.520489
@@ -19683,8 +19685,6 @@ vn -0.054875 0.996802 -0.058088
 vn -0.073526 0.994271 -0.077576
 vn -0.123543 0.987853 -0.094250
 vn -0.157530 0.981953 -0.104653
-mtllib terrain.mtl
-g default
 g pPlane1
 usemtl phong2SG
 f 1/1/1 2/2/2 83/3/3 82/4/4
