@@ -96,10 +96,26 @@ Item *ObjLoader::load()
           facePair.first = Mesh::Polygons;
           foreach (QString faceComponents, face.cap(1).split(QRegExp("\\s+"))) {
             if (faceComponent.exactMatch(faceComponents)) {
-              sortedVertices << vertices.at(faceComponent.cap(1).toUShort() - 1);
-              sortedUvs << uvMaps.at(faceComponent.cap(2).toUShort() - 1);
-              sortedNormals << normals.at(faceComponent.cap(3).toUShort() - 1);
-              facePair.second << sortedVertices.size() - 1;
+              Vector3f vertex = vertices.at(faceComponent.cap(1).toUShort() - 1);
+              Vector2f uvMap = uvMaps.at(faceComponent.cap(2).toUShort() - 1);
+              Vector3f normal = normals.at(faceComponent.cap(3).toUShort() - 1);
+
+              // Check for existing triple
+              bool found = false;
+              for (quint16 i = 0; i < sortedVertices.size(); i++) {
+                if (sortedVertices.at(i) == vertex && sortedUvs.at(i) == uvMap && sortedNormals.at(i) == normal) {
+                  found = true;
+                  facePair.second << i;
+                  break;
+                }
+              }
+
+              if (!found) {
+                sortedVertices << vertex;
+                sortedUvs << uvMap;
+                sortedNormals << normal;
+                facePair.second << sortedVertices.size() - 1;
+              }
             }
           }
           faces << facePair;
