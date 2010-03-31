@@ -17,6 +17,7 @@
 #include "storage/storagemanager.h"
 #include "storage/mesh.h"
 #include "storage/material.h"
+#include "storage/texture.h"
 #include "storage/shaderprogram.h"
 
 #include "scene/camera.h"
@@ -87,6 +88,13 @@ int main(int argc, char** argv)
   object->setShaderProgram(BGE::Storage::StorageManager::self()->get<BGE::Storage::ShaderProgram*>("/shaders/Object"));
   object->move(-150, 0, 150);
   BGE::Canvas::canvas()->addSceneObject(object);
+
+  // Hard coding material :D
+  BGE::Storage::Material *surfaceMaterial = new BGE::Storage::Material("Surface material", QColor(0.5 * 255, 0.5 * 255, 0.5 * 255), QColor(255, 255, 255), QColor(0, 0, 0), QColor(0, 0, 0), 80);
+  surfaceMaterial->setFaceName("phong2SG");
+  BGE::Storage::StorageManager::self()->set(surfaceMaterial, "/materials");
+  object->addMaterial(surfaceMaterial);
+  object->setTexture(BGE::Storage::StorageManager::self()->get<BGE::Storage::Texture*>("/textures/Desert"));
 
   // First R2-D2
   object = new BGE::Scene::Object;

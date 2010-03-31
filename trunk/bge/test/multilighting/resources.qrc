@@ -1,7 +1,10 @@
 <RCC>
     <qresource prefix="/bge_resources/models">
-        <file alias="R2-D2.3ds">resources/r2-d2.3ds</file>
-        <file alias="Surface.obj">resources/surface.obj</file>
+      <file alias="R2-D2.3ds">resources/r2-d2.3ds</file>
+      <file alias="Surface.obj">resources/surface.obj</file>
+    </qresource>
+    <qresource prefix="/bge_resources/textures">
+      <file alias="Desert.jpg">resources/desert.jpg</file>
     </qresource>
     <qresource prefix="/bge_resources/shaders">
       <file alias="Light.sp">resources/light.sp</file>
