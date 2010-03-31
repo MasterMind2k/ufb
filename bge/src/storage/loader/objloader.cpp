@@ -37,7 +37,9 @@ Item *ObjLoader::load()
   QList<Vector2f> sortedUvs;
   VectorList sortedNormals;
   QList<Face> faces;
+  FaceMaterial facesMaterials;
   QHash<QString, qint32> vertexIdxs;
+  QString currentMaterial = "None";
 
   QFile modelFile(filename());
   if (!modelFile.open(QFile::ReadOnly)) {
@@ -45,20 +47,32 @@ Item *ObjLoader::load()
     return 0l;
   }
 
-  QRegExp comment("^\\s*#.*");
-  QRegExp emptyLine("^\\s*");
   QRegExp vertex("^\\s*v\\s*(-?\\d+\\.?\\d*)\\s(-?\\d+\\.?\\d*)\\s(-?\\d+\\.?\\d*).*", Qt::CaseInsensitive, QRegExp::RegExp2);
   QRegExp uvMap("^\\s*vt\\s*(-?\\d+\\.?\\d*)\\s(-?\\d+\\.?\\d*).*", Qt::CaseInsensitive, QRegExp::RegExp2);
   QRegExp normal("^\\s*vn\\s*(-?\\d+\\.?\\d*)\\s(-?\\d+\\.?\\d*)\\s(-?\\d+\\.?\\d*).*", Qt::CaseInsensitive, QRegExp::RegExp2);
   QRegExp face("^\\s*f\\s(.*)");
   QRegExp faceComponent("(\\d+)/(\\d+)/(\\d+)");
 
+  // And some stateless variables
+  QRegExp comment("^\\s*#.*");
+  QRegExp emptyLine("^\\s*");
+  QRegExp group("^\\s*g.*", Qt::CaseInsensitive);
+  QRegExp mtllib("^\\s*mtllib.*", Qt::CaseInsensitive);
+  QRegExp usemtl("^\\s*usemtl\\s(.*)\\s*", Qt::CaseInsensitive, QRegExp::RegExp2);
+
   qDebug("BGE::Storage::Loader::ObjLoader::load(): Parsing file '%s'.", filename().toUtf8().data());
   while (!modelFile.atEnd()) {
     QString line = modelFile.readLine();
     line.remove('\n');
-    if (comment.exactMatch(line) || emptyLine.exactMatch(line))
+    if (comment.exactMatch(line) || emptyLine.exactMatch(line) || group.exactMatch(line) || mtllib.exactMatch(line))
       continue;
+
+    // Parse some meaningful stateless variables
+    if (usemtl.exactMatch(line)) {
+      currentMaterial = usemtl.cap(1);
+      qDebug("BGE::Storage::Loader::ObjLoader::load(): Set material name to '%s'.", currentMaterial.toUtf8().data());
+      continue;
+    }
 
     switch (stage) {
       case Vertices: {
@@ -121,6 +135,7 @@ Item *ObjLoader::load()
               facePair.second << idx;
             }
           }
+          facesMaterials.insert(faces.size(), currentMaterial);
           faces << facePair;
         } else {
           continue;
@@ -137,5 +152,6 @@ Item *ObjLoader::load()
   mesh->addTextureMaps("mesh", sortedUvs.toVector());
   mesh->addNormals("mesh", sortedNormals.toVector());
   mesh->addFaces("mesh", faces);
+  mesh->addFacesMaterials("mesh", facesMaterials);
   return mesh;
 }
