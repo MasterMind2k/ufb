@@ -37,6 +37,7 @@ Item *ObjLoader::load()
   QList<Vector2f> sortedUvs;
   VectorList sortedNormals;
   QList<Face> faces;
+  QHash<QString, qint32> vertexIdxs;
 
   QFile modelFile(filename());
   if (!modelFile.open(QFile::ReadOnly)) {
@@ -96,26 +97,28 @@ Item *ObjLoader::load()
           facePair.first = Mesh::Polygons;
           foreach (QString faceComponents, face.cap(1).split(QRegExp("\\s+"))) {
             if (faceComponent.exactMatch(faceComponents)) {
-              Vector3f vertex = vertices.at(faceComponent.cap(1).toUShort() - 1);
+              quint16 vertexIdx = faceComponent.cap(1).toUShort() - 1;
+              Vector3f vertex = vertices.at(vertexIdx);
               Vector2f uvMap = uvMaps.at(faceComponent.cap(2).toUShort() - 1);
               Vector3f normal = normals.at(faceComponent.cap(3).toUShort() - 1);
 
               // Check for existing triple
-              bool found = false;
-              for (quint16 i = 0; i < sortedVertices.size(); i++) {
-                if (sortedVertices.at(i) == vertex && sortedUvs.at(i) == uvMap && sortedNormals.at(i) == normal) {
-                  found = true;
-                  facePair.second << i;
-                  break;
-                }
-              }
+              // Calculate hash key
+              QString key = "%0,%1,%2/%3,%4/%5,%6,%7";
+              key = key.arg(QString::number(vertex[0]), QString::number(vertex[1]), QString::number(vertex[2]), QString::number(uvMap[0]), QString::number(uvMap[1]), QString::number(normal[0]), QString::number(normal[1]), QString::number(normal[2]));
 
-              if (!found) {
+              // Find our idx
+              qint32 idx = vertexIdxs.value(key, -1);
+
+              if (idx == -1) {
+                // idx not found, add the triple
                 sortedVertices << vertex;
                 sortedUvs << uvMap;
                 sortedNormals << normal;
-                facePair.second << sortedVertices.size() - 1;
+                idx = sortedVertices.size() - 1;
+                vertexIdxs.insert(key, idx);
               }
+              facePair.second << idx;
             }
           }
           faces << facePair;
