@@ -43,8 +43,7 @@ class Mesh : public Item
      */
     enum Primitives {
       Quads,
-      Triangles,
-      Polygons
+      Triangles
     };
 
     inline Mesh(const QString& name) : Item(name) {}
