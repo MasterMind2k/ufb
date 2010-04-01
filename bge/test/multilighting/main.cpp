@@ -85,7 +85,7 @@ int main(int argc, char** argv)
   // Setup objects
   BGE::Scene::Object *object = new BGE::Scene::Object;
   object->setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/models/Surface"));
-  object->setShaderProgram(BGE::Storage::StorageManager::self()->get<BGE::Storage::ShaderProgram*>("/shaders/Object"));
+  object->setShaderProgram(BGE::Storage::StorageManager::self()->get<BGE::Storage::ShaderProgram*>("/shaders/Textured"));
   object->move(-150, 0, 150);
   BGE::Canvas::canvas()->addSceneObject(object);
 
