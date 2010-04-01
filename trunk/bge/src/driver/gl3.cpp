@@ -323,9 +323,6 @@ void GL3::load(Storage::Mesh *mesh)
         case Storage::Mesh::Triangles:
           primitive = GL_TRIANGLES;
           break;
-        case Storage::Mesh::Polygons:
-          primitive = GL_POLYGON;
-          break;
       }
 
       idxs += face.second;

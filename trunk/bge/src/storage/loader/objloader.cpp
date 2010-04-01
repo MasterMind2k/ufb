@@ -13,12 +13,24 @@
 #include "objloader.h"
 
 #include <QtCore/QFile>
+#include <QtCore/QStack>
 
 #include "storage/mesh.h"
 
 using namespace BGE;
 using namespace BGE::Storage;
 using namespace BGE::Storage::Loader;
+
+bool vectorLessThan(const Vector3f &v1, const Vector3f &v2)
+{
+  if (v1.x() != v2.x())
+    return v1.x() < v2.x();
+
+  if (v1.y() != v2.y())
+    return v1.y() < v2.y();
+
+  return v1.z() > v2.z();
+}
 
 Item *ObjLoader::load()
 {
@@ -33,7 +45,7 @@ Item *ObjLoader::load()
   QList<Vector2f> uvMaps;
   VectorList normals;
 
-  VectorList sortedVertices;
+  QList<Vector3f> sortedVertices;
   QList<Vector2f> sortedUvs;
   VectorList sortedNormals;
   QList<Face> faces;
@@ -107,8 +119,8 @@ Item *ObjLoader::load()
 
       case Faces: {
         if (face.exactMatch(line)) {
-          Face facePair;
-          facePair.first = Mesh::Polygons;
+          QHash<quint16, Vector3f> polygon;
+          QList<Vector3f> vertexList;
           foreach (QString faceComponents, face.cap(1).split(QRegExp("\\s+"))) {
             if (faceComponent.exactMatch(faceComponents)) {
               quint16 vertexIdx = faceComponent.cap(1).toUShort() - 1;
@@ -132,11 +144,31 @@ Item *ObjLoader::load()
                 idx = sortedVertices.size() - 1;
                 vertexIdxs.insert(key, idx);
               }
-              facePair.second << idx;
+              polygon.insert(idx, vertex);
+              vertexList << vertex;
             }
           }
+
+          // Triangulate polygon
+          quint16 i = 0;
+          Face facePair;
+          facePair.first = Mesh::Triangles;
+          foreach (Vector3f vertex, triangulate(vertexList)) {
+            if (i++ > 2) {
+              facesMaterials.insert(faces.size(), currentMaterial);
+              faces << facePair;
+              facePair.second.clear();
+              i = 0;
+            }
+
+            quint16 idx = polygon.key(vertex);
+
+            facePair.second << idx;
+          }
+          // Add last face
           facesMaterials.insert(faces.size(), currentMaterial);
           faces << facePair;
+
         } else {
           continue;
         }
@@ -154,4 +186,55 @@ Item *ObjLoader::load()
   mesh->addFaces("mesh", faces);
   mesh->addFacesMaterials("mesh", facesMaterials);
   return mesh;
+}
+
+// Took algorithem from http://www.cs.ucsb.edu/~suri/cs235/Triangulation.pdf
+QList<Vector3f> ObjLoader::triangulate(const QList<Vector3f> &vertices)
+{
+  QList<Vector3f> faces;
+
+  // Sort vertices
+  QList<Vector3f> sortedVertices = vertices;
+  qSort(sortedVertices.begin(), sortedVertices.end(), vectorLessThan);
+  QStack<Vector3f> stack;
+
+  // Add first two vertices to the stack
+  stack.push(sortedVertices.takeFirst());
+  stack.push(sortedVertices.takeFirst());
+
+  // Process the vertices
+  for (quint16 i = 0; i < sortedVertices.size(); i++) {
+    Vector3f top = stack.pop();
+    quint16 topIdx = vertices.indexOf(top);
+    Vector3f v1 = sortedVertices.at(i);
+
+    // Create neighbor indexes
+    quint16 next = 0;
+    if (topIdx != vertices.size() - 1)
+      next = topIdx + 1;
+    quint16 prev = vertices.size() - 1;
+    if (topIdx != 0)
+      prev = topIdx - 1;
+
+    // Sorth the index list, so we have the proper orientation
+    QList<quint16> idxs;
+    idxs << vertices.indexOf(v1) << vertices.indexOf(stack.top()) << topIdx;
+    qSort(idxs);
+
+    // Is v1 top's neighbor?
+    if (vertices.at(next) != v1 && vertices.at(prev) != v1) {
+      // v1 is not on the same chain, so we have to change last element
+
+      // Change top element on the stack
+      stack.pop();
+      stack.push(top);
+    }
+    // Add the processed vertex to the stack
+    stack.push(v1);
+
+    foreach (quint16 idx, idxs)
+      faces << vertices.at(idx);
+  }
+
+  return faces;
 }

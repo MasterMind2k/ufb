@@ -196,21 +196,6 @@ void GL1::bind(Storage::Mesh *mesh)
           drawTriangles(verticesTemp, normalsTemp, textureMapTemp);
           break;
 
-        // Triangles rendering
-        case Storage::Mesh::Polygons:
-          foreach (quint16 idx, idxs) {
-            // Prepare vertices
-            verticesTemp << vertices.at(idx);
-            // Prepare normal vectors
-            normalsTemp << normals.at(idx);
-            // Prepare texture mappings
-            if (hasTexturesMapping)
-              textureMapTemp << textureMaps.at(idx);
-          }
-          // Render
-          drawPolygon(verticesTemp, normalsTemp, textureMapTemp);
-          break;
-
         default:
           break;
       }

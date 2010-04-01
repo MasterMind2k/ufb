@@ -15,6 +15,8 @@
 
 #include "storage/loader/abstractloader.h"
 
+#include "global.h"
+
 namespace BGE {
 namespace Storage {
 namespace Loader {
@@ -25,6 +27,9 @@ class ObjLoader : public AbstractLoader
     inline ObjLoader(const QString& filename) : AbstractLoader(filename) {}
 
     Item *load();
+
+  private:
+    QList<Vector3f> triangulate(const QList<Vector3f> &vertices);
 };
 
 }
