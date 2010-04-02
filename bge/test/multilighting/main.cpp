@@ -23,6 +23,8 @@
 #include "scene/camera.h"
 #include "scene/light.h"
 
+#include "lighting.h"
+
 BGE::Storage::Mesh* createCube()
 {
   QString name = "cube";
@@ -140,36 +142,8 @@ int main(int argc, char** argv)
   object->rotateX(-90);
   BGE::Canvas::canvas()->addSceneObject(object);
 
-  BGE::Canvas::canvas()->addSceneObject(BGE::Canvas::canvas()->createLight("First light"));
-  BGE::Canvas::canvas()->light("First light")->setQuadraticAttenuation(0.0005);
-  BGE::Canvas::canvas()->light("First light")->move(0, 50, 0);
-  BGE::Canvas::canvas()->light("First light")->setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/models/Cube"));
-  BGE::Canvas::canvas()->light("First light")->setShaderProgram(BGE::Storage::StorageManager::self()->get<BGE::Storage::ShaderProgram*>("/shaders/Light"));
-  BGE::Canvas::canvas()->light("First light")->addMaterial(material);
-  BGE::Canvas::canvas()->addSceneObject(BGE::Canvas::canvas()->createLight("Second light"));
-  BGE::Canvas::canvas()->light("Second light")->setQuadraticAttenuation(0.0005);
-  BGE::Canvas::canvas()->light("Second light")->move(150, 50, 150);
-  BGE::Canvas::canvas()->light("Second light")->setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/models/Cube"));
-  BGE::Canvas::canvas()->light("Second light")->setShaderProgram(BGE::Storage::StorageManager::self()->get<BGE::Storage::ShaderProgram*>("/shaders/Light"));
-  BGE::Canvas::canvas()->light("Second light")->addMaterial(material);
-  BGE::Canvas::canvas()->addSceneObject(BGE::Canvas::canvas()->createLight("Third light"));
-  BGE::Canvas::canvas()->light("Third light")->setQuadraticAttenuation(0.0005);
-  BGE::Canvas::canvas()->light("Third light")->move(-150, 50, -150);
-  BGE::Canvas::canvas()->light("Third light")->setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/models/Cube"));
-  BGE::Canvas::canvas()->light("Third light")->setShaderProgram(BGE::Storage::StorageManager::self()->get<BGE::Storage::ShaderProgram*>("/shaders/Light"));
-  BGE::Canvas::canvas()->light("Third light")->addMaterial(material);
-  BGE::Canvas::canvas()->addSceneObject(BGE::Canvas::canvas()->createLight("Fourth light"));
-  BGE::Canvas::canvas()->light("Fourth light")->setQuadraticAttenuation(0.0005);
-  BGE::Canvas::canvas()->light("Fourth light")->move(150, 50, -150);
-  BGE::Canvas::canvas()->light("Fourth light")->setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/models/Cube"));
-  BGE::Canvas::canvas()->light("Fourth light")->setShaderProgram(BGE::Storage::StorageManager::self()->get<BGE::Storage::ShaderProgram*>("/shaders/Light"));
-  BGE::Canvas::canvas()->light("Fourth light")->addMaterial(material);
-  BGE::Canvas::canvas()->addSceneObject(BGE::Canvas::canvas()->createLight("Fifth light"));
-  BGE::Canvas::canvas()->light("Fifth light")->setQuadraticAttenuation(0.0005);
-  BGE::Canvas::canvas()->light("Fifth light")->move(-150, 50, 150);
-  BGE::Canvas::canvas()->light("Fifth light")->setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/models/Cube"));
-  BGE::Canvas::canvas()->light("Fifth light")->setShaderProgram(BGE::Storage::StorageManager::self()->get<BGE::Storage::ShaderProgram*>("/shaders/Light"));
-  BGE::Canvas::canvas()->light("Fifth light")->addMaterial(material);
+  // Add light container
+  BGE::Canvas::canvas()->addSceneObject(new Lighting);
 
   // Show canvas
   BGE::Canvas::canvas()->show();
