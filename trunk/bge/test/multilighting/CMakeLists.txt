@@ -7,9 +7,11 @@ include_directories(. ../../src ${CMAKE_CURRENT_BINARY_DIR} ${QT_INCLUDES} ${EIG
 
 set(bge_multilighting_SRCS
   main.cpp
+  lighting.cpp
 )
 
 set(bge_multilighting_HDRS
+  lighting.h
 )
 
 qt4_wrap_cpp(bge_multilighting_MOC ${bge_multilighting_HDRS})
