@@ -138,7 +138,8 @@ void Canvas::paintGL()
     list.append(object->children());
 
     // Mark the object with calculatd transforms
-    object->m_transformModified = false;
+    if (elapsed > 0)
+      object->m_transformModified = false;
   }
 
   // Make the actual rendering
