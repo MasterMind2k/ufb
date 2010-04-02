@@ -14,6 +14,7 @@
 #define __BGE_DRIVER_GL1_H
 
 #include <QtCore/QHash>
+#include <QtCore/QVector>
 
 #include "driver/abstractdriver.h"
 
@@ -24,6 +25,7 @@ namespace Driver {
 class GL1 : public AbstractDriver
 {
   public:
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     GL1();
 
     void bind(Storage::Mesh* mesh);
@@ -59,8 +61,15 @@ class GL1 : public AbstractDriver
 
   private:
     quint8 m_usedLights;
+    Transform3f m_transform;
+    QVector<Scene::Light*> m_lights;
+    QVector<Transform3f> m_lightTransforms;
+    quint32 m_renderedLights;
     QHash<QString, Storage::Material*> m_materials;
     QHash<QPair<quint32, QString>, quint32> m_meshBindings;
+
+    void loadLights();
+    void unloadLights();
 };
 
 }

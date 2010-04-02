@@ -30,7 +30,7 @@ Lighting::Lighting()
 {
   BGE::Storage::Material *material = BGE::Storage::StorageManager::self()->get<BGE::Storage::Material*>("/materials/Light");
   // Setup lights
-  for (quint16 i = 0; i < 10; i ++) {
+  for (quint16 i = 0; i < 9; i ++) {
     QString lightName = "Light_" + QString::number(i);
     addChild(BGE::Canvas::canvas()->createLight(lightName));
     BGE::Canvas::canvas()->light(lightName)->setQuadraticAttenuation(0.0005);
@@ -55,7 +55,7 @@ Lighting::Lighting()
 
 void Lighting::calculateTransforms(qint32 timeDiff)
 {
-  /*quint32 i = 0;
+  quint32 i = 0;
   foreach (BGE::Scene::Object *light, BGE::Scene::Object::children()) {
     Vector3f direction = m_directions.at(i);
     if (light->globalPosition().x() >= 300 || light->globalPosition().x() <= -300)
@@ -66,7 +66,7 @@ void Lighting::calculateTransforms(qint32 timeDiff)
 
     m_directions[i++] = direction;
     light->move(direction * (qreal) timeDiff / 1000.0);
-  }*/
+  }
 }
 
 void Lighting::setDirections()

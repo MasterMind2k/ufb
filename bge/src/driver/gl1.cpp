@@ -112,6 +112,7 @@ void setMaterial(Storage::Material* material)
 GL1::GL1()
 {
   m_usedLights = 0;
+  m_renderedLights = 0;
 }
 
 void GL1::bind(Storage::Mesh *mesh)
@@ -239,53 +240,20 @@ void GL1::unload(Storage::Texture* texture)
 
 void GL1::setLight(Scene::Light *light)
 {
-  if (m_usedLights >= GL_MAX_LIGHTS) {
-    qWarning("BGE::Driver::GL1::setLight(): Number of lights exeeds max value (%d)!", GL_MAX_LIGHTS);
-    return;
-  }
-  GLenum lightId = GL_LIGHT0 + m_usedLights++;
-
-  // Setup light properties
-  // Position
-  Vector4f temp(0, 0, 0, 1);
-  if (!light->isPositional())
-    temp = Vector4f(light->globalPosition().x(), light->globalPosition().y(), light->globalPosition().z(), 0);
-  glLightfv(lightId, GL_POSITION, temp.data());
-  // Colors
-  temp = Vector4f(light->ambientColor().redF(), light->ambientColor().greenF(), light->ambientColor().blueF(), light->ambientColor().alphaF());
-  glLightfv(lightId, GL_AMBIENT, temp.data());
-  temp = Vector4f(light->diffuseColor().redF(), light->diffuseColor().greenF(), light->diffuseColor().blueF(), light->diffuseColor().alphaF());
-  glLightfv(lightId, GL_DIFFUSE, temp.data());
-  temp = Vector4f(light->specularColor().redF(), light->specularColor().greenF(), light->specularColor().blueF(), light->specularColor().alphaF());
-  glLightfv(lightId, GL_SPECULAR, temp.data());
-  // Attenuation
-  glLightf(lightId, GL_CONSTANT_ATTENUATION, light->constantAttenuation());
-  glLightf(lightId, GL_LINEAR_ATTENUATION, light->linearAttenuation());
-  glLightf(lightId, GL_QUADRATIC_ATTENUATION, light->quadraticAttenuation());
-  // Spot properties
-  if (light->isPositional() && light->isSpot()) {
-    glLightfv(lightId, GL_SPOT_DIRECTION, Vector3f(0, 0, -1).data());
-    glLightf(lightId, GL_SPOT_CUTOFF, light->spotCutOff());
-    glLightf(lightId, GL_SPOT_EXPONENT, light->spotExponent());
-  } else {
-    glLightf(lightId, GL_SPOT_CUTOFF, 180);
-  }
-
-  // Enable light
-  glEnable(lightId);
+  m_lights << light;
+  m_lightTransforms << m_transform;
 }
 
 void GL1::resetLighting()
 {
-  for (quint8 i = 0; i < m_usedLights; i++)
-    glDisable(GL_LIGHT0 + i);
-
-  m_usedLights = 0;
+  m_lights.clear();
+  m_lightTransforms.clear();
 }
 
 void GL1::setTransformMatrix(const Transform3f& transform)
 {
   glLoadMatrixf(transform.data());
+  m_transform = transform;
 }
 
 void GL1::draw(Scene::Object* object)
@@ -305,7 +273,13 @@ void GL1::draw(Scene::Object* object)
   else
     meshId = object->mesh()->bindId();
 
-  glCallList(meshId);
+  while (m_renderedLights < m_lights.size()) {
+
+    loadLights();
+    glCallList(meshId);
+    unloadLights();
+  }
+  m_renderedLights = 0;
 
   if (hasTexture)
     glDisable(GL_TEXTURE_2D);
@@ -334,4 +308,64 @@ void GL1::setProjection(const QMatrix4x4& transform)
   glMatrixMode(GL_PROJECTION);
   glLoadMatrixd(transform.data());
   glMatrixMode(GL_MODELVIEW);
+}
+
+void GL1::loadLights()
+{
+  quint32 offset = 0;
+  if (m_renderedLights)
+    offset = m_renderedLights - 1;
+  for (quint32 i = 0; i < 8; i++) {
+    if (i + offset >= m_lights.size())
+      break;
+
+    Scene::Light *light = m_lights.at(i + offset);
+
+    glPushMatrix();
+    glLoadMatrixf(m_lightTransforms.at(i + offset).data());
+
+    GLenum lightId = GL_LIGHT0 + i;
+
+    // Setup light properties
+    // Position
+    Vector4f temp(0, 0, 0, 1);
+    if (!light->isPositional())
+      temp = Vector4f(light->globalPosition().x(), light->globalPosition().y(), light->globalPosition().z(), 0);
+    glLightfv(lightId, GL_POSITION, temp.data());
+    // Colors
+    temp = Vector4f(light->ambientColor().redF(), light->ambientColor().greenF(), light->ambientColor().blueF(), light->ambientColor().alphaF());
+    glLightfv(lightId, GL_AMBIENT, temp.data());
+    temp = Vector4f(light->diffuseColor().redF(), light->diffuseColor().greenF(), light->diffuseColor().blueF(), light->diffuseColor().alphaF());
+    glLightfv(lightId, GL_DIFFUSE, temp.data());
+    temp = Vector4f(light->specularColor().redF(), light->specularColor().greenF(), light->specularColor().blueF(), light->specularColor().alphaF());
+    glLightfv(lightId, GL_SPECULAR, temp.data());
+    // Attenuation
+    glLightf(lightId, GL_CONSTANT_ATTENUATION, light->constantAttenuation());
+    glLightf(lightId, GL_LINEAR_ATTENUATION, light->linearAttenuation());
+    glLightf(lightId, GL_QUADRATIC_ATTENUATION, light->quadraticAttenuation());
+    // Spot properties
+    if (light->isPositional() && light->isSpot()) {
+      glLightfv(lightId, GL_SPOT_DIRECTION, Vector3f(0, 0, -1).data());
+      glLightf(lightId, GL_SPOT_CUTOFF, light->spotCutOff());
+      glLightf(lightId, GL_SPOT_EXPONENT, light->spotExponent());
+    } else {
+      glLightf(lightId, GL_SPOT_CUTOFF, 180);
+    }
+
+    // Enable light
+    glEnable(lightId);
+
+    m_renderedLights++;
+    m_usedLights++;
+
+    glPopMatrix();
+  }
+}
+
+void GL1::unloadLights()
+{
+  for (quint8 i = 0; i < m_usedLights; i++)
+    glDisable(GL_LIGHT0 + i);
+
+  m_usedLights = 0;
 }
