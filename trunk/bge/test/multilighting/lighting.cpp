@@ -30,7 +30,7 @@ Lighting::Lighting()
 {
   BGE::Storage::Material *material = BGE::Storage::StorageManager::self()->get<BGE::Storage::Material*>("/materials/Light");
   // Setup lights
-  for (quint16 i = 0; i < 9; i ++) {
+  for (quint16 i = 0; i < 15; i ++) {
     QString lightName = "Light_" + QString::number(i);
     addChild(BGE::Canvas::canvas()->createLight(lightName));
     BGE::Canvas::canvas()->light(lightName)->setQuadraticAttenuation(0.0005);
@@ -44,13 +44,6 @@ Lighting::Lighting()
 
   // Init directions
   setDirections();
-
-  QTimer *timer = new QTimer(this);
-  timer->setInterval(2000);
-  timer->setSingleShot(false);
-  timer->start();
-
-  connect(timer, SIGNAL(timeout()), SLOT(setDirections()));
 }
 
 void Lighting::calculateTransforms(qint32 timeDiff)
@@ -58,11 +51,11 @@ void Lighting::calculateTransforms(qint32 timeDiff)
   quint32 i = 0;
   foreach (BGE::Scene::Object *light, BGE::Scene::Object::children()) {
     Vector3f direction = m_directions.at(i);
-    if (light->globalPosition().x() >= 300 || light->globalPosition().x() <= -300)
-      direction = direction.cwise() * Vector3f(-1, 0, 0);
+    if (light->globalPosition().x() > 300 || light->globalPosition().x() < -300)
+      direction = direction.cwise() * Vector3f(-1, 1, 1);
 
-    if (light->globalPosition().z() >= 300 || light->globalPosition().z() <= -300)
-      direction = direction.cwise() * Vector3f(0, 0, -1);
+    if (light->globalPosition().z() > 300 || light->globalPosition().z() < -300)
+      direction = direction.cwise() * Vector3f(1, 1, -1);
 
     m_directions[i++] = direction;
     light->move(direction * (qreal) timeDiff / 1000.0);
@@ -74,5 +67,5 @@ void Lighting::setDirections()
   quint32 size = BGE::Canvas::canvas()->lights().size();
   m_directions.clear();
   for (quint32 i = 0; i < size; i++)
-    m_directions << Vector3f(qrand() % 100 - 50, 0, qrand() % 100 - 50);
+    m_directions << Vector3f(qrand() % 50, 0, qrand() % 50);
 }
