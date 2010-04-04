@@ -35,6 +35,7 @@ uniform LightStruct Lights0;
 uniform LightStruct Lights1;
 uniform LightStruct Lights2;
 uniform LightStruct Lights3;
+uniform int UsedLights;
 uniform MaterialStruct Material;
 
 vec4 light0(in vec3 n)
@@ -171,9 +172,25 @@ vec4 light3(in vec3 n)
 
 vec4 calculateLighting()
 {
-  vec4 color = ambientGlobal;
+  vec4 color = vec4(0, 0, 0, 1);
   vec3 n = normalize(normal);
 
-  return color + light0(n) + light1(n) + light2(n) + light3(n);
+  if (UsedLights > 0) {
+    color = color + light0(n);
+  }
+
+  if (UsedLights > 1) {
+    color = color + light1(n);
+  }
+
+  if (UsedLights > 2) {
+    color = color + light2(n);
+  }
+
+  if (UsedLights > 3) {
+    color = color + light3(n);
+  }
+
+  return color;
 }
 
