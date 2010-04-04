@@ -273,16 +273,32 @@ void GL1::draw(Scene::Object* object)
   else
     meshId = object->mesh()->bindId();
 
-  while (m_renderedLights < m_lights.size()) {
+  bool isFirstPass = true;
+  bool isBlending = false;
 
-    loadLights();
+  while (m_renderedLights < m_lights.size()) {
+    if (!isFirstPass)
+      loadLights();
+
     glCallList(meshId);
-    unloadLights();
+
+    if (!isFirstPass)
+      unloadLights();
+
+    if (isFirstPass && !isBlending) {
+      glDepthFunc(GL_LEQUAL);
+      glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_COLOR);
+      isFirstPass = false;
+      isBlending = true;
+    }
   }
-  m_renderedLights = 0;
 
   if (hasTexture)
     glDisable(GL_TEXTURE_2D);
+  glDepthFunc(GL_LESS);
+
+  m_renderedLights = 0;
+
 }
 
 void GL1::init()
@@ -294,6 +310,10 @@ void GL1::init()
   glEnable(GL_LIGHTING);
   glEnable(GL_CULL_FACE);
   glEnable(GL_NORMALIZE);
+  glEnable(GL_BLEND);
+
+  Vector4f black(0, 0, 0, 1);
+  glLightModelfv(GL_LIGHT_MODEL_AMBIENT, black.data());
 }
 
 void GL1::clear()
@@ -314,7 +334,7 @@ void GL1::loadLights()
 {
   quint32 offset = 0;
   if (m_renderedLights)
-    offset = m_renderedLights - 1;
+    offset = m_renderedLights;
   for (quint32 i = 0; i < 8; i++) {
     if (i + offset >= m_lights.size())
       break;
