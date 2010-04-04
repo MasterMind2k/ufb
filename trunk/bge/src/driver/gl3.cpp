@@ -174,14 +174,28 @@ void GL3::draw(Scene::Object *object)
   bindUniformAttribute(object->shaderProgram(), "ProjectionMatrix", m_projectionMatrix);
   bindUniformAttribute(object->shaderProgram(), "ModelViewMatrix", m_transform.matrix());
   bindUniformAttribute(object->shaderProgram(), "NormalMatrix", m_normalMatrix);
+  bindAttribute(object->shaderProgram(), "Vertex", 3, GL_FLOAT, sizeof(BufferElement), VERTEX_OFFSET);
+  bindAttribute(object->shaderProgram(), "Normal", 3, GL_FLOAT, sizeof(BufferElement), NORMAL_OFFSET);
+  bindAttribute(object->shaderProgram(), "TexCoord", 3, GL_FLOAT, sizeof(BufferElement), UV_OFFSET);
+
+  Storage::Material* currentMaterial = 0l;
+  setMaterial(currentMaterial, object->shaderProgram());
+  foreach (Plan plan, m_plans.value(object->mesh()->bindId())) {
+    if (currentMaterial != m_materials.value(plan.materialName)) {
+      currentMaterial = m_materials.value(plan.materialName);
+      setMaterial(currentMaterial, object->shaderProgram());
+    }
+
+    glDrawElements(plan.primitive, plan.count, GL_UNSIGNED_SHORT, (GLushort*)0 + plan.offset);
+  }
+
+  bool isFirstPass = true;
+  bool blendingEnabled = false;
 
   while (m_lights.size() > m_renderedLights) {
 
-    loadLights(object->shaderProgram());
-
-    bindAttribute(object->shaderProgram(), "Vertex", 3, GL_FLOAT, sizeof(BufferElement), VERTEX_OFFSET);
-    bindAttribute(object->shaderProgram(), "Normal", 3, GL_FLOAT, sizeof(BufferElement), NORMAL_OFFSET);
-    bindAttribute(object->shaderProgram(), "TexCoord", 3, GL_FLOAT, sizeof(BufferElement), UV_OFFSET);
+    if (!isFirstPass)
+      loadLights(object->shaderProgram());
 
     Storage::Material* currentMaterial = 0l;
     setMaterial(currentMaterial, object->shaderProgram());
@@ -193,7 +207,18 @@ void GL3::draw(Scene::Object *object)
 
       glDrawElements(plan.primitive, plan.count, GL_UNSIGNED_SHORT, (GLushort*)0 + plan.offset);
     }
+
+    if (isFirstPass && !blendingEnabled) {
+      glEnable(GL_BLEND);
+      glDepthFunc(GL_LEQUAL);
+      glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_COLOR);
+      isFirstPass = false;
+      blendingEnabled = true;
+    }
   }
+
+  glDepthFunc(GL_LESS);
+  glDisable(GL_BLEND);
 
   unbindAttribute(object->shaderProgram(), "Vertex");
   unbindAttribute(object->shaderProgram(), "Normal");
@@ -609,7 +634,10 @@ void GL3::loadLights(Storage::ShaderProgram *shaderProgram)
   //quint32 i = 0;
   //foreach (Light light, m_lights) {
   quint8 offset = m_renderedLights;
+  if (offset)
+    offset--;
   qint32 size = m_lights.size();
+  quint8 usedLights = 0;
   for (quint32 i = 0; i < m_maxLights; i++) {
     if (i + offset >= size)
       break;
@@ -625,5 +653,7 @@ void GL3::loadLights(Storage::ShaderProgram *shaderProgram)
     bindUniformAttribute(shaderProgram, QString("Lights%0.spot_exponent").arg(i), light.spot_exponent);
     bindUniformAttribute(shaderProgram, QString("Lights%0.spot_direction").arg(i), light.spot_direction);
     m_renderedLights++;
+    usedLights++;
   }
+  bindUniformAttribute(shaderProgram, "UsedLights", usedLights);
 }

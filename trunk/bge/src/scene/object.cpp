@@ -50,6 +50,7 @@ Object::~Object()
 
 void Object::move(const Vector3f& direction)
 {
+  m_globalPosition += direction;
   m_position += direction;
 
   // Mark for recalculation
