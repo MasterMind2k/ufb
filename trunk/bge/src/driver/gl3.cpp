@@ -178,17 +178,6 @@ void GL3::draw(Scene::Object *object)
   bindAttribute(object->shaderProgram(), "Normal", 3, GL_FLOAT, sizeof(BufferElement), NORMAL_OFFSET);
   bindAttribute(object->shaderProgram(), "TexCoord", 3, GL_FLOAT, sizeof(BufferElement), UV_OFFSET);
 
-  Storage::Material* currentMaterial = 0l;
-  setMaterial(currentMaterial, object->shaderProgram());
-  foreach (Plan plan, m_plans.value(object->mesh()->bindId())) {
-    if (currentMaterial != m_materials.value(plan.materialName)) {
-      currentMaterial = m_materials.value(plan.materialName);
-      setMaterial(currentMaterial, object->shaderProgram());
-    }
-
-    glDrawElements(plan.primitive, plan.count, GL_UNSIGNED_SHORT, (GLushort*)0 + plan.offset);
-  }
-
   bool isFirstPass = true;
   bool blendingEnabled = false;
 
