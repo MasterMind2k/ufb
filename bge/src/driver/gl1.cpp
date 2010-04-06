@@ -287,6 +287,7 @@ void GL1::draw(Scene::Object* object)
 
     if (isFirstPass && !isBlending) {
       glDepthFunc(GL_LEQUAL);
+      glEnable(GL_BLEND);
       glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_COLOR);
       isFirstPass = false;
       isBlending = true;
@@ -296,6 +297,7 @@ void GL1::draw(Scene::Object* object)
   if (hasTexture)
     glDisable(GL_TEXTURE_2D);
   glDepthFunc(GL_LESS);
+  glDisable(GL_BLEND);
 
   m_renderedLights = 0;
 
