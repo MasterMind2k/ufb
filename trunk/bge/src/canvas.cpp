@@ -151,8 +151,11 @@ void Canvas::paintGL()
 
   // 2D painting
   QPainter painter(this);
-  if (m_overlay)
+  if (m_overlay) {
+    painter.save();
     m_overlay->paint(&painter, elapsed);
+    painter.restore();
+  }
 
   painter.setPen(Qt::white);
   painter.drawText(width() / 2, height() - 3, "FPS: " + QString::number(m_fps));

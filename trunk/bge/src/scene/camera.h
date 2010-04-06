@@ -59,8 +59,10 @@ class Camera : public Object
 
     static quint32 m_serialNumber;
 
+    // I do not allow creation of cameras outside the engine!
     Camera(const QString& name = QString());
     ~Camera() {}
+    Camera();
 
   friend class BGE::Canvas;
 };
