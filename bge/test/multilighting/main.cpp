@@ -24,6 +24,9 @@
 #include "scene/light.h"
 
 #include "lighting.h"
+#include "camera.h"
+#include "controller.h"
+#include "overlay.h"
 
 BGE::Storage::Mesh* createCube()
 {
@@ -79,10 +82,21 @@ int main(int argc, char** argv)
   BGE::Storage::StorageManager::self()->set(material, "/materials/");
 
   // Setup camera
-  BGE::Canvas::canvas()->createCamera("Global camera")->move(0, 500, 0);
-  BGE::Canvas::canvas()->camera("Global camera")->rotateX(-90);
+  BGE::Canvas::canvas()->createCamera("Global camera");
   BGE::Canvas::canvas()->activateCamera("Global camera");
-  BGE::Canvas::canvas()->addSceneObject(BGE::Canvas::canvas()->camera("Global camera"));
+
+  // Our controlled camera :D
+  Camera *camera = new Camera;
+  camera->move(0, 500, 0);
+  camera->rotateX(-90);
+  camera->addChild(BGE::Canvas::canvas()->camera("Global camera"));
+  BGE::Canvas::canvas()->addSceneObject(camera);
+
+  // And the controller
+  BGE::Canvas::canvas()->setController(new Controller(camera));
+
+  // Overlay graphics
+  BGE::Canvas::canvas()->setOverlay(new Overlay(camera));
 
   // Setup objects
   BGE::Scene::Object *object = new BGE::Scene::Object;

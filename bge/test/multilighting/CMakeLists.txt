@@ -8,6 +8,9 @@ include_directories(. ../../src ${CMAKE_CURRENT_BINARY_DIR} ${QT_INCLUDES} ${EIG
 set(bge_multilighting_SRCS
   main.cpp
   lighting.cpp
+  controller.cpp
+  camera.cpp
+  overlay.cpp
 )
 
 set(bge_multilighting_HDRS
