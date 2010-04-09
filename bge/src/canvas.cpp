@@ -27,6 +27,7 @@
 #include "scene/object.h"
 #include "scene/camera.h"
 #include "scene/light.h"
+#include "scene/partition.h"
 
 #include "storage/storagemanager.h"
 
@@ -72,6 +73,8 @@ Canvas::Canvas()
 
   m_controller = 0l;
   m_overlay = 0l;
+  m_partition = new Scene::Partition;
+  m_partition->setSize(1000, 1000, 1000);
 
   setAutoFillBackground(false);
 
@@ -85,6 +88,7 @@ Canvas::Canvas()
 void Canvas::addSceneObject(Scene::Object* object)
 {
   m_scene->addChild(object);
+  m_partition->addObject(object);
 }
 
 Canvas* Canvas::canvas()
@@ -109,6 +113,7 @@ void Canvas::resizeGL(int w, int h)
 
   // Default perspective setup
   QMatrix4x4 perspective;
+  // Careful! Values are also used by v-f culling
   perspective.perspective(80, (qreal) w / (qreal) h, 0.1, 1000.0);
   Driver::AbstractDriver::self()->setProjection(perspective);
 }
@@ -128,14 +133,24 @@ void Canvas::paintGL()
   if (elapsed > 0)
     m_scene->prepareTransforms(elapsed);
 
+  // Calculate list of visible objects
+  // Using hard-coded values!
+  QList<Scene::Object*> visibleObjects;
+  QQueue<Scene::Partition*> partitionQueue;
+  partitionQueue.enqueue(m_partition);
+  while (!partitionQueue.isEmpty()) {
+    Scene::Partition *partition = partitionQueue.dequeue();
+    Vector3f temp = activeCamera()->globalOrientation().inverse() * (partition->center() - activeCamera()->globalPosition());
+
+    if (temp.z() <= 0) {
+      partitionQueue.append(partition->partitions().toList());
+      visibleObjects.append(partition->objects());
+    }
+  }
+
   // Enqueue objects for rendering
-  /// @TODO Culling comes here somewhere :D (someday)
-  QQueue<Scene::Object*> list;
-  list.enqueue(m_scene);
-  while (!list.isEmpty()) {
-    Scene::Object* object = list.dequeue();
+  foreach (Scene::Object *object, visibleObjects) {
     m_renderer->enqueueObject(object);
-    list.append(object->children());
 
     // Mark the object with calculatd transforms
     if (elapsed > 0)
