@@ -215,11 +215,7 @@ class Object
      *
      * @see removeChild
      */
-    inline void addChild(Object* child)
-    {
-      m_children << child;
-      child->setParent(this);
-    }
+    void addChild(Object* child);
     /**
      * Removes a child.
      *

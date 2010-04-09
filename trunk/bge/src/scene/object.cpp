@@ -14,6 +14,10 @@
 
 #include <cmath>
 
+#include "canvas.h"
+
+#include "scene/partition.h"
+
 #include "rendering/renderer.h"
 
 #include "storage/mesh.h"
@@ -63,6 +67,13 @@ void Object::rotate(const AngleAxisf& rotation)
 
   // Mark for recalculation
   m_transformModified = true;
+}
+
+void Object::addChild(Object *child)
+{
+  m_children << child;
+  child->setParent(this);
+  Canvas::canvas()->partition()->addObject(child);
 }
 
 void Object::lookAt(Object *object)

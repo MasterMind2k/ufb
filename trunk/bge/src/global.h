@@ -30,6 +30,16 @@ using Eigen::Scaling3f;
 
 typedef QList<Vector3f> VectorList;
 
+inline bool operator<=(const Vector3f &v1, const Vector3f &v2)
+{
+  return v1.x() <= v2.x() && v1.y() <= v2.y() && v1.z() <= v2.z();
+}
+
+inline bool operator>=(const Vector3f &v1, const Vector3f &v2)
+{
+  return v1.x() >= v2.x() && v1.y() >= v2.y() && v1.z() >= v2.z();
+}
+
 // Some documentation entries
 /**
  * @short Main namespace of the engine.

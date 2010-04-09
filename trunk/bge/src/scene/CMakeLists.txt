@@ -6,6 +6,7 @@ set(scene_SRCS
   object.cpp
   camera.cpp
   light.cpp
+  partition.cpp
 )
 
 add_library(scene ${scene_SRCS})

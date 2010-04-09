@@ -28,6 +28,7 @@ namespace Scene
 class Object;
 class Camera;
 class Light;
+class Partition;
 }
 namespace Rendering
 {
@@ -55,9 +56,17 @@ class Canvas : public QGLWidget
     /**
      * Returns the root node of the scene.
      */
-    inline const Scene::Object* scene() const
+    inline const Scene::Object *scene() const
     {
       return m_scene;
+    }
+
+    /**
+     * Returns root cube.
+     */
+    inline Scene::Partition *partition() const
+    {
+      return m_partition;
     }
 
     /**
@@ -171,10 +180,11 @@ class Canvas : public QGLWidget
 
   private:
     /* Really private stuff */
-    Scene::Object* m_scene;
-    Rendering::Renderer* m_renderer;
-    AbstractController* m_controller;
-    AbstractOverlay* m_overlay;
+    Scene::Object *m_scene;
+    Scene::Partition *m_partition;
+    Rendering::Renderer *m_renderer;
+    AbstractController *m_controller;
+    AbstractOverlay *m_overlay;
     QTime *m_time;
     QTimer *m_timer;
     qint32 m_totalElapsed;
