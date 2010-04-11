@@ -22,21 +22,36 @@ class BoundingVolume
 {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+    inline BoundingVolume()
+    {
+      m_corners.reserve(8);
+      m_transformedCorners.reserve(8);
+      m_radius = 0;
+      m_size = Vector3f::Zero();
+      m_center = m_size;
+      m_transform.setIdentity();
+      m_isCacheValid = false;
+      calculateCorners();
+    }
     inline BoundingVolume(float radius, const Vector3f &min, const Vector3f &max)
     {
       m_corners.reserve(8);
+      m_transformedCorners.reserve(8);
       m_radius = radius;
       m_size = min.cwise().abs() + max;
       m_center = (min + max) / 2.0;
       m_transform.setIdentity();
+      m_isCacheValid = false;
       calculateCorners();
     }
     inline BoundingVolume(const Vector3f &center, const Vector3f &size)
     {
       m_corners.reserve(8);
+      m_transformedCorners.reserve(8);
       m_center = center;
       m_size = size;
       m_transform.setIdentity();
+      m_isCacheValid = false;
       calculateCorners();
       calculateRadius();
     }
@@ -44,6 +59,7 @@ class BoundingVolume
     inline void setTransform(const Transform3f &transform)
     {
       m_transform = transform;
+      m_isCacheValid = false;
     }
     inline const Transform3f & transform() const
     {
@@ -78,6 +94,24 @@ class BoundingVolume
       return m_center;
     }
 
+    inline const Vector3f &transformedCenter() const
+    {
+      if (!m_isCacheValid) {
+        m_transformedCenter = m_transform * m_center;
+        calculateTransformedCorners();
+      }
+      return m_transformedCenter;
+    }
+    inline const QVector<Vector3f> &transformedCorners() const
+    {
+      if (!m_isCacheValid) {
+        m_transformedCenter = m_transform * m_center;
+        calculateTransformedCorners();
+      }
+
+      return m_transformedCorners;
+    }
+
     inline bool isBigger(const BoundingVolume *boundingVolume) const
     {
       return boundingVolume->m_radius > m_radius;
@@ -90,9 +124,13 @@ class BoundingVolume
     Vector3f m_size;
     Vector3f m_center;
     Transform3f m_transform;
+    mutable Vector3f m_transformedCenter;
     QVector<Vector3f> m_corners;
+    mutable QVector<Vector3f> m_transformedCorners;
+    mutable bool m_isCacheValid;
 
     void calculateCorners();
+    void calculateTransformedCorners() const;
     void calculateRadius();
 };
 
