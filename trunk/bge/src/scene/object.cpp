@@ -45,6 +45,9 @@ Object::Object()
   m_texture = 0l;
   m_observed = 0l;
   m_shaderProgram = 0l;
+  m_partition = 0l;
+
+  m_radius = 0;
 }
 
 Object::~Object()
@@ -54,8 +57,11 @@ Object::~Object()
 
 void Object::move(const Vector3f& direction)
 {
-  m_globalPosition += direction;
   m_position += direction;
+  if (parent())
+    m_globalPosition = parent()->globalPosition() + m_position;
+  else
+    m_globalPosition = m_position;
 
   // Mark for recalculation
   m_transformModified = true;
@@ -64,6 +70,11 @@ void Object::move(const Vector3f& direction)
 void Object::rotate(const AngleAxisf& rotation)
 {
   m_orientation = (m_orientation * rotation).normalized();
+  if (parent())
+    m_globalOrientation = (parent()->globalOrientation() * m_orientation).normalized();
+  else
+    m_globalOrientation = m_orientation;
+
 
   // Mark for recalculation
   m_transformModified = true;
@@ -73,7 +84,14 @@ void Object::addChild(Object *child)
 {
   m_children << child;
   child->setParent(this);
-  Canvas::canvas()->partition()->addObject(child);
+  if (m_partition)
+    m_partition->addObject(child);
+}
+
+void Object::setMesh(Storage::Mesh *mesh)
+{
+  m_mesh = mesh;
+  m_mesh->calculateBoundingGeometries(&m_radius, &m_size, &m_center);
 }
 
 void Object::lookAt(Object *object)
@@ -195,8 +213,23 @@ void Object::prepareTransforms(qint32 timeDiff)
     } else {
       // Just copy if we don't have a parent
       m_globalTransform = m_transform;
-      m_globalPosition = m_position;
-      m_globalOrientation = m_orientation;
+    }
+  }
+
+  // Check if we are still in this octree
+  if (m_partition) {
+    if (!m_partition->isInside(m_globalPosition)) {
+      Partition *partition = m_partition;
+      while (partition->parent() && !partition->isInside(m_globalPosition))
+        partition = partition->parent();
+      if (m_partition != partition) {
+        m_partition->removeObject(this);
+        partition->addObject(this);
+        qDebug("moving");
+      } else {
+        m_partition->isInside(m_globalPosition, true);
+        qDebug("wtf?");
+      }
     }
   }
 
@@ -207,5 +240,16 @@ void Object::prepareTransforms(qint32 timeDiff)
 
     // Make the recursion
     child->prepareTransforms(timeDiff);
+  }
+}
+
+void Object::setPartition(Partition *partition)
+{
+  bool havePartition = m_partition != 0l;
+  m_partition = partition;
+  if (!havePartition) {
+    qDebug("dajem childe");
+    foreach (Object *object, m_children)
+      partition->addObject(object);
   }
 }

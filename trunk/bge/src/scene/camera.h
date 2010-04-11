@@ -16,6 +16,9 @@
 #include "scene/object.h"
 
 #include <QtCore/QString>
+#include <QtCore/QVector>
+
+#include "size.h"
 
 namespace BGE {
 namespace Scene {
@@ -28,7 +31,7 @@ namespace Scene {
  * Let's look at an example:
  * @code
  * // Create our camera
- * BGE::Scene::Camera* camera = Canvas::canvas()->createCamera("test");
+ * BGE::Scene::Camera *camera = Canvas::canvas()->createCamera("test");
  *
  * // And do some transformations to it
  * camera.move(vector);
@@ -49,20 +52,53 @@ class Camera : public Object
     /**
      * Returns the name of the camera.
      */
-    inline const QString& name() const
+    inline const QString &name() const
     {
       return m_name;
     }
 
+    inline const Transform3f &cameraTransform() const
+    {
+      if (m_cameraTransform.matrix().isIdentity())
+        calculateCameraTransform();
+      return m_cameraTransform;
+    }
+
+    inline static const Transform3f &projection()
+    {
+      return m_projection;
+    }
+
+    Containment isSphereInFrustrum(const Vector3f &center, float radius) const;
+    Containment isBoxInFrustrum(const Vector3f center, const Size &size) const;
+    Containment isBoxInFrustrum(const Vector3f center, const Vector3f &pos, const Quaternionf &orit, const Size &size) const;
+
   private:
+    mutable Transform3f m_cameraTransform;
     QString m_name;
+    QVector<Plane> m_frustrum;
 
     static quint32 m_serialNumber;
+    static Transform3f m_projection;
+
+    inline void calculateTransforms(qint32 timeDiff)
+    {
+      Q_UNUSED(timeDiff);
+
+      if (isTransformModified())
+        m_cameraTransform.setIdentity();
+    }
+
+    void calculateCameraTransform() const;
+    void calculateFrustrum();
 
     // I do not allow creation of cameras outside the engine!
-    Camera(const QString& name = QString());
+    Camera(const QString &name = QString());
     ~Camera() {}
-    Camera();
+    Camera()
+    {
+      qFatal("BGE::Scene::Camera(): Invalid constructor!");
+    }
 
   friend class BGE::Canvas;
 };

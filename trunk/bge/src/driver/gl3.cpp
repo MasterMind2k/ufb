@@ -229,11 +229,9 @@ void GL3::clear()
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void GL3::setProjection(const QMatrix4x4& transform)
+void GL3::setProjection(const Transform3f &projection)
 {
-  Matrix4d temp;
-  memcpy(temp.data(), transform.data(), 16 * sizeof (qreal));
-  m_projectionMatrix = temp.cast<float>();
+  m_projectionMatrix = projection.matrix();
 }
 
 void GL3::load(Storage::Mesh *mesh)

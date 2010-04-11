@@ -57,7 +57,7 @@ class GL1 : public AbstractDriver
 
     void init();
     void clear();
-    void setProjection(const QMatrix4x4& transform);
+    void setProjection(const Transform3f &projection);
 
   private:
     quint8 m_usedLights;

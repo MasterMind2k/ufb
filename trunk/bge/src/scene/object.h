@@ -17,6 +17,7 @@
 #include <QtCore/QMap>
 
 #include "global.h"
+#include "size.h"
 
 #include "storage/material.h"
 
@@ -30,13 +31,9 @@ class Shader;
 class ShaderProgram;
 }
 
-namespace Rendering
-{
-class Renderer;
-}
-
 namespace Scene
 {
+class Partition;
 
 /**
  *@short Main Scene graph object representation
@@ -261,6 +258,10 @@ class Object
     inline void setParent(Object* parent)
     {
       m_parent = parent;
+      if (m_parent) {
+        m_globalPosition = m_parent->globalPosition() + m_position;
+        m_globalOrientation = (m_parent->globalOrientation() * m_orientation).normalized();
+      }
     }
     /**
      * Gets the parent.
@@ -284,10 +285,7 @@ class Object
     /**
      * Sets the mesh.
      */
-    inline void setMesh(Storage::Mesh* mesh)
-    {
-      m_mesh = mesh;
-    }
+    void setMesh(Storage::Mesh* mesh);
     /**
      * Gets the mesh.
      */
@@ -375,6 +373,19 @@ class Object
 
     void loadMaterialsFromMesh();
 
+    float boundingSphereRadius() const
+    {
+      return m_radius;
+    }
+    const Size &boundingBoxSize() const
+    {
+      return m_size;
+    }
+    const Vector3f &center() const
+    {
+      return m_center;
+    }
+
   protected:
     /**
      * This method gets called _before_ transform matrices get updated. Reimplement
@@ -386,8 +397,6 @@ class Object
     }
 
   private:
-    void prepareTransforms(qint32 timeDiff);
-
     Transform3f m_transform;
     Transform3f m_globalTransform;
     Vector3f m_globalPosition;
@@ -395,8 +404,11 @@ class Object
     Scaling3f m_scale;
     Quaternionf m_globalOrientation;
     Quaternionf m_orientation;
+    Size m_size;
+    float m_radius;
+    Vector3f m_center;
     QList<Object*> m_children;
-    Object* m_parent;
+    Object *m_parent;
     bool m_transformModified;
 
     Storage::Mesh* m_mesh;
@@ -407,8 +419,14 @@ class Object
 
     Storage::ShaderProgram* m_shaderProgram;
 
+    Partition *m_partition;
+
+    void prepareTransforms(qint32 timeDiff);
+    void setPartition(Partition *partition);
+
     /* Be very careful in these classes!!! */
     friend class BGE::Canvas;
+    friend class BGE::Scene::Partition;
 };
 
 }
