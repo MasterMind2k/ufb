@@ -171,6 +171,15 @@ class Canvas : public QGLWidget
       return m_lights.values();
     }
 
+    inline void setFPSShown(bool show)
+    {
+      m_isFPSShown = show;
+    }
+    inline bool isFPSShown() const
+    {
+      return m_isFPSShown;
+    }
+
     /**
      * Loads the resource. The resource file has to be a Qt's binary resource file.
      *
@@ -197,7 +206,7 @@ class Canvas : public QGLWidget
 
     QHash<QString, Scene::Light*> m_lights;
 
-    bool m_showFPS;
+    bool m_isFPSShown;
     quint64 m_frames;
     qreal m_fps;
 

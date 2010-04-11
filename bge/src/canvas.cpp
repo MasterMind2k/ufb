@@ -44,6 +44,7 @@ Canvas::Canvas()
 {
   m_frames = 0;
   m_fps = 0;
+  m_isFPSShown = false;
   m_totalElapsed = 0;
   m_timeSinceSnap = 0;
 
@@ -209,8 +210,11 @@ void Canvas::paintGL()
     painter.restore();
   }
 
-  painter.setPen(Qt::white);
-  painter.drawText(width() / 2, height() - 3, "FPS: " + QString::number(m_fps));
+  if (m_isFPSShown) {
+    painter.setPen(Qt::white);
+    painter.drawText(width() / 2, height() - 3, "FPS: " + QString::number(m_fps));
+  }
+
   painter.end();
 
   if (m_recorder && m_timeSinceSnap >= 40) {

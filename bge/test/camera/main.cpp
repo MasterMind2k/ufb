@@ -241,6 +241,9 @@ int main(int argc, char** argv)
   bigCube->addChild(camera);
   BGE::Canvas::canvas()->addSceneObject(bigCube);
 
+  // Make FPS shown
+  BGE::Canvas::canvas()->setFPSShown(true);
+
   // Show the canvas
   BGE::Canvas::canvas()->show();
 

@@ -161,6 +161,9 @@ int main(int argc, char** argv)
   // Add light container
   BGE::Canvas::canvas()->addSceneObject(new Lighting);
 
+  // Make FPS shown
+  BGE::Canvas::canvas()->setFPSShown(true);
+
   // Show canvas
   BGE::Canvas::canvas()->show();
 
