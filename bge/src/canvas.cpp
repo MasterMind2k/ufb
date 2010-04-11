@@ -198,10 +198,6 @@ void Canvas::paintGL()
   // Make the actual rendering
   m_renderer->renderScene();
 
-  m_frames++;
-  if (m_totalElapsed >= 1000)
-    updateFPS();
-
   // 2D painting
   QPainter painter(this);
   if (m_overlay) {
@@ -211,6 +207,10 @@ void Canvas::paintGL()
   }
 
   if (m_isFPSShown) {
+    m_frames++;
+    if (m_totalElapsed >= 1000)
+      updateFPS();
+
     painter.setPen(Qt::white);
     painter.drawText(width() / 2, height() - 3, "FPS: " + QString::number(m_fps));
   }
