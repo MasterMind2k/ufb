@@ -73,8 +73,7 @@ Canvas::Canvas()
 
   m_controller = 0l;
   m_overlay = 0l;
-  m_partition = new Scene::Partition;
-  m_partition->setSize(1000, 1000, 1000);
+  m_partition = new Scene::Partition(1000, 1000, 1000);
 
   setAutoFillBackground(false);
 
@@ -145,10 +144,10 @@ void Canvas::paintGL()
   while (!partitionQueue.isEmpty()) {
     Scene::Partition *partition = partitionQueue.dequeue();
 
-    switch (activeCamera()->isSphereInFrustrum(partition->center(), partition->radius())) {
+    switch (activeCamera()->isSphereInFrustrum(partition->boundingVolume())) {
       case PartialyInside: {
 
-        Containment cont = activeCamera()->isBoxInFrustrum(partition->center(), partition->size());
+        Containment cont = activeCamera()->isBoxInFrustrum(partition->boundingVolume());
         if (cont == FullyInside || cont == PartialyInside) {
           partitionQueue.append(partition->partitions().toList());
           QQueue<Scene::Object*> objectQueue;
@@ -156,7 +155,7 @@ void Canvas::paintGL()
           while (!objectQueue.isEmpty()) {
             Scene::Object *object = objectQueue.dequeue();
             if (cont == PartialyInside) {
-              if (activeCamera()->isBoxInFrustrum(object->center(), object->globalPosition(), object->orientation(), object->boundingBoxSize()) == Outside)
+              if (activeCamera()->isBoxInFrustrum(object->boundingVolume()) == Outside)
                 continue;
             }
             visibleObjects << object;

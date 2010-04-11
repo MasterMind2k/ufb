@@ -16,76 +16,55 @@
 
 #include "canvas.h"
 
+#include "scene/boundingvolume.h"
+
 using namespace BGE;
 using namespace BGE::Scene;
 
 quint32 Camera::m_serialNumber = 0;
 Transform3f Camera::m_projection(Transform3f::Identity());
 
-Containment Camera::isSphereInFrustrum(const Vector3f &center, float radius) const
+Containment Camera::isSphereInFrustrum(const BoundingVolume *boundingVolume) const
 {
   quint8 c = 0;
+  Vector3f center = boundingVolume->transform() * boundingVolume->center();
 
   for (QVector<Plane>::const_iterator i = m_frustrum.constBegin(); i != m_frustrum.constEnd(); i++) {
     Plane plane = *i;
     float d;
     d = plane.signedDistance(center);
 
-    if(d <= -radius)
+    if(d <= -boundingVolume->radius())
       return Outside;
-    if(d > radius)
+    if(d > boundingVolume->radius())
       c++;
   }
   return (c == 6) ? FullyInside : PartialyInside;
 }
 
-Containment Camera::isBoxInFrustrum(Vector3f center, const Size &size) const
+Containment Camera::isBoxInFrustrum(const BoundingVolume *boundingVolume) const
 {
   quint8 c = 0;
   quint8 c2 = 0;
-  QVector<Vector3f> points = size.points(center);
+
+  QVector<Vector3f> corners;
+  foreach (Vector3f corner, boundingVolume->corners())
+    corners << boundingVolume->transform() * corner;
 
   for (QVector<Plane>::const_iterator i = m_frustrum.constBegin(); i != m_frustrum.constEnd(); i++) {
     Plane plane = *i;
     c = 0;
 
-    foreach (Vector3f point, points) {
-      if (plane.signedDistance(point) > 0)
+    foreach (Vector3f corner, corners) {
+      if (plane.signedDistance(corner) > 0)
         c++;
     }
 
     if (!c)
       return Outside;
-
     if (c == 8)
       c2++;
   }
-
-  return c2 == 6 ? FullyInside : PartialyInside;
-}
-
-Containment Camera::isBoxInFrustrum(Vector3f center, const Vector3f &pos, const Quaternionf &orit, const Size &size) const
-{
-  quint8 c = 0;
-  quint8 c2 = 0;
-  QVector<Vector3f> points = size.points(center);
-
-  for (QVector<Plane>::const_iterator i = m_frustrum.constBegin(); i != m_frustrum.constEnd(); i++) {
-    Plane plane = *i;
-    c = 0;
-
-    foreach (Vector3f point, points) {
-      if (plane.signedDistance(orit * point + pos) > 0)
-        c++;
-    }
-
-    if (!c)
-      return Outside;
-
-    if (c == 8)
-      c2++;
-  }
-
   return c2 == 6 ? FullyInside : PartialyInside;
 }
 

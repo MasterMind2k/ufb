@@ -17,7 +17,6 @@
 #include <QtCore/QMap>
 
 #include "global.h"
-#include "size.h"
 
 #include "storage/material.h"
 
@@ -34,6 +33,7 @@ class ShaderProgram;
 namespace Scene
 {
 class Partition;
+class BoundingVolume;
 
 /**
  *@short Main Scene graph object representation
@@ -373,17 +373,9 @@ class Object
 
     void loadMaterialsFromMesh();
 
-    float boundingSphereRadius() const
+    inline const BoundingVolume *boundingVolume() const
     {
-      return m_radius;
-    }
-    const Size &boundingBoxSize() const
-    {
-      return m_size;
-    }
-    const Vector3f &center() const
-    {
-      return m_center;
+      return m_boundingVolume;
     }
 
   protected:
@@ -404,9 +396,7 @@ class Object
     Scaling3f m_scale;
     Quaternionf m_globalOrientation;
     Quaternionf m_orientation;
-    Size m_size;
-    float m_radius;
-    Vector3f m_center;
+    BoundingVolume *m_boundingVolume;
     QList<Object*> m_children;
     Object *m_parent;
     bool m_transformModified;

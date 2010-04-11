@@ -17,6 +17,7 @@
 #include "canvas.h"
 
 #include "scene/partition.h"
+#include "scene/boundingvolume.h"
 
 #include "rendering/renderer.h"
 
@@ -46,12 +47,13 @@ Object::Object()
   m_observed = 0l;
   m_shaderProgram = 0l;
   m_partition = 0l;
-
-  m_radius = 0;
+  m_boundingVolume = new BoundingVolume(Vector3f::Zero(), Vector3f::Zero());
 }
 
 Object::~Object()
 {
+  if (m_boundingVolume)
+    delete m_boundingVolume;
   qDeleteAll(m_children);
 }
 
@@ -91,7 +93,8 @@ void Object::addChild(Object *child)
 void Object::setMesh(Storage::Mesh *mesh)
 {
   m_mesh = mesh;
-  m_mesh->calculateBoundingGeometries(&m_radius, &m_size, &m_center);
+  delete m_boundingVolume;
+  m_boundingVolume = m_mesh->calculateBoundingVolume();
 }
 
 void Object::lookAt(Object *object)
@@ -214,21 +217,19 @@ void Object::prepareTransforms(qint32 timeDiff)
       // Just copy if we don't have a parent
       m_globalTransform = m_transform;
     }
+
+    m_boundingVolume->setTransform(m_globalTransform);
   }
 
   // Check if we are still in this octree
   if (m_partition) {
-    if (!m_partition->isInside(m_globalPosition)) {
+    if (!m_partition->boundingVolume()->isInside(m_boundingVolume)) {
       Partition *partition = m_partition;
-      while (partition->parent() && !partition->isInside(m_globalPosition))
+      while (partition->parent() && !partition->boundingVolume()->isInside(m_boundingVolume))
         partition = partition->parent();
       if (m_partition != partition) {
         m_partition->removeObject(this);
         partition->addObject(this);
-        qDebug("moving");
-      } else {
-        m_partition->isInside(m_globalPosition, true);
-        qDebug("wtf?");
       }
     }
   }
@@ -248,7 +249,6 @@ void Object::setPartition(Partition *partition)
   bool havePartition = m_partition != 0l;
   m_partition = partition;
   if (!havePartition) {
-    qDebug("dajem childe");
     foreach (Object *object, m_children)
       partition->addObject(object);
   }

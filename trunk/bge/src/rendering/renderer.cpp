@@ -36,21 +36,16 @@ void Renderer::enqueueObject(Scene::Object *object)
 void Renderer::renderScene()
 {
   // Let's use the active camera
-  /*Scene::Camera* camera = Canvas::canvas()->activeCamera();
+  Scene::Camera* camera = Canvas::canvas()->activeCamera();
   if (!camera)
-    qFatal("BGE::Rendering::Renderer::renderScene(): No active camera defined!");*/
-
-  Transform3f cameraTransform(Transform3f::Identity());
-  cameraTransform.rotate(AngleAxisf(M_PI/2, Vector3f::UnitX()));
-  cameraTransform.translate(Vector3f(0, -500, 0));
-  //cameraTransform = Canvas::canvas()->activeCamera()->cameraTransform();
+    qFatal("BGE::Rendering::Renderer::renderScene(): No active camera defined!");
 
   // Set projection matrix
   Driver::AbstractDriver::self()->setProjection(Scene::Camera::projection());
 
   // Prepare lighting
   foreach (Scene::Light* light, Canvas::canvas()->lights()) {
-    Transform3f transform = cameraTransform * light->globalTransform();
+    Transform3f transform = camera->cameraTransform() * light->globalTransform();
     Driver::AbstractDriver::self()->setTransformMatrix(transform);
 
     Driver::AbstractDriver::self()->setLight(light);
@@ -60,7 +55,7 @@ void Renderer::renderScene()
     Scene::Object* object = m_renderQueue.dequeue();
 
     // Calculate world transform
-    Transform3f worldTransform = cameraTransform * object->globalTransform();
+    Transform3f worldTransform = camera->cameraTransform() * object->globalTransform();
     Driver::AbstractDriver::self()->setTransformMatrix(worldTransform);
 
     if (object->shaderProgram())

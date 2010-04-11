@@ -17,25 +17,26 @@
 #include <QtCore/QVector>
 #include <QtCore/QSizeF>
 
-#include "size.h"
+#include "global.h"
 
 namespace BGE {
 
 namespace Scene {
 
 class Object;
+class BoundingVolume;
 
 class Partition
 {
   public:
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     inline Partition()
     {
       m_partitions.reserve(8);
-      m_points.reserve(8);
-      m_center = Vector3f::Zero();
       m_parent = 0l;
+      m_boundingVolume = 0l;
     }
+    Partition(float width, float height, float depth);
+    ~Partition();
 
     void addObject(Object *object);
     inline void removeObject(int index)
@@ -52,14 +53,13 @@ class Partition
       return m_objects.at(index);
     }
 
-    inline void setSize(const Size &size)
+    inline void setBoundingVolume(BoundingVolume *boundingVolume)
     {
-      setSize(size.width(), size.height(), size.depth());
+      m_boundingVolume = boundingVolume;
     }
-    void setSize(float width, float height, float depth);
-    inline const Size &size() const
+    inline const BoundingVolume *size() const
     {
-      return m_size;
+      return m_boundingVolume;
     }
 
     inline const QVector<Partition*> &partitions() const
@@ -71,29 +71,13 @@ class Partition
       return m_partitions.at(index);
     }
 
-    inline const Vector3f &center() const
+    inline const BoundingVolume *boundingVolume() const
     {
-      return m_center;
-    }
-    inline float radius() const
-    {
-      return m_radius;
+      return m_boundingVolume;
     }
 
     void partition();
     void departition();
-
-    bool isInside(const Vector3f &point, bool debug = false) const;
-
-    bool isBigger(float radius)
-    {
-      return radius > m_radius;
-    }
-
-    const QVector<Vector3f> &points() const
-    {
-      return m_points;
-    }
 
     inline Partition *parent() const
     {
@@ -101,13 +85,10 @@ class Partition
     }
 
   private:
-    Vector3f m_center;
-    Size m_size;
+    BoundingVolume *m_boundingVolume;
     QList<Object*> m_objects;
     QVector<Partition*> m_partitions;
-    QVector<Vector3f> m_points;
     Partition *m_parent;
-    float m_radius;
 };
 
 }

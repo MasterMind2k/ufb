@@ -18,10 +18,9 @@
 #include <QtCore/QString>
 #include <QtCore/QVector>
 
-#include "size.h"
-
 namespace BGE {
 namespace Scene {
+class BoundingVolume;
 
 /**
  * @short A viewing tool in the game
@@ -69,9 +68,8 @@ class Camera : public Object
       return m_projection;
     }
 
-    Containment isSphereInFrustrum(const Vector3f &center, float radius) const;
-    Containment isBoxInFrustrum(const Vector3f center, const Size &size) const;
-    Containment isBoxInFrustrum(const Vector3f center, const Vector3f &pos, const Quaternionf &orit, const Size &size) const;
+    Containment isSphereInFrustrum(const BoundingVolume *boundingVolume) const;
+    Containment isBoxInFrustrum(const BoundingVolume *boundingVolume) const;
 
   private:
     mutable Transform3f m_cameraTransform;
