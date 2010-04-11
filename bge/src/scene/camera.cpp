@@ -27,12 +27,11 @@ Transform3f Camera::m_projection(Transform3f::Identity());
 Containment Camera::isSphereInFrustrum(const BoundingVolume *boundingVolume) const
 {
   quint8 c = 0;
-  Vector3f center = boundingVolume->transform() * boundingVolume->center();
 
   for (QVector<Plane>::const_iterator i = m_frustrum.constBegin(); i != m_frustrum.constEnd(); i++) {
     Plane plane = *i;
     float d;
-    d = plane.signedDistance(center);
+    d = plane.signedDistance(boundingVolume->transformedCenter());
 
     if(d <= -boundingVolume->radius())
       return Outside;
@@ -47,15 +46,11 @@ Containment Camera::isBoxInFrustrum(const BoundingVolume *boundingVolume) const
   quint8 c = 0;
   quint8 c2 = 0;
 
-  QVector<Vector3f> corners;
-  foreach (Vector3f corner, boundingVolume->corners())
-    corners << boundingVolume->transform() * corner;
-
   for (QVector<Plane>::const_iterator i = m_frustrum.constBegin(); i != m_frustrum.constEnd(); i++) {
     Plane plane = *i;
     c = 0;
 
-    foreach (Vector3f corner, corners) {
+    foreach (Vector3f corner, boundingVolume->transformedCorners()) {
       if (plane.signedDistance(corner) > 0)
         c++;
     }

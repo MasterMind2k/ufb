@@ -38,6 +38,15 @@ void BoundingVolume::calculateCorners()
     m_corners << (m_center + (Vector3f(i & 0x01 ? -1 : 1, i & 0x02 ? -1 : 1, i & 0x04 ? -1 : 1).cwise() * size));
 }
 
+void BoundingVolume::calculateTransformedCorners() const
+{
+  m_transformedCorners.clear();
+  foreach (Vector3f corner, m_corners)
+    m_transformedCorners << m_transform * corner;
+
+  m_isCacheValid = true;
+}
+
 void BoundingVolume::calculateRadius()
 {
   m_radius = 0;
