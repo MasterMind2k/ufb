@@ -205,6 +205,9 @@ int main(int argc, char** argv)
 
   BGE::Canvas::canvas()->setController(new Controller(cameras));
 
+  // Make FPS shown
+  BGE::Canvas::canvas()->setFPSShown(true);
+
   BGE::Canvas::canvas()->show();
 
   return app.exec();
