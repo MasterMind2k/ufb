@@ -7,6 +7,7 @@ set(scene_SRCS
   camera.cpp
   light.cpp
   partition.cpp
+  boundingvolume.cpp
 )
 
 add_library(scene ${scene_SRCS})

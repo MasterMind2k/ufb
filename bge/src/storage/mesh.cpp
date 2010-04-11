@@ -14,7 +14,7 @@
 
 #include <QtCore/QMap>
 
-#include "size.h"
+#include "scene/boundingvolume.h"
 
 #include "driver/abstractdriver.h"
 
@@ -128,11 +128,11 @@ void Mesh::addRectangle(const QString& objectName, const Vector3f& bottomLeft, c
   addFace(objectName, Quads, face);
 }
 
-void Mesh::calculateBoundingGeometries(float *sphereRadius, Size *boxSize, Vector3f *center) const
+Scene::BoundingVolume *Mesh::calculateBoundingVolume() const
 {
   QList<QVector<Vector3f> > vertices = m_vertices.values();
-  float radius = 0;
   Vector3f min, max;
+  float radius = 0;
 
   for (QList<QVector<Vector3f> >::const_iterator i = vertices.constBegin(); i != vertices.constEnd(); i++) {
     foreach (Vector3f vertex, *i) {
@@ -146,14 +146,7 @@ void Mesh::calculateBoundingGeometries(float *sphereRadius, Size *boxSize, Vecto
     }
   }
 
-  if (sphereRadius)
-    *sphereRadius = radius;
-  if (boxSize)
-    boxSize->vector() = min.cwise().abs() + max;
-  if (center) {
-    *center = (max + min) / 2;
-    qDebug() << *center;
-  }
+  return new Scene::BoundingVolume(radius, min, max);
 }
 
 void Mesh::bind()

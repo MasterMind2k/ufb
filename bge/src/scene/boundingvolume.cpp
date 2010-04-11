@@ -10,16 +10,37 @@
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
  ***************************************************************************/
-#include "size.h"
+#include "boundingvolume.h"
 
 using namespace BGE;
+using namespace BGE::Scene;
 
-QVector<Vector3f> Size::points(const Vector3f &center) const
+bool BoundingVolume::isInside(const BoundingVolume *boundingVolume) const
 {
-  QVector<Vector3f> output;
-  output.reserve(8);
-  Vector3f size = m_vector / 2.0;
+  if (!((max().cwise() > boundingVolume->center()).all() && (min().cwise() < boundingVolume->center()).all()))
+    return false;
+
+  // Is it bigger?
+  return m_radius > boundingVolume->m_radius;
+}
+
+bool BoundingVolume::isInside(const Vector3f &point) const
+{
+  // Let's perform min-max test :D
+  return (max().cwise() >= point).all() && (min().cwise() <= point).all();
+}
+
+void BoundingVolume::calculateCorners()
+{
+  m_corners.clear();
+  Vector3f size = m_size / 2.0;
   for (quint8 i = 0; i < 8; i++)
-    output << (center + (Vector3f(i & 0x01 ? -1 : 1, i & 0x02 ? -1 : 1, i & 0x04 ? -1 : 1).cwise() * size));
-  return output;
+    m_corners << (m_center + (Vector3f(i & 0x01 ? -1 : 1, i & 0x02 ? -1 : 1, i & 0x04 ? -1 : 1).cwise() * size));
+}
+
+void BoundingVolume::calculateRadius()
+{
+  m_radius = 0;
+  foreach (Vector3f corner, m_corners)
+    m_radius = qMax(corner.norm(), m_radius);
 }
