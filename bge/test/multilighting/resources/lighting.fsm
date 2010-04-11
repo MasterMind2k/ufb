@@ -175,21 +175,17 @@ vec4 calculateLighting()
   vec4 color = vec4(0, 0, 0, 1);
   vec3 n = normalize(normal);
 
-  if (UsedLights > 0) {
+  if (UsedLights > 0)
     color = color + light0(n);
-  }
 
-  if (UsedLights > 1) {
+  if (UsedLights > 1)
     color = color + light1(n);
-  }
 
-  if (UsedLights > 2) {
+  if (UsedLights > 2)
     color = color + light2(n);
-  }
 
-  if (UsedLights > 3) {
+  if (UsedLights > 3)
     color = color + light3(n);
-  }
 
   return color;
 }

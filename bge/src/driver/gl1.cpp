@@ -325,10 +325,10 @@ void GL1::clear()
   glLoadIdentity();
 }
 
-void GL1::setProjection(const QMatrix4x4& transform)
+void GL1::setProjection(const Transform3f &projection)
 {
   glMatrixMode(GL_PROJECTION);
-  glLoadMatrixd(transform.data());
+  glLoadMatrixf(projection.data());
   glMatrixMode(GL_MODELVIEW);
 }
 

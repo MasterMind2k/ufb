@@ -25,6 +25,7 @@
 #include "global.h"
 
 namespace BGE {
+class Size;
 namespace Storage {
 class Material;
 }
@@ -181,6 +182,8 @@ class Mesh : public Item
      * A conveniance method for creating rectangles.
      */
     void addRectangle(const QString& objectName, const Vector3f& bottomLeft, const Vector3f& bottomRight, const Vector3f& topLeft, const Vector3f& topRight);
+
+    void calculateBoundingGeometries(float *sphereRadius, Size *boxSize, Vector3f *center = 0l) const;
 
     void bind();
     void unbind();

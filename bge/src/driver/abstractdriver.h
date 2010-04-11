@@ -64,7 +64,7 @@ class AbstractDriver
 
     virtual void init() = 0;
     virtual void clear() = 0;
-    virtual void setProjection(const QMatrix4x4& transform) = 0;
+    virtual void setProjection(const Transform3f &projection) = 0;
 
   protected:
     inline AbstractDriver() {}

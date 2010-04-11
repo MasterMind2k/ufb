@@ -17,70 +17,9 @@
 #include <QtCore/QVector>
 #include <QtCore/QSizeF>
 
-#include "global.h"
+#include "size.h"
 
 namespace BGE {
-
-class Size
-{
-  public:
-    inline Size()
-    {
-      m_vector = Vector3f::Zero();
-    }
-    inline Size(float width, float height, float depth)
-    {
-      m_vector.x() = width;
-      m_vector.y() = height;
-      m_vector.z() = depth;
-    }
-    inline Size(const Vector3f &vector)
-    {
-      m_vector = vector;
-    }
-
-    inline float &width()
-    {
-      return m_vector.x();
-    }
-    inline float &height()
-    {
-      return m_vector.y();
-    }
-    inline float &depth()
-    {
-      return m_vector.z();
-    }
-    inline const float width() const
-    {
-      return m_vector.x();
-    }
-    inline const float height() const
-    {
-      return m_vector.y();
-    }
-    inline const float depth() const
-    {
-      return m_vector.z();
-    }
-
-    inline Vector3f &vector()
-    {
-      return m_vector;
-    }
-    inline const Vector3f &vector() const
-    {
-      return m_vector;
-    }
-
-    inline Size operator/(float divider) const
-    {
-      return Size(m_vector / divider);
-    }
-
-  private:
-    Vector3f m_vector;
-};
 
 namespace Scene {
 
@@ -93,7 +32,9 @@ class Partition
     inline Partition()
     {
       m_partitions.reserve(8);
+      m_points.reserve(8);
       m_center = Vector3f::Zero();
+      m_parent = 0l;
     }
 
     void addObject(Object *object);
@@ -101,10 +42,7 @@ class Partition
     {
       m_objects.removeAt(index);
     }
-    inline void removeObject(Object *object)
-    {
-      m_objects.removeOne(object);
-    }
+    void removeObject(Object *object);
     inline const QList<Object*> &objects() const
     {
       return m_objects;
@@ -116,14 +54,9 @@ class Partition
 
     inline void setSize(const Size &size)
     {
-      m_size = size;
+      setSize(size.width(), size.height(), size.depth());
     }
-    inline void setSize(float width, float height, float depth)
-    {
-      m_size.width() = width;
-      m_size.height() = height;
-      m_size.depth() = depth;
-    }
+    void setSize(float width, float height, float depth);
     inline const Size &size() const
     {
       return m_size;
@@ -142,12 +75,29 @@ class Partition
     {
       return m_center;
     }
+    inline float radius() const
+    {
+      return m_radius;
+    }
 
     void partition();
+    void departition();
 
-    bool isInside(const Vector3f &point) const
+    bool isInside(const Vector3f &point, bool debug = false) const;
+
+    bool isBigger(float radius)
     {
-      return point <= size().vector() + m_center && point >= m_center - size().vector();
+      return radius > m_radius;
+    }
+
+    const QVector<Vector3f> &points() const
+    {
+      return m_points;
+    }
+
+    inline Partition *parent() const
+    {
+      return m_parent;
     }
 
   private:
@@ -155,6 +105,9 @@ class Partition
     Size m_size;
     QList<Object*> m_objects;
     QVector<Partition*> m_partitions;
+    QVector<Vector3f> m_points;
+    Partition *m_parent;
+    float m_radius;
 };
 
 }

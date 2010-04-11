@@ -36,28 +36,21 @@ void Renderer::enqueueObject(Scene::Object *object)
 void Renderer::renderScene()
 {
   // Let's use the active camera
-  Scene::Camera* camera = Canvas::canvas()->activeCamera();
+  /*Scene::Camera* camera = Canvas::canvas()->activeCamera();
+  if (!camera)
+    qFatal("BGE::Rendering::Renderer::renderScene(): No active camera defined!");*/
 
-  // Calculate camera transformations
-  Transform3f move(Transform3f::Identity()), rotation(Transform3f::Identity());
-  if (camera) {
-    // Calculate camera translation
-    move.translate(-camera->globalPosition());
+  Transform3f cameraTransform(Transform3f::Identity());
+  cameraTransform.rotate(AngleAxisf(M_PI/2, Vector3f::UnitX()));
+  cameraTransform.translate(Vector3f(0, -500, 0));
+  //cameraTransform = Canvas::canvas()->activeCamera()->cameraTransform();
 
-    // Calculate camera rotation
-    rotation *= camera->orientation().inverse();
-
-    // And do some fixing for local camera
-    if (camera->parent() != Canvas::canvas()->scene()) {
-      rotation.translate(-camera->position());
-      rotation.rotate(camera->orientation() * camera->globalOrientation().inverse());
-      rotation.translate(camera->position());
-    }
-  }
+  // Set projection matrix
+  Driver::AbstractDriver::self()->setProjection(Scene::Camera::projection());
 
   // Prepare lighting
   foreach (Scene::Light* light, Canvas::canvas()->lights()) {
-    Transform3f transform = rotation * move * light->globalTransform();
+    Transform3f transform = cameraTransform * light->globalTransform();
     Driver::AbstractDriver::self()->setTransformMatrix(transform);
 
     Driver::AbstractDriver::self()->setLight(light);
@@ -67,7 +60,7 @@ void Renderer::renderScene()
     Scene::Object* object = m_renderQueue.dequeue();
 
     // Calculate world transform
-    Transform3f worldTransform = rotation * move * object->globalTransform();
+    Transform3f worldTransform = cameraTransform * object->globalTransform();
     Driver::AbstractDriver::self()->setTransformMatrix(worldTransform);
 
     if (object->shaderProgram())

@@ -10,3 +10,5 @@ set(scene_SRCS
 )
 
 add_library(scene ${scene_SRCS})
+target_link_libraries(scene bge)
+add_dependencies(scene bge)

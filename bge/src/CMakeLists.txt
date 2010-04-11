@@ -14,6 +14,7 @@ set(bge_SRCS
   canvas.cpp
   recorder.cpp
   abstractoverlay.cpp
+  size.cpp
 )
 
 set(bge_QHDRS

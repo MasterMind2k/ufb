@@ -21,12 +21,18 @@
 #include <Eigen/LU>
 #include <Eigen/SVD>
 
+/* Debugging */
+#include <QtDebug>
+
 USING_PART_OF_NAMESPACE_EIGEN
 using Eigen::Transform3f;
 using Eigen::Transform3d;
 using Eigen::Quaternionf;
 using Eigen::AngleAxisf;
 using Eigen::Scaling3f;
+using Eigen::Hyperplane;
+
+typedef Hyperplane<float, 3> Plane;
 
 typedef QList<Vector3f> VectorList;
 
@@ -40,12 +46,33 @@ inline bool operator>=(const Vector3f &v1, const Vector3f &v2)
   return v1.x() >= v2.x() && v1.y() >= v2.y() && v1.z() >= v2.z();
 }
 
+inline bool operator<(const Vector3f &v1, const Vector3f &v2)
+{
+  return v1.x() < v2.x() && v1.y() < v2.y() && v1.z() < v2.z();
+}
+
+inline bool operator>(const Vector3f &v1, const Vector3f &v2)
+{
+  return v1.x() > v2.x() && v1.y() > v2.y() && v1.z() > v2.z();
+}
+
+inline bool operator==(const Vector3f &v1, const Vector3f &v2)
+{
+  return v1.x() == v2.x() && v1.y() == v2.y() && v1.z() == v2.z();
+}
+
 // Some documentation entries
 /**
  * @short Main namespace of the engine.
  */
 namespace BGE
 {
+
+enum Containment {
+  FullyInside,
+  PartialyInside,
+  Outside
+};
 
 /**
  * @short All scene graph related classes are inside this namespace.
@@ -63,6 +90,13 @@ namespace Rendering
 {
 }
 
+}
+
+// For easier debugging
+inline QDebug operator<<(QDebug dbg, const Vector3f &vector)
+{
+  dbg.nospace() << "Vector3f(" << vector.x() << ", " << vector.y() << ", " << vector.z() << ")";
+  return dbg.space();
 }
 
 #endif

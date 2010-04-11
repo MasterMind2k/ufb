@@ -19,8 +19,8 @@
 #include <QtCore/QResource>
 
 #include <QtGui/QKeyEvent>
-#include <QtGui/QMatrix4x4>
 #include <QtGui/QApplication>
+#include <QtGui/QMatrix4x4>
 
 #include "driver/abstractdriver.h"
 
@@ -112,10 +112,12 @@ void Canvas::resizeGL(int w, int h)
   glViewport(0, 0, w, h);
 
   // Default perspective setup
-  QMatrix4x4 perspective;
+  QMatrix4x4 projection;
   // Careful! Values are also used by v-f culling
-  perspective.perspective(80, (qreal) w / (qreal) h, 0.1, 1000.0);
-  Driver::AbstractDriver::self()->setProjection(perspective);
+  projection.perspective(80, (qreal) w / (qreal) h, 0.1, 1000.0);
+  Matrix4d temp;
+  memcpy(temp.data(), projection.data(), 16 * sizeof(qreal));
+  Scene::Camera::m_projection.matrix() = temp.cast<float>();
 }
 
 void Canvas::paintGL()
@@ -133,18 +135,54 @@ void Canvas::paintGL()
   if (elapsed > 0)
     m_scene->prepareTransforms(elapsed);
 
+
   // Calculate list of visible objects
   // Using hard-coded values!
+  activeCamera()->calculateFrustrum();
   QList<Scene::Object*> visibleObjects;
   QQueue<Scene::Partition*> partitionQueue;
   partitionQueue.enqueue(m_partition);
   while (!partitionQueue.isEmpty()) {
     Scene::Partition *partition = partitionQueue.dequeue();
-    Vector3f temp = activeCamera()->globalOrientation().inverse() * (partition->center() - activeCamera()->globalPosition());
 
-    if (temp.z() <= 0) {
-      partitionQueue.append(partition->partitions().toList());
-      visibleObjects.append(partition->objects());
+    switch (activeCamera()->isSphereInFrustrum(partition->center(), partition->radius())) {
+      case PartialyInside: {
+
+        Containment cont = activeCamera()->isBoxInFrustrum(partition->center(), partition->size());
+        if (cont == FullyInside || cont == PartialyInside) {
+          partitionQueue.append(partition->partitions().toList());
+          QQueue<Scene::Object*> objectQueue;
+          objectQueue.append(partition->objects());
+          while (!objectQueue.isEmpty()) {
+            Scene::Object *object = objectQueue.dequeue();
+            if (cont == PartialyInside) {
+              if (activeCamera()->isBoxInFrustrum(object->center(), object->globalPosition(), object->orientation(), object->boundingBoxSize()) == Outside)
+                continue;
+            }
+            visibleObjects << object;
+            objectQueue.append(object->children());
+          }
+        }
+        break;
+      }
+
+      case FullyInside: {
+        visibleObjects.append(partition->objects());
+        QQueue<Scene::Partition*> queue;
+        queue.append(partition->partitions().toList());
+        while (!queue.isEmpty()) {
+          Scene::Partition *partition = queue.dequeue();
+          QQueue<Scene::Object*> objectQueue;
+          objectQueue.append(partition->objects());
+          while (!objectQueue.isEmpty()) {
+            Scene::Object *object = objectQueue.dequeue();
+            visibleObjects << object;
+            objectQueue.append(object->children());
+          }
+          queue.append(partition->partitions().toList());
+        }
+        break;
+      }
     }
   }
 

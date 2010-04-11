@@ -14,6 +14,8 @@
 
 #include <QtCore/QMap>
 
+#include "size.h"
+
 #include "driver/abstractdriver.h"
 
 #include "storage/material.h"
@@ -124,6 +126,34 @@ void Mesh::addRectangle(const QString& objectName, const Vector3f& bottomLeft, c
   face << vectors.indexOf(topLeft);
 
   addFace(objectName, Quads, face);
+}
+
+void Mesh::calculateBoundingGeometries(float *sphereRadius, Size *boxSize, Vector3f *center) const
+{
+  QList<QVector<Vector3f> > vertices = m_vertices.values();
+  float radius = 0;
+  Vector3f min, max;
+
+  for (QList<QVector<Vector3f> >::const_iterator i = vertices.constBegin(); i != vertices.constEnd(); i++) {
+    foreach (Vector3f vertex, *i) {
+      radius = qMax(vertex.norm(), radius);
+      min.x() = qMin(vertex.x(), min.x());
+      max.x() = qMax(vertex.x(), max.x());
+      min.y() = qMin(vertex.y(), min.y());
+      max.y() = qMax(vertex.y(), max.y());
+      min.z() = qMin(vertex.z(), min.z());
+      max.z() = qMax(vertex.z(), max.z());
+    }
+  }
+
+  if (sphereRadius)
+    *sphereRadius = radius;
+  if (boxSize)
+    boxSize->vector() = min.cwise().abs() + max;
+  if (center) {
+    *center = (max + min) / 2;
+    qDebug() << *center;
+  }
 }
 
 void Mesh::bind()
