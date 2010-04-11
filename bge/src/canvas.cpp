@@ -131,67 +131,67 @@ void Canvas::paintGL()
   m_timeSinceSnap += elapsed;
 
   // Calculate all the transforms (recursive)
-  if (elapsed > 0)
+  if (elapsed > 0) {
     m_scene->prepareTransforms(elapsed);
 
+    // Calculate list of visible objects
+    // Using hard-coded values!
+    activeCamera()->calculateFrustrum();
+    QQueue<Scene::Partition*> partitionQueue;
+    partitionQueue.enqueue(m_partition);
+    while (!partitionQueue.isEmpty()) {
+      Scene::Partition *partition = partitionQueue.dequeue();
 
-  // Calculate list of visible objects
-  // Using hard-coded values!
-  activeCamera()->calculateFrustrum();
-  QList<Scene::Object*> visibleObjects;
-  QQueue<Scene::Partition*> partitionQueue;
-  partitionQueue.enqueue(m_partition);
-  while (!partitionQueue.isEmpty()) {
-    Scene::Partition *partition = partitionQueue.dequeue();
-
-    switch (activeCamera()->isSphereInFrustrum(partition->boundingVolume())) {
+      switch (activeCamera()->isSphereInFrustrum(partition->boundingVolume())) {
       case PartialyInside: {
+          Containment cont = activeCamera()->isBoxInFrustrum(partition->boundingVolume());
+          if (cont == FullyInside || cont == PartialyInside) {
+            partitionQueue.append(partition->partitions().toList());
+            QQueue<Scene::Object*> objectQueue;
+            objectQueue.append(partition->objects());
+            while (!objectQueue.isEmpty()) {
+              Scene::Object *object = objectQueue.dequeue();
+              if (cont == PartialyInside) {
+                if (activeCamera()->isBoxInFrustrum(object->boundingVolume()) == Outside)
+                  continue;
+              }
+              objectQueue.append(object->children());
 
-        Containment cont = activeCamera()->isBoxInFrustrum(partition->boundingVolume());
-        if (cont == FullyInside || cont == PartialyInside) {
-          partitionQueue.append(partition->partitions().toList());
-          QQueue<Scene::Object*> objectQueue;
-          objectQueue.append(partition->objects());
-          while (!objectQueue.isEmpty()) {
-            Scene::Object *object = objectQueue.dequeue();
-            if (cont == PartialyInside) {
-              if (activeCamera()->isBoxInFrustrum(object->boundingVolume()) == Outside)
-                continue;
+              // Put object to the rendering queue
+              m_renderer->enqueueObject(object);
             }
-            visibleObjects << object;
-            objectQueue.append(object->children());
           }
+          break;
         }
-        break;
-      }
 
       case FullyInside: {
-        visibleObjects.append(partition->objects());
-        QQueue<Scene::Partition*> queue;
-        queue.append(partition->partitions().toList());
-        while (!queue.isEmpty()) {
-          Scene::Partition *partition = queue.dequeue();
-          QQueue<Scene::Object*> objectQueue;
-          objectQueue.append(partition->objects());
-          while (!objectQueue.isEmpty()) {
-            Scene::Object *object = objectQueue.dequeue();
-            visibleObjects << object;
-            objectQueue.append(object->children());
+          QQueue<Scene::Partition*> queue;
+          queue.enqueue(partition);;
+          while (!queue.isEmpty()) {
+            Scene::Partition *partition = queue.dequeue();
+            QQueue<Scene::Object*> objectQueue;
+            objectQueue.append(partition->objects());
+            while (!objectQueue.isEmpty()) {
+              Scene::Object *object = objectQueue.dequeue();
+              objectQueue.append(object->children());
+
+              // Put object to the rendering queue
+              m_renderer->enqueueObject(object);
+            }
+            queue.append(partition->partitions().toList());
           }
-          queue.append(partition->partitions().toList());
+          break;
         }
-        break;
       }
     }
-  }
 
-  // Enqueue objects for rendering
-  foreach (Scene::Object *object, visibleObjects) {
-    m_renderer->enqueueObject(object);
-
-    // Mark the object with calculatd transforms
-    if (elapsed > 0)
+    // Mark the objects as calculated
+    QQueue<Scene::Object*> objectQueue;
+    objectQueue.enqueue(m_scene);
+    while (!objectQueue.isEmpty()) {
+      Scene::Object *object = objectQueue.dequeue();
       object->m_transformModified = false;
+    }
   }
 
   // Make the actual rendering
