@@ -43,12 +43,11 @@ Containment Camera::isSphereInFrustrum(const BoundingVolume *boundingVolume) con
 
 Containment Camera::isBoxInFrustrum(const BoundingVolume *boundingVolume) const
 {
-  quint8 c = 0;
   quint8 c2 = 0;
 
   for (QVector<Plane>::const_iterator i = m_frustrum.constBegin(); i != m_frustrum.constEnd(); i++) {
     Plane plane = *i;
-    c = 0;
+    quint8 c = 0;
 
     foreach (Vector3f corner, boundingVolume->transformedCorners()) {
       if (plane.signedDistance(corner) > 0)
