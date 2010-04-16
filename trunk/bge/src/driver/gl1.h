@@ -20,6 +20,10 @@
 
 namespace BGE {
 
+namespace Scene {
+class BoundingVolume;
+}
+
 namespace Driver {
 
 class GL1 : public AbstractDriver
@@ -70,6 +74,7 @@ class GL1 : public AbstractDriver
 
     void loadLights();
     void unloadLights();
+    void draw(const Scene::BoundingVolume *boundingVolume);
 };
 
 }

@@ -92,6 +92,11 @@ class Canvas : public QGLWidget
      */
     void setOverlay(AbstractOverlay* overlay);
 
+    inline bool drawBoundingVolumes() const
+    {
+      return m_drawBoundingVolumes;
+    }
+
     /**
      * Creates a camera with a name. The camera is _not_ added to the scene.
      *
@@ -209,6 +214,8 @@ class Canvas : public QGLWidget
     bool m_isFPSShown;
     quint64 m_frames;
     qreal m_fps;
+
+    bool m_drawBoundingVolumes;
 
     static Canvas* m_self;
 
