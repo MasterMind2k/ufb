@@ -17,6 +17,7 @@
 #include "canvas.h"
 
 #include "scene/object.h"
+#include "scene/boundingvolume.h"
 #include "scene/light.h"
 
 #include "storage/mesh.h"
@@ -299,6 +300,9 @@ void GL1::draw(Scene::Object* object)
   glDepthFunc(GL_LESS);
   glDisable(GL_BLEND);
 
+  if (Canvas::canvas()->drawBoundingVolumes())
+    draw(object->boundingVolume());
+
   m_renderedLights = 0;
 
 }
@@ -390,4 +394,60 @@ void GL1::unloadLights()
     glDisable(GL_LIGHT0 + i);
 
   m_usedLights = 0;
+}
+
+void GL1::draw(const Scene::BoundingVolume *boundingVolume)
+{
+  // Set material
+  Storage::Material* white = new Storage::Material("white");
+  white->setEmission(QColor(1, 1, 1));
+  setMaterial(white);
+  delete white;
+
+  glDisable(GL_LIGHTING);
+  glDisable(GL_CULL_FACE);
+  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+  glBegin(GL_QUADS);
+
+  // Draw front
+  glVertex3fv(boundingVolume->corners().at(0b011).data()); // -x, -y, z (0b011)
+  glVertex3fv(boundingVolume->corners().at(0b010).data()); // x, -y, z (0b010)
+  glVertex3fv(boundingVolume->corners().at(0b000).data()); // x, y, z (0b000)
+  glVertex3fv(boundingVolume->corners().at(0b001).data()); // -x, y, z (0b001)
+
+  // Draw left
+  glVertex3fv(boundingVolume->corners().at(0b111).data()); // -x, -y, -z (0b111)
+  glVertex3fv(boundingVolume->corners().at(0b011).data()); // -x, -y, z (0b011)
+  glVertex3fv(boundingVolume->corners().at(0b001).data()); // -x, y, z (0b001)
+  glVertex3fv(boundingVolume->corners().at(0b101).data()); // -x, y, -z (0b101)
+
+  // Draw right
+  glVertex3fv(boundingVolume->corners().at(0b010).data()); // x, -y, z (0b010)
+  glVertex3fv(boundingVolume->corners().at(0b110).data()); // x, -y, -z (0b110)
+  glVertex3fv(boundingVolume->corners().at(0b100).data()); // x, y, -z (0b100)
+  glVertex3fv(boundingVolume->corners().at(0b000).data()); // x, y, z (0b000)
+
+  // Draw behind
+  glVertex3fv(boundingVolume->corners().at(0b110).data()); // x, -y, -z (0b110)
+  glVertex3fv(boundingVolume->corners().at(0b111).data()); // -x, -y, -z (0b111)
+  glVertex3fv(boundingVolume->corners().at(0b101).data()); // -x, y, -z (0b101)
+  glVertex3fv(boundingVolume->corners().at(0b100).data()); // x, y, -z (0b100)
+
+  // Draw bottom
+  glVertex3fv(boundingVolume->corners().at(0b111).data()); // -x, -y, -z (0b111)
+  glVertex3fv(boundingVolume->corners().at(0b110).data()); // x, -y, -z (0b110)
+  glVertex3fv(boundingVolume->corners().at(0b010).data()); // x, -y, z (0b010)
+  glVertex3fv(boundingVolume->corners().at(0b011).data()); // -x, -y, z (0b011)
+
+  // Draw top
+  glVertex3fv(boundingVolume->corners().at(0b001).data()); // -x, y, z (0b001)
+  glVertex3fv(boundingVolume->corners().at(0b000).data()); // x, y, z (0b000)
+  glVertex3fv(boundingVolume->corners().at(0b100).data()); // x, y, -z (0b100)
+  glVertex3fv(boundingVolume->corners().at(0b101).data()); // -x, y, -z (0b101)
+
+  glEnd();
+
+  glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+  glEnable(GL_CULL_FACE);
+  glEnable(GL_LIGHTING);
 }

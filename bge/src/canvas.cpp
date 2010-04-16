@@ -60,6 +60,12 @@ Canvas::Canvas()
     m_recorder->start();
     qDebug("BGE::Canvas(): Recording...");
   }
+  if (args.contains("drawBV")) {
+    m_drawBoundingVolumes = true;
+    qDebug("BGE::Canvas(): Bounding volumes are drawn.");
+  } else {
+    m_drawBoundingVolumes = false;
+  }
 
   m_timer = new QTimer(this);
   m_timer->setSingleShot(false);
