@@ -44,7 +44,7 @@ void Partition::addObject(Object *object)
   }
 
   if (!m_partitions.size()) {
-    if (m_objects.size() > 4) {
+    if (m_objects.size() > 20) {
       partition();
       // Retry
       addObject(object);
@@ -55,9 +55,6 @@ void Partition::addObject(Object *object)
   } else {
     bool isAdded = false;
     foreach (Partition *partition, m_partitions) {
-      if (partition->m_boundingVolume->isBigger(object->boundingVolume()))
-        break;
-
       if (partition->m_boundingVolume->isInside(object->boundingVolume())) {
         isAdded = true;
         partition->addObject(object);
@@ -94,8 +91,8 @@ void Partition::partition()
 
     foreach (Object *object, m_objects) {
       if (subPartition->m_boundingVolume->isInside(object->boundingVolume())) {
-        subPartition->addObject(object);
         removeObject(object);
+        subPartition->addObject(object);
       }
     }
   }
@@ -103,19 +100,23 @@ void Partition::partition()
 
 void Partition::departition()
 {
-  /*qDebug("departicioneram");
-  quint8 size = m_objects.size();
-  foreach (Partition *partition, m_partitions)
-    size += partition->m_objects.size();
+  foreach (Partition *partition, m_partitions) {
+    if (partition->m_objects.size())
+      return;
+  }
 
-  if (size < 4) {
-    foreach (Partition *partition, m_partitions)
-      m_objects += partition->m_objects;
-    foreach (Object *object, m_objects) {
-      object->setPartition(this);
+  QList<Object*> objects;
+  foreach (Partition *partition, m_partitions) {
+    if (partition->m_partitions.size()) {
+      partition->departition();
+      return;
     }
+    objects += partition->m_objects;
+  }
+  foreach (Object *object, objects)
+    addObject(object);
 
-    qDeleteAll(m_partitions);
-    m_partitions.clear();
-  }*/
+  qDeleteAll(m_partitions);
+  m_partitions.clear();
 }
+

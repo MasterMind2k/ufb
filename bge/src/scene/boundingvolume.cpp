@@ -17,11 +17,7 @@ using namespace BGE::Scene;
 
 bool BoundingVolume::isInside(const BoundingVolume *boundingVolume) const
 {
-  if (!((max().cwise() > boundingVolume->center()).all() && (min().cwise() < boundingVolume->center()).all()))
-    return false;
-
-  // Is it bigger?
-  return m_radius > boundingVolume->m_radius;
+  return m_radius > boundingVolume->m_radius && isInside(boundingVolume->transformedCenter());
 }
 
 bool BoundingVolume::isInside(const Vector3f &point) const
@@ -51,5 +47,5 @@ void BoundingVolume::calculateRadius()
 {
   m_radius = 0;
   foreach (Vector3f corner, m_corners)
-    m_radius = qMax(corner.norm(), m_radius);
+    m_radius = qMax((m_center - corner).norm(), m_radius);
 }
