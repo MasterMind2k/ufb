@@ -28,7 +28,7 @@ struct MaterialStruct {
   vec4 diffuse;
   vec4 specular;
   vec4 emission;
-  int shininess;
+  float shininess;
 };
 uniform MaterialStruct Material;
 

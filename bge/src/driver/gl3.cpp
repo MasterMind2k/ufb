@@ -821,7 +821,7 @@ void GL3::setMaterial(Storage::Material *material, Storage::ShaderProgram *shade
   color = Vector4f(material->emission().redF(), material->emission().greenF(), material->emission().blueF(), material->emission().alphaF());
   bindUniformAttribute(shaderProgram, "Material.emission", color);
 
-  bindUniformAttribute(shaderProgram, "Material.shininess", material->shininess());
+  bindUniformAttribute(shaderProgram, "Material.shininess", (float) material->shininess());
 
   if (deleteAfter)
     delete material;

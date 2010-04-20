@@ -63,13 +63,8 @@ vec4 positionalLight(in vec3 ecPos, in vec3 n, in vec4 colorMap, in MaterialStru
   dist = length(aux);
   lightDir = normalize(aux);
 
-  att = 1.0 / (Light.constant +
-        Light.linear * dist +
-        Light.quadratic * dist * dist);
-
+  color = Material.ambient * GlobalAmbient;
   ambient = Material.ambient * Light.ambient;
-
-  color = Material.ambient * GlobalAmbient + ambient * att;
 
   diffuse = Material.diffuse * Light.diffuse;
   NdotL = max(dot(n, lightDir), 0.0);
@@ -81,8 +76,12 @@ vec4 positionalLight(in vec3 ecPos, in vec3 n, in vec4 colorMap, in MaterialStru
 
     if (spotEffect > cos(Light.spot_cutoff)) {
       spotEffect = pow(spotEffect, Light.spot_exponent);
-      color += spotEffect * att * (diffuse * NdotL);
-      halfVector = normalize(lightDir + normalize(ecPos));
+      att = spotEffect / (Light.constant +
+            Light.linear * dist +
+            Light.quadratic * dist * dist);
+      color += att * (diffuse * NdotL + ambient);
+
+      halfVector = normalize(lightDir - normalize(ecPos));
       NdotHV = max(dot(n, halfVector), 0.0);
       color += att * Material.specular * Light.specular * pow(NdotHV, Material.shininess);
     }
@@ -162,7 +161,7 @@ void main(void)
 
   /* Material */
   MaterialStruct Material;
-  Material.shininess = temp.w;
+  Material.shininess = temp.w * 100;
   Material.ambient = texture2D(Tex3, ex_TexCoord[2].st);
   Material.diffuse = texture2D(Tex4, ex_TexCoord[2].st);
   Material.specular = texture2D(Tex5, ex_TexCoord[2].st);
