@@ -47,6 +47,8 @@ class Renderer
 
   private:
     QQueue<Scene::Object*> m_renderQueue;
+
+    void drawScene();
 };
 
 }

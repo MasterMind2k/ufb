@@ -36,7 +36,6 @@ Lighting::Lighting()
     BGE::Canvas::canvas()->light(lightName)->setQuadraticAttenuation(0.0005);
     BGE::Canvas::canvas()->light(lightName)->move(qrand() % 500 - 300, 50, qrand() % 500 - 300);
     BGE::Canvas::canvas()->light(lightName)->setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/models/Cube"));
-    BGE::Canvas::canvas()->light(lightName)->setShaderProgram(BGE::Storage::StorageManager::self()->get<BGE::Storage::ShaderProgram*>("/shaders/Light"));
     BGE::Canvas::canvas()->light(lightName)->addMaterial(material);
   }
 

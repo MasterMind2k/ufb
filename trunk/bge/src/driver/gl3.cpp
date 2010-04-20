@@ -12,7 +12,7 @@
  ***************************************************************************/
 #include "gl3.h"
 
-#include <QtGui/QMatrix4x4>
+#include <QtOpenGL/QGLFramebufferObject>
 
 #include "canvas.h"
 
@@ -27,26 +27,136 @@
 
 #include "shader_p.h"
 #include "buffer_p.h"
+#include "fbo_p.h"
 
 struct BufferElement {
   GLfloat vertex[3];
   GLfloat normal[3];
   GLfloat uvMap[2];
-  GLubyte padding[32];
+  GLfloat uvMap1[2];
+  GLfloat uvMap2[2];
+  GLubyte padding[16];
 };
 
 #define VERTEX_OFFSET 0
 #define NORMAL_OFFSET (3 * sizeof(GLfloat))
 #define UV_OFFSET (6 * sizeof(GLfloat))
+#define UV1_OFFSET (8 * sizeof(GLfloat))
+#define UV2_OFFSET (10 * sizeof(GLfloat))
 
 using namespace BGE;
 using namespace BGE::Driver;
+
+class FBO
+{
+  public:
+    inline FBO(const QSize &size)
+    {
+      glGenFramebuffers(1, &m_frame);
+      glBindFramebuffer(GL_FRAMEBUFFER, m_frame);
+
+      glGenRenderbuffers(1, &m_depth);
+      glBindRenderbuffer(GL_RENDERBUFFER, m_depth);
+      glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, size.width(), size.height());
+      glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_depth);
+
+      glGenTextures(7, m_textures);
+
+      for (quint8 i = 0; i < 8; i++) {
+        glBindTexture(GL_TEXTURE_2D, m_textures[i]);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F_ARB, size.width(), size.height(), 0, GL_RGB, GL_FLOAT, NULL);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, m_textures[i], 0);
+      }
+
+      GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+      if (status != GL_FRAMEBUFFER_COMPLETE)
+        qFatal("FBO error!");
+
+      m_size = size;
+      glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    }
+
+    inline ~FBO()
+    {
+      glDeleteTextures(7, m_textures);
+      glDeleteRenderbuffers(1, &m_depth);
+      glDeleteFramebuffers(1, &m_frame);
+    }
+
+    inline void bind() const
+    {
+      glBindFramebuffer(GL_FRAMEBUFFER, m_frame);
+    }
+
+    inline void unbind() const
+    {
+      glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    }
+
+    inline const QSize &size() const
+    {
+      return m_size;
+    }
+
+    inline void activateTextures()
+    {
+      for (quint8 i = 0; i < 7; i++) {
+        glActiveTexture(GL_TEXTURE0 + i);
+        glBindTexture(GL_TEXTURE_2D, m_textures[i]);
+      }
+    }
+
+    inline void deactivateTextures()
+    {
+      for (quint8 i = 0; i < 7; i++) {
+        glActiveTexture(GL_TEXTURE0 + i);
+        glBindTexture(GL_TEXTURE_2D, 0);
+      }
+      glActiveTexture(GL_TEXTURE0);
+    }
+
+  private:
+    GLuint m_textures[7];
+    QSize m_size;
+    GLuint m_frame;
+    GLuint m_depth;
+};
 
 GL3::GL3()
 {
   getShaderFunctions();
   getBufferFunctions();
+  getFBOFunctions();
   m_renderedLights = 0;
+  m_boundShader = 0l;
+  m_boundMesh = 0l;
+  m_quad = 0;
+  m_quadIdxs = 0;
+
+  if (m_quad != 0 && m_quadIdxs != 0) {
+    GLuint ids[2] = {m_quad, m_quadIdxs};
+    glDeleteBuffers(2, ids);
+  }
+}
+
+GL3::~GL3()
+{
+  delete m_fbo;
+}
+
+void GL3::bindFBO()
+{
+  GLenum buffers[] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3, GL_COLOR_ATTACHMENT4, GL_COLOR_ATTACHMENT5, GL_COLOR_ATTACHMENT6};
+  m_fbo->bind();
+  glDrawBuffers(7, buffers);
+}
+
+void GL3::unbindFBO()
+{
+  m_fbo->unbind();
+  glDrawBuffer(GL_BACK);
 }
 
 void GL3::bind(Storage::Mesh *mesh)
@@ -59,6 +169,15 @@ void GL3::bind(Storage::Mesh *mesh)
     glBindBuffer(GL_ARRAY_BUFFER, mesh->bindId());
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indices.value(mesh->bindId()));
   }
+
+  // Let's bind our shader thingies :)
+  bindUniformAttribute(m_boundShader, "ProjectionMatrix", m_projectionMatrix);
+  bindUniformAttribute(m_boundShader, "ModelViewMatrix", m_transform.matrix());
+  bindUniformAttribute(m_boundShader, "NormalMatrix", m_normalMatrix);
+  bindAttribute(m_boundShader, "Vertex", 3, GL_FLOAT, sizeof(BufferElement), VERTEX_OFFSET);
+  bindAttribute(m_boundShader, "Normal", 3, GL_FLOAT, sizeof(BufferElement), NORMAL_OFFSET);
+  bindAttribute(m_boundShader, "TexCoord", 2, GL_FLOAT, sizeof(BufferElement), UV_OFFSET);
+  m_boundMesh = mesh;
 }
 
 void GL3::bind(Storage::Texture *texture)
@@ -82,6 +201,7 @@ void GL3::bind(Storage::ShaderProgram *shaderProgram)
     load(shaderProgram);
 
   glUseProgram(shaderProgram->bindId());
+  m_boundShader = shaderProgram;
 }
 
 void GL3::unbind(Storage::Mesh *mesh)
@@ -89,8 +209,19 @@ void GL3::unbind(Storage::Mesh *mesh)
   if (!mesh || !mesh->bindId())
     return;
 
+  unbindAttribute(m_boundShader, "Vertex");
+  unbindAttribute(m_boundShader, "Normal");
+  unbindAttribute(m_boundShader, "TexCoord");
+
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+  m_boundMesh = 0l;
+}
+
+void GL3::unbind(Storage::Texture *texture)
+{
+  Q_UNUSED(texture);
+  glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void GL3::unbind(Storage::ShaderProgram *shaderProgram)
@@ -99,6 +230,7 @@ void GL3::unbind(Storage::ShaderProgram *shaderProgram)
     return;
 
   glUseProgram(0);
+  m_boundShader = 0l;
 }
 
 void GL3::unload(Storage::Mesh *mesh)
@@ -136,6 +268,7 @@ void GL3::setLight(Scene::Light *light)
   if (!light->isPositional())
     tempPos = Vector4f(light->globalPosition().x(), light->globalPosition().y(), light->globalPosition().z(), 0);
   temp.position = m_transform * tempPos;
+  temp.position.w() = light->isPositional() ? 1 : 0;
 
   temp.ambient = Vector4f(light->ambientColor().redF(), light->ambientColor().greenF(), light->ambientColor().blueF(), light->ambientColor().alphaF());
   temp.diffuse = Vector4f(light->diffuseColor().redF(), light->diffuseColor().greenF(), light->diffuseColor().blueF(), light->diffuseColor().alphaF());
@@ -168,70 +301,166 @@ void GL3::setTransformMatrix(const Transform3f& transform)
 
 void GL3::draw(Scene::Object *object)
 {
-  if (!object->shaderProgram())
-    return;
+  if (!m_boundShader)
+    qFatal("BGE::Driver::GL3::draw(): Shader not bound!");
 
-  bindUniformAttribute(object->shaderProgram(), "ProjectionMatrix", m_projectionMatrix);
-  bindUniformAttribute(object->shaderProgram(), "ModelViewMatrix", m_transform.matrix());
-  bindUniformAttribute(object->shaderProgram(), "NormalMatrix", m_normalMatrix);
-  bindAttribute(object->shaderProgram(), "Vertex", 3, GL_FLOAT, sizeof(BufferElement), VERTEX_OFFSET);
-  bindAttribute(object->shaderProgram(), "Normal", 3, GL_FLOAT, sizeof(BufferElement), NORMAL_OFFSET);
-  bindAttribute(object->shaderProgram(), "TexCoord", 3, GL_FLOAT, sizeof(BufferElement), UV_OFFSET);
-
-  bool isFirstPass = true;
-  bool blendingEnabled = false;
-
-  while (m_lights.size() > m_renderedLights) {
-
-    if (!isFirstPass)
-      loadLights(object->shaderProgram());
-
-    Storage::Material* currentMaterial = 0l;
-    setMaterial(currentMaterial, object->shaderProgram());
-    foreach (Plan plan, m_plans.value(object->mesh()->bindId())) {
-      if (currentMaterial != m_materials.value(plan.materialName)) {
-        currentMaterial = m_materials.value(plan.materialName);
-        setMaterial(currentMaterial, object->shaderProgram());
-      }
-
-      glDrawElements(plan.primitive, plan.count, GL_UNSIGNED_SHORT, (GLushort*)0 + plan.offset);
+  Storage::Material* currentMaterial = 0l;
+  setMaterial(currentMaterial, m_boundShader);
+  foreach (Plan plan, m_plans.value(m_boundMesh->bindId())) {
+    if (currentMaterial != m_materials.value(plan.materialName)) {
+      currentMaterial = m_materials.value(plan.materialName);
+      setMaterial(currentMaterial, m_boundShader);
     }
 
-    if (isFirstPass && !blendingEnabled) {
-      glEnable(GL_BLEND);
-      glDepthFunc(GL_LEQUAL);
-      glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_COLOR);
-      isFirstPass = false;
-      blendingEnabled = true;
-    }
+    glDrawElements(plan.primitive, plan.count, GL_UNSIGNED_SHORT, (GLushort*)0 + plan.offset);
   }
-
-  glDepthFunc(GL_LESS);
-  glDisable(GL_BLEND);
-
-  unbindAttribute(object->shaderProgram(), "Vertex");
-  unbindAttribute(object->shaderProgram(), "Normal");
-  unbindAttribute(object->shaderProgram(), "TexCoord");
-
-  m_renderedLights = 0;
 }
 
 void GL3::init()
 {
   glClearColor(0, 0, 0, 0);
+  glDisable(GL_DEPTH_TEST);
+  glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_COLOR);
+
+  m_fbo = new FBO(Canvas::canvas()->size());
+  m_fbo->bind();
+  glClearColor(0, 0, 0, 0);
   glEnable(GL_DEPTH_TEST);
 
   glEnable(GL_CULL_FACE);
+  m_fbo->unbind();
 }
 
 void GL3::clear()
 {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+  if (m_fbo->size() != Canvas::canvas()->size()) {
+    delete m_fbo;
+    m_fbo = new FBO(Canvas::canvas()->size());
+    m_fbo->bind();
+    glClearColor(0, 0, 0, 0);
+    glEnable(GL_DEPTH_TEST);
+
+    glEnable(GL_CULL_FACE);
+    m_fbo->unbind();
+  } else {
+    m_fbo->bind();
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    m_fbo->unbind();
+  }
 }
 
 void GL3::setProjection(const Transform3f &projection)
 {
   m_projectionMatrix = projection.matrix();
+}
+
+void GL3::shading()
+{
+  if (!m_quad) {
+    // Vertices
+    BufferElement *buffer = (BufferElement*) malloc(4 * sizeof(BufferElement));
+    BufferElement *bufPtr = buffer;
+    BufferElement temp;
+    Vector3f vertex;
+    Vector2f uvMap;
+
+    // First
+    vertex = Vector3f(-1, -1, 0);
+    uvMap = Vector2f(0, 0);
+    memcpy(temp.vertex, vertex.data(), 3 * sizeof(GLfloat));
+    memcpy(temp.uvMap, uvMap.data(), 2 * sizeof(GLfloat));
+    memcpy(temp.uvMap1, uvMap.data(), 2 * sizeof(GLfloat));
+    memcpy(temp.uvMap2, uvMap.data(), 2 * sizeof(GLfloat));
+    memcpy(bufPtr++, &temp, sizeof(BufferElement));
+
+    // Second
+    vertex = Vector3f(1, -1, 0);
+    uvMap = Vector2f(1, 0);
+    memcpy(temp.vertex, vertex.data(), 3 * sizeof(GLfloat));
+    memcpy(temp.uvMap, uvMap.data(), 2 * sizeof(GLfloat));
+    memcpy(temp.uvMap1, uvMap.data(), 2 * sizeof(GLfloat));
+    memcpy(temp.uvMap2, uvMap.data(), 2 * sizeof(GLfloat));
+    memcpy(bufPtr++, &temp, sizeof(BufferElement));
+
+    // Third
+    vertex = Vector3f(1, 1, 0);
+    uvMap = Vector2f(1, 1);
+    memcpy(temp.vertex, vertex.data(), 3 * sizeof(GLfloat));
+    memcpy(temp.uvMap, uvMap.data(), 2 * sizeof(GLfloat));
+    memcpy(temp.uvMap1, uvMap.data(), 2 * sizeof(GLfloat));
+    memcpy(temp.uvMap2, uvMap.data(), 2 * sizeof(GLfloat));
+    memcpy(bufPtr++, &temp, sizeof(BufferElement));
+
+    // Fourth
+    vertex = Vector3f(-1, 1, 0);
+    uvMap = Vector2f(0, 1);
+    memcpy(temp.vertex, vertex.data(), 3 * sizeof(GLfloat));
+    memcpy(temp.uvMap, uvMap.data(), 2 * sizeof(GLfloat));
+    memcpy(temp.uvMap1, uvMap.data(), 2 * sizeof(GLfloat));
+    memcpy(temp.uvMap2, uvMap.data(), 2 * sizeof(GLfloat));
+    memcpy(bufPtr++, &temp, sizeof(BufferElement));
+
+    glGenBuffers(1, &m_quad);
+    glBindBuffer(GL_ARRAY_BUFFER, m_quad);
+    glBufferData(GL_ARRAY_BUFFER, 4 * sizeof(BufferElement), buffer, GL_STATIC_DRAW);
+    free(buffer);
+
+    // Indices
+    quint16 indices[] = {0, 1, 2, 3};
+    glGenBuffers(1, &m_quadIdxs);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_quadIdxs);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, 4 * sizeof(quint16), indices, GL_STATIC_DRAW);
+  } else {
+    glBindBuffer(GL_ARRAY_BUFFER, m_quad);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_quadIdxs);
+  }
+
+  bindUniformAttribute(m_boundShader, "ProjectionMatrix", m_projectionMatrix);
+  bindUniformAttribute(m_boundShader, "ModelViewMatrix", m_transform.matrix());
+  bindAttribute(m_boundShader, "Vertex", 3, GL_FLOAT, sizeof(BufferElement), VERTEX_OFFSET);
+  bindAttribute(m_boundShader, "TexCoord0", 2, GL_FLOAT, sizeof(BufferElement), UV_OFFSET);
+  bindAttribute(m_boundShader, "TexCoord1", 2, GL_FLOAT, sizeof(BufferElement), UV1_OFFSET);
+  bindAttribute(m_boundShader, "TexCoord2", 2, GL_FLOAT, sizeof(BufferElement), UV2_OFFSET);
+  bindUniformAttribute(m_boundShader, "Tex0", 0);
+  bindUniformAttribute(m_boundShader, "Tex1", 1);
+  bindUniformAttribute(m_boundShader, "Tex2", 2);
+  bindUniformAttribute(m_boundShader, "Tex3", 3);
+  bindUniformAttribute(m_boundShader, "Tex4", 4);
+  bindUniformAttribute(m_boundShader, "Tex5", 5);
+  bindUniformAttribute(m_boundShader, "Tex6", 6);
+  bindUniformAttribute(m_boundShader, "GlobalAmbient", Vector4f(Scene::Light::globalAmbient().redF(), Scene::Light::globalAmbient().greenF(), Scene::Light::globalAmbient().blueF(), Scene::Light::globalAmbient().alphaF()));
+  m_fbo->activateTextures();
+
+  bool isFirstPass = true;
+
+  while (m_renderedLights < m_lights.size()) {
+    loadLights(m_boundShader);
+
+    glDrawElements(GL_QUADS, 4, GL_UNSIGNED_SHORT, (GLushort*)0);
+
+    if (isFirstPass) {
+      isFirstPass = false;
+      glEnable(GL_BLEND);
+      glDisable(GL_DEPTH_TEST);
+      bindUniformAttribute(m_boundShader, "GlobalAmbient", Vector4f(0, 0, 0, 1));
+    }
+  }
+
+  unbindAttribute(m_boundShader, "Vertex");
+  unbindAttribute(m_boundShader, "TexCoord0");
+  unbindAttribute(m_boundShader, "TexCoord1");
+  unbindAttribute(m_boundShader, "TexCoord2");
+  m_fbo->deactivateTextures();
+
+  glDisable(GL_BLEND);
+  glEnable(GL_DEPTH_TEST);
+
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+  m_renderedLights = 0;
 }
 
 void GL3::load(Storage::Mesh *mesh)

@@ -20,6 +20,7 @@
 #include "scene/camera.h"
 #include "scene/light.h"
 
+#include "storage/storagemanager.h"
 #include "storage/mesh.h"
 #include "storage/texture.h"
 #include "storage/shaderprogram.h"
@@ -36,8 +37,7 @@ void Renderer::enqueueObject(Scene::Object *object)
 void Renderer::renderScene()
 {
   // Let's use the active camera
-  Scene::Camera* camera = Canvas::canvas()->activeCamera();
-  if (!camera)
+  if (!Canvas::canvas()->activeCamera())
     qFatal("BGE::Rendering::Renderer::renderScene(): No active camera defined!");
 
   // Set projection matrix
@@ -45,35 +45,44 @@ void Renderer::renderScene()
 
   // Prepare lighting
   foreach (Scene::Light* light, Canvas::canvas()->lights()) {
-    Transform3f transform = camera->cameraTransform() * light->globalTransform();
+    Transform3f transform = Canvas::canvas()->activeCamera()->cameraTransform() * light->globalTransform();
     Driver::AbstractDriver::self()->setTransformMatrix(transform);
 
     Driver::AbstractDriver::self()->setLight(light);
   }
 
+  // Geometry render
+  Driver::AbstractDriver::self()->bindFBO();
+  Driver::AbstractDriver::self()->bind(Storage::StorageManager::self()->get<Storage::ShaderProgram*>("/shaders/FirstStage")); // FirstStage
+  drawScene();
+  Driver::AbstractDriver::self()->unbind(Storage::StorageManager::self()->get<Storage::ShaderProgram*>("/shaders/FirstStage"));
+  Driver::AbstractDriver::self()->unbindFBO();
+
+  // Shading stage(s)
+  Driver::AbstractDriver::self()->bind(Storage::StorageManager::self()->get<Storage::ShaderProgram*>("/shaders/LightingStage")); // LightingStage
+  Driver::AbstractDriver::self()->shading();
+  Driver::AbstractDriver::self()->unbind(Storage::StorageManager::self()->get<Storage::ShaderProgram*>("/shaders/LightingStage")); // LightingStage
+
+  Driver::AbstractDriver::self()->resetLighting();
+}
+
+void Renderer::drawScene()
+{
   while (!m_renderQueue.isEmpty()) {
     Scene::Object* object = m_renderQueue.dequeue();
 
     // Calculate world transform
-    Transform3f worldTransform = camera->cameraTransform() * object->globalTransform();
+    Transform3f worldTransform = Canvas::canvas()->activeCamera()->cameraTransform() * object->globalTransform();
     Driver::AbstractDriver::self()->setTransformMatrix(worldTransform);
-
-    if (object->shaderProgram())
-      object->shaderProgram()->bind();
 
     Driver::AbstractDriver::self()->bind(object->materials());
 
     object->mesh()->bind();
     if (object->texture())
       object->texture()->bind();
-    Driver::AbstractDriver::self()->draw(object);
+    Driver::AbstractDriver::self()->draw();
     if (object->texture())
       object->texture()->unbind();
     object->mesh()->unbind();
-
-    if (object->shaderProgram())
-      object->shaderProgram()->unbind();
   }
-
-  Driver::AbstractDriver::self()->resetLighting();
 }

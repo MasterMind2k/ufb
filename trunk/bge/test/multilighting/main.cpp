@@ -18,7 +18,6 @@
 #include "storage/mesh.h"
 #include "storage/material.h"
 #include "storage/texture.h"
-#include "storage/shaderprogram.h"
 
 #include "scene/camera.h"
 #include "scene/light.h"
@@ -30,6 +29,9 @@
 
 BGE::Storage::Mesh* createCube()
 {
+  Q_INIT_RESOURCE(bge_resources);
+  BGE::Scene::Light::setGlobalAmbient(Qt::black);
+
   QString name = "cube";
   BGE::Storage::Mesh* mesh = new BGE::Storage::Mesh("Cube");
   float half = 3;
@@ -92,7 +94,6 @@ int main(int argc, char** argv)
   camera->addChild(BGE::Canvas::canvas()->camera("Global camera"));
   BGE::Canvas::canvas()->addSceneObject(camera);
   camera->setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/models/Cube"));
-  camera->setShaderProgram(BGE::Storage::StorageManager::self()->get<BGE::Storage::ShaderProgram*>("/shaders/Object"));
 
   // And the controller
   BGE::Canvas::canvas()->setController(new Controller(camera));
@@ -103,7 +104,6 @@ int main(int argc, char** argv)
   // Setup objects
   BGE::Scene::Object *object = new BGE::Scene::Object;
   object->setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/models/Surface"));
-  object->setShaderProgram(BGE::Storage::StorageManager::self()->get<BGE::Storage::ShaderProgram*>("/shaders/Textured"));
   object->move(-150, 0, 150);
   BGE::Canvas::canvas()->addSceneObject(object);
 
@@ -117,7 +117,6 @@ int main(int argc, char** argv)
   // First R2-D2
   object = new BGE::Scene::Object;
   object->setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/models/R2-D2"));
-  object->setShaderProgram(BGE::Storage::StorageManager::self()->get<BGE::Storage::ShaderProgram*>("/shaders/Object"));
   object->loadMaterialsFromMesh();
   object->rotateX(-90);
   BGE::Canvas::canvas()->addSceneObject(object);
@@ -125,7 +124,6 @@ int main(int argc, char** argv)
   // Second R2-D2
   object = new BGE::Scene::Object;
   object->setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/models/R2-D2"));
-  object->setShaderProgram(BGE::Storage::StorageManager::self()->get<BGE::Storage::ShaderProgram*>("/shaders/Object"));
   object->loadMaterialsFromMesh();
   object->move(100, 0, 100);
   object->rotateX(-90);
@@ -134,7 +132,6 @@ int main(int argc, char** argv)
   // Third R2-D2
   object = new BGE::Scene::Object;
   object->setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/models/R2-D2"));
-  object->setShaderProgram(BGE::Storage::StorageManager::self()->get<BGE::Storage::ShaderProgram*>("/shaders/Object"));
   object->loadMaterialsFromMesh();
   object->move(-100, 0, -100);
   object->rotateX(-90);
@@ -143,7 +140,6 @@ int main(int argc, char** argv)
   // Fourth R2-D2
   object = new BGE::Scene::Object;
   object->setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/models/R2-D2"));
-  object->setShaderProgram(BGE::Storage::StorageManager::self()->get<BGE::Storage::ShaderProgram*>("/shaders/Object"));
   object->loadMaterialsFromMesh();
   object->move(100, 0, -100);
   object->rotateX(-90);
@@ -152,7 +148,6 @@ int main(int argc, char** argv)
   // Fifth R2-D2
   object = new BGE::Scene::Object;
   object->setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/models/R2-D2"));
-  object->setShaderProgram(BGE::Storage::StorageManager::self()->get<BGE::Storage::ShaderProgram*>("/shaders/Object"));
   object->loadMaterialsFromMesh();
   object->move(-100, 0, 100);
   object->rotateX(-90);

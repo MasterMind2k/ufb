@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/bge_resources/shaders">
+      <file alias="FirstStage.sp">resources/firststage.sp</file>
+      <file alias="LightingStage.sp">resources/lightingstage.sp</file>
+    </qresource>
+</RCC>

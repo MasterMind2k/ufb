@@ -10,12 +10,10 @@
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
  ***************************************************************************/
-
 #ifndef BUFFER_P_H
 #define BUFFER_P_H
 
 #include "canvas.h"
-
 
 /* Defines for Buffer */
 #define glGenBuffers _glGenBuffers
@@ -69,6 +67,5 @@ void getBufferFunctions()
 
   hasBuffers = true;
 }
-
 
 #endif

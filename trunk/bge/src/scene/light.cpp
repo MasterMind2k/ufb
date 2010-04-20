@@ -13,9 +13,10 @@
 #include "light.h"
 
 using namespace BGE;
-using namespace Scene;
+using namespace BGE::Scene;
 
 quint8 Light::m_serial = 0;
+QColor Light::m_globalAmbient = QColor(0.2 * 255, 0.2 * 255, 0.2 * 255);
 
 Light::Light(const QString &name)
  : Object()

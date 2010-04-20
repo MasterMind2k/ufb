@@ -63,6 +63,8 @@ class GL1 : public AbstractDriver
     void clear();
     void setProjection(const Transform3f &projection);
 
+    inline void shading() {}
+
   private:
     quint8 m_usedLights;
     Transform3f m_transform;
