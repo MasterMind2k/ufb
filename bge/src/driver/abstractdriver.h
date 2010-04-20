@@ -41,6 +41,8 @@ class AbstractDriver
   public:
     static AbstractDriver* self();
 
+    inline virtual void bindFBO() {}
+    inline virtual void unbindFBO() {}
     virtual void bind(Storage::Mesh* mesh) = 0;
     virtual void bind(const QHash<QString, Storage::Material*> &materials) = 0;
     virtual void bind(Storage::Texture* texture) = 0;
@@ -60,11 +62,13 @@ class AbstractDriver
 
     virtual void setTransformMatrix(const Transform3f& transform) = 0;
 
-    virtual void draw(Scene::Object* object) = 0;
+    virtual void draw(Scene::Object* object = 0l) = 0;
 
     virtual void init() = 0;
     virtual void clear() = 0;
     virtual void setProjection(const Transform3f &projection) = 0;
+
+    virtual void shading() = 0;
 
   protected:
     inline AbstractDriver() {}

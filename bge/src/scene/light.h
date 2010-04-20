@@ -119,6 +119,15 @@ class Light : public BGE::Scene::Object
       return m_spotCutOff;
     }
 
+    inline static const QColor &globalAmbient()
+    {
+      return m_globalAmbient;
+    }
+    inline static void setGlobalAmbient(const QColor &globalAmbient)
+    {
+      m_globalAmbient = globalAmbient;
+    }
+
   private:
     /* General */
     QString m_name;
@@ -128,6 +137,7 @@ class Light : public BGE::Scene::Object
     QColor m_ambient;
     QColor m_diffuse;
     QColor m_specular;
+    static QColor m_globalAmbient;
 
     bool m_isPositional;
 

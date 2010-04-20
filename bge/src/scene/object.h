@@ -26,8 +26,6 @@ class Canvas;
 namespace Storage {
 class Mesh;
 class Texture;
-class Shader;
-class ShaderProgram;
 }
 
 namespace Scene
@@ -39,7 +37,7 @@ class BoundingVolume;
  *@short Main Scene graph object representation
  *
  * It contains the basic transform commands (currently move and rotate).
- * It should contain also a texture, material and shader settings for an
+ * It should contain also a texture and material settings for an
  * object.
  */
 class Object
@@ -359,16 +357,6 @@ class Object
       return m_observed;
     }
 
-    void setShaderProgram(Storage::ShaderProgram* shaderProgram);
-    inline void removeShaderProgram()
-    {
-      m_shaderProgram = 0l;
-    }
-    inline Storage::ShaderProgram* shaderProgram() const
-    {
-      return m_shaderProgram;
-    }
-
     Object *objectify(const QString& objectName);
 
     void loadMaterialsFromMesh();
@@ -406,8 +394,6 @@ class Object
     Storage::Texture* m_texture;
 
     Object* m_observed;
-
-    Storage::ShaderProgram* m_shaderProgram;
 
     Partition *m_partition;
 

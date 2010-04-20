@@ -18,6 +18,8 @@
 #include <QtCore/QHash>
 #include <QtCore/QVector>
 
+class FBO;
+
 namespace BGE {
 namespace Storage {
 class Material;
@@ -29,7 +31,10 @@ class GL3 : public AbstractDriver
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     GL3();
+    ~GL3();
 
+    void bindFBO();
+    void unbindFBO();
     void bind(Storage::Mesh* mesh);
     void bind(Storage::Texture* texture);
     inline void bind(const QHash<QString, Storage::Material*> &materials)
@@ -43,7 +48,7 @@ class GL3 : public AbstractDriver
     {
       m_materials.clear();
     }
-    inline void unbind(Storage::Texture* texture) {/* Ignore */}
+    inline void unbind(Storage::Texture* texture);
     void unbind(Storage::ShaderProgram* shaderProgram);
 
     void unload(Storage::Mesh* mesh);
@@ -55,11 +60,13 @@ class GL3 : public AbstractDriver
 
     void setTransformMatrix(const Transform3f& transform);
 
-    void draw(Scene::Object* object);
+    void draw(Scene::Object* object = 0l);
 
     void init();
     void clear();
     void setProjection(const Transform3f &projection);
+
+    void shading();
 
   private:
     struct Plan {
@@ -92,7 +99,13 @@ class GL3 : public AbstractDriver
     QList<Light> m_lights;
     QHash<QString, Storage::Material*> m_materials;
     static const quint8 m_maxLights = 4;
+    Storage::ShaderProgram *m_boundShader;
+    Storage::Mesh *m_boundMesh;
     quint32 m_renderedLights;
+    FBO *m_fbo;
+    quint32 m_quad;
+    quint32 m_quadIdxs;
+    bool m_shading;
 
     void load(Storage::Mesh* mesh);
     void load(Storage::ShaderProgram* shaderProgram);
@@ -145,6 +158,7 @@ class GL3 : public AbstractDriver
     static char** prepareShaderSource(const QString &source, qint32 &count, qint32 **length);
 
     void loadLights(Storage::ShaderProgram *shaderProgram);
+    void initFBO();
 };
 
 }

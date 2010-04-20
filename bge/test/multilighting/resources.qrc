@@ -6,15 +6,4 @@
     <qresource prefix="/bge_resources/textures">
       <file alias="Desert.jpg">resources/desert.jpg</file>
     </qresource>
-    <qresource prefix="/bge_resources/shaders">
-      <file alias="Light.sp">resources/light.sp</file>
-      <file alias="Object.sp">resources/object.sp</file>
-      <file alias="Textured.sp">resources/textured.sp</file>
-    </qresource>
-    <qresource prefix="/bge_resources/shaders/vertex">
-      <file alias="lighting.vsm">resources/lighting.vsm</file>
-    </qresource>
-    <qresource prefix="/bge_resources/shaders/fragment">
-      <file alias="lighting.fsm">resources/lighting.fsm</file>
-    </qresource>
 </RCC>

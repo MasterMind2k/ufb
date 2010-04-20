@@ -1,4 +1,3 @@
-
 include_directories(.. ${CMAKE_CURRENT_BINARY_DIR} ${EIGEN2_INCLUDE_DIR} ${QT_INCLUDES}
   ${CMAKE_CURRENT_SOURCE_DIR})
 
@@ -11,6 +10,7 @@ set(driver_SRCS
 set(driver_HDRS
   shader_p.h
   buffer_p.h
+  fbo_p.h
 )
 
 add_library(driver ${driver_SRCS} ${driver_HDRS})

@@ -21,7 +21,6 @@
 #include "storage/storagemanager.h"
 #include "storage/mesh.h"
 #include "storage/texture.h"
-#include "storage/shaderprogram.h"
 
 #include "movinglight.h"
 #include "overlay.h"
@@ -89,6 +88,9 @@ class Controller : public BGE::AbstractController
 
 int main(int argc, char** argv)
 {
+  Q_INIT_RESOURCE(bge_resources);
+  BGE::Scene::Light::setGlobalAmbient(Qt::black);
+
   QApplication app(argc, argv);
 
   // Load models and textures
@@ -147,7 +149,6 @@ int main(int argc, char** argv)
 
   // Add our model
   BGE::Scene::Object* fighter = new BGE::Scene::Object;
-  fighter->setShaderProgram(BGE::Storage::StorageManager::self()->get<BGE::Storage::ShaderProgram*>("/shaders/Textured"));
   fighter->setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/models/Fighter"));
   fighter->setTexture(BGE::Storage::StorageManager::self()->get<BGE::Storage::Texture*>("/textures/Fighter"));
   // Add materials
@@ -166,7 +167,6 @@ int main(int argc, char** argv)
   light->setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/models/Cube"));
   light->addMaterial(BGE::Storage::StorageManager::self()->get<BGE::Storage::Material*>("/materials/Red light"));
   light->observe(fighter);
-  light->setShaderProgram(BGE::Storage::StorageManager::self()->get<BGE::Storage::ShaderProgram*>("/shaders/Shader"));
   movingLight->addChild(light);
 
   light = BGE::Canvas::canvas()->createLight("Blue light");
@@ -177,7 +177,6 @@ int main(int argc, char** argv)
   light->setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/models/Cube"));
   light->addMaterial(BGE::Storage::StorageManager::self()->get<BGE::Storage::Material*>("/materials/Blue light"));
   light->observe(fighter);
-  light->setShaderProgram(BGE::Storage::StorageManager::self()->get<BGE::Storage::ShaderProgram*>("/shaders/Shader"));
   movingLight->addChild(light);
 
   light = BGE::Canvas::canvas()->createLight("Green light");
@@ -188,7 +187,6 @@ int main(int argc, char** argv)
   light->setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/models/Cube"));
   light->addMaterial(BGE::Storage::StorageManager::self()->get<BGE::Storage::Material*>("/materials/Green light"));
   light->observe(fighter);
-  light->setShaderProgram(BGE::Storage::StorageManager::self()->get<BGE::Storage::ShaderProgram*>("/shaders/Shader"));
   movingLight->addChild(light);
 
   light = BGE::Canvas::canvas()->createLight("Yellow light");
@@ -199,7 +197,6 @@ int main(int argc, char** argv)
   light->setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/models/Cube"));
   light->addMaterial(BGE::Storage::StorageManager::self()->get<BGE::Storage::Material*>("/materials/Yellow light"));
   light->observe(fighter);
-  light->setShaderProgram(BGE::Storage::StorageManager::self()->get<BGE::Storage::ShaderProgram*>("/shaders/Shader"));
   movingLight->addChild(light);
   BGE::Canvas::canvas()->addSceneObject(movingLight);
 

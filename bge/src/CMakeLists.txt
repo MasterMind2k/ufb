@@ -27,7 +27,8 @@ set(bge_HDRS
 )
 
 qt4_wrap_cpp(bge_MOC ${bge_QHDRS})
+qt4_add_resources(bge_RC bge_resources.qrc)
 
-add_library(bge ${bge_SRCS} ${bge_MOC} ${bge_HDRS})
+add_library(bge ${bge_SRCS} ${bge_MOC} ${bge_HDRS} ${bge_RC})
 target_link_libraries(bge scene rendering driver storage ${QT_LIBRARIES})
 add_dependencies(bge rendering driver storage scene)

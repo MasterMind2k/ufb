@@ -22,7 +22,6 @@
 #include "rendering/renderer.h"
 
 #include "storage/mesh.h"
-#include "storage/shaderprogram.h"
 
 using namespace BGE;
 using namespace BGE::Scene;
@@ -45,7 +44,6 @@ Object::Object()
   m_mesh = 0l;
   m_texture = 0l;
   m_observed = 0l;
-  m_shaderProgram = 0l;
   m_partition = 0l;
   m_boundingVolume = new BoundingVolume(Vector3f::Zero(), Vector3f::Zero());
 }
@@ -137,22 +135,6 @@ void Object::lookAt(Object *object)
   // And get the rotation :)
   Quaternionf rotation(matrix.rotation());
   setOrientation(rotation);
-}
-
-void Object::setShaderProgram(Storage::ShaderProgram *shaderProgram)
-{
-  if (!shaderProgram) {
-    qWarning("BGE::Scene::Object::setShaderProgram(): Shader is not defined. Ignoring.");
-    return;
-  }
-
-  if (m_shaderProgram)
-    qWarning("BGE::Scene::Object::setShaderProgram(): Replacing shader program!");
-
-  if (!shaderProgram->prepareProgram())
-    return;
-
-  m_shaderProgram = shaderProgram;
 }
 
 Object* Object::objectify(const QString &objectName)
