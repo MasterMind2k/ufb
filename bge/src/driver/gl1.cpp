@@ -210,6 +210,9 @@ void GL1::bind(Storage::Mesh *mesh)
 
   delete defaultMaterial;
 
+  if (Canvas::canvas()->drawBoundingVolumes())
+    draw(mesh->boundingVolume());
+
   glEndList();
 }
 
@@ -312,10 +315,6 @@ void GL1::draw()
   glDepthFunc(GL_LESS);
   glDisable(GL_BLEND);
 
-  /// @TODO!!!!
-  if (Canvas::canvas()->drawBoundingVolumes())
-    draw(m_boundMesh->calculateBoundingVolume());
-
   m_renderedLights = 0;
 }
 
@@ -412,54 +411,40 @@ void GL1::draw(const Scene::BoundingVolume *boundingVolume)
 {
   // Set material
   Storage::Material* white = new Storage::Material("white");
-  white->setEmission(QColor(1, 1, 1));
+  white->setEmission(QColor(255, 255, 255));
   setMaterial(white);
   delete white;
 
   glDisable(GL_LIGHTING);
-  glDisable(GL_CULL_FACE);
-  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-  glBegin(GL_QUADS);
-
   // Draw front
-  glVertex3fv(boundingVolume->corners().at(0b011).data()); // -x, -y, z (0b011)
-  glVertex3fv(boundingVolume->corners().at(0b010).data()); // x, -y, z (0b010)
-  glVertex3fv(boundingVolume->corners().at(0b000).data()); // x, y, z (0b000)
-  glVertex3fv(boundingVolume->corners().at(0b001).data()); // -x, y, z (0b001)
-
-  // Draw left
-  glVertex3fv(boundingVolume->corners().at(0b111).data()); // -x, -y, -z (0b111)
-  glVertex3fv(boundingVolume->corners().at(0b011).data()); // -x, -y, z (0b011)
-  glVertex3fv(boundingVolume->corners().at(0b001).data()); // -x, y, z (0b001)
-  glVertex3fv(boundingVolume->corners().at(0b101).data()); // -x, y, -z (0b101)
-
-  // Draw right
-  glVertex3fv(boundingVolume->corners().at(0b010).data()); // x, -y, z (0b010)
-  glVertex3fv(boundingVolume->corners().at(0b110).data()); // x, -y, -z (0b110)
-  glVertex3fv(boundingVolume->corners().at(0b100).data()); // x, y, -z (0b100)
-  glVertex3fv(boundingVolume->corners().at(0b000).data()); // x, y, z (0b000)
-
-  // Draw behind
-  glVertex3fv(boundingVolume->corners().at(0b110).data()); // x, -y, -z (0b110)
-  glVertex3fv(boundingVolume->corners().at(0b111).data()); // -x, -y, -z (0b111)
-  glVertex3fv(boundingVolume->corners().at(0b101).data()); // -x, y, -z (0b101)
-  glVertex3fv(boundingVolume->corners().at(0b100).data()); // x, y, -z (0b100)
-
-  // Draw bottom
-  glVertex3fv(boundingVolume->corners().at(0b111).data()); // -x, -y, -z (0b111)
-  glVertex3fv(boundingVolume->corners().at(0b110).data()); // x, -y, -z (0b110)
-  glVertex3fv(boundingVolume->corners().at(0b010).data()); // x, -y, z (0b010)
-  glVertex3fv(boundingVolume->corners().at(0b011).data()); // -x, -y, z (0b011)
-
-  // Draw top
-  glVertex3fv(boundingVolume->corners().at(0b001).data()); // -x, y, z (0b001)
-  glVertex3fv(boundingVolume->corners().at(0b000).data()); // x, y, z (0b000)
-  glVertex3fv(boundingVolume->corners().at(0b100).data()); // x, y, -z (0b100)
-  glVertex3fv(boundingVolume->corners().at(0b101).data()); // -x, y, -z (0b101)
-
+  glBegin(GL_LINE_STRIP);
+  glVertex3fv(boundingVolume->corners().at(0b000).data());
+  glVertex3fv(boundingVolume->corners().at(0b001).data());
+  glVertex3fv(boundingVolume->corners().at(0b011).data());
+  glVertex3fv(boundingVolume->corners().at(0b010).data());
+  glVertex3fv(boundingVolume->corners().at(0b000).data());
   glEnd();
 
-  glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-  glEnable(GL_CULL_FACE);
+  // Draw behind
+  glBegin(GL_LINE_STRIP);
+  glVertex3fv(boundingVolume->corners().at(0b100).data());
+  glVertex3fv(boundingVolume->corners().at(0b101).data());
+  glVertex3fv(boundingVolume->corners().at(0b111).data());
+  glVertex3fv(boundingVolume->corners().at(0b110).data());
+  glVertex3fv(boundingVolume->corners().at(0b100).data());
+  glEnd();
+
+  // Draw side lines
+  glBegin(GL_LINES);
+  glVertex3fv(boundingVolume->corners().at(0b000).data());
+  glVertex3fv(boundingVolume->corners().at(0b100).data());
+  glVertex3fv(boundingVolume->corners().at(0b001).data());
+  glVertex3fv(boundingVolume->corners().at(0b101).data());
+  glVertex3fv(boundingVolume->corners().at(0b011).data());
+  glVertex3fv(boundingVolume->corners().at(0b111).data());
+  glVertex3fv(boundingVolume->corners().at(0b010).data());
+  glVertex3fv(boundingVolume->corners().at(0b110).data());
+  glEnd();
+
   glEnable(GL_LIGHTING);
 }

@@ -18,6 +18,7 @@
 
 #include "scene/object.h"
 #include "scene/light.h"
+#include "scene/boundingvolume.h"
 
 #include "storage/mesh.h"
 #include "storage/material.h"
@@ -139,11 +140,14 @@ GL3::GL3()
     GLuint ids[2] = {m_quad, m_quadIdxs};
     glDeleteBuffers(2, ids);
   }
+
+  m_boundingMaterial = new Storage::Material("BGE::BoundingVolume", QColor(0, 0, 0), QColor(0, 0, 0), QColor(0, 0, 0), QColor(255, 255, 255), 0);
 }
 
 GL3::~GL3()
 {
   delete m_fbo;
+  delete m_boundingMaterial;
 }
 
 void GL3::bindFBO()
@@ -178,6 +182,13 @@ void GL3::bind(Storage::Mesh *mesh)
   bindAttribute(m_boundShader, "Normal", 3, GL_FLOAT, sizeof(BufferElement), NORMAL_OFFSET);
   bindAttribute(m_boundShader, "TexCoord", 2, GL_FLOAT, sizeof(BufferElement), UV_OFFSET);
   m_boundMesh = mesh;
+}
+
+void GL3::bind(const QHash<QString, Storage::Material*> &materials)
+{
+  m_materials = materials;
+  if (Canvas::canvas()->drawBoundingVolumes())
+    m_materials.insert("BGE::BoundingVolume", m_boundingMaterial);
 }
 
 void GL3::bind(Storage::Texture *texture)
@@ -485,6 +496,8 @@ void GL3::load(Storage::Mesh *mesh)
   // Process vertices and normals
   {
     quint64 size = vertices.size();
+    if (Canvas::canvas()->drawBoundingVolumes())
+      size += mesh->boundingVolume()->corners().size();
 
     BufferElement* buffer = (BufferElement*) malloc(size * sizeof(BufferElement));
     BufferElement* bufferPtr = buffer;
@@ -509,6 +522,17 @@ void GL3::load(Storage::Mesh *mesh)
       memcpy(bufferPtr, &element, sizeof(BufferElement));
       // Iterate
       bufferPtr++;
+    }
+
+    // Add BB vertices
+    if (Canvas::canvas()->drawBoundingVolumes()) {
+      BufferElement *temp = (BufferElement*) calloc(1, sizeof(BufferElement));
+      foreach (Vector3f corner, mesh->boundingVolume()->corners()) {
+        memcpy(temp->vertex, corner.data(), 3 * sizeof(GLfloat));
+        memcpy(bufferPtr, temp, sizeof(BufferElement));
+        bufferPtr++;
+      }
+      free(temp);
     }
 
     // Copy it to GPU
@@ -577,6 +601,34 @@ void GL3::load(Storage::Mesh *mesh)
 
       plans << plan;
     }
+
+    // Add BB plans
+    if (Canvas::canvas()->drawBoundingVolumes()) {
+      quint16 meshOffset = vertices.size();
+      idxs << meshOffset + 0b000 << meshOffset + 0b001
+           << meshOffset + 0b001 << meshOffset + 0b011
+           << meshOffset + 0b011 << meshOffset + 0b010
+           << meshOffset + 0b010 << meshOffset + 0b000
+
+           << meshOffset + 0b100 << meshOffset + 0b101
+           << meshOffset + 0b101 << meshOffset + 0b111
+           << meshOffset + 0b111 << meshOffset + 0b110
+           << meshOffset + 0b110 << meshOffset + 0b100
+
+           << meshOffset + 0b000 << meshOffset + 0b100
+           << meshOffset + 0b001 << meshOffset + 0b101
+           << meshOffset + 0b011 << meshOffset + 0b111
+           << meshOffset + 0b010 << meshOffset + 0b110;
+
+      Plan plan;
+      plan.primitive = GL_LINES;
+      plan.count = 24;
+      plan.offset = size;
+      plan.materialName = "BGE::BoundingVolume";
+      plans << plan;
+      size += plan.count;
+    }
+
     m_plans.insert(mesh->bindId(), plans);
     // Pad the array (blocks of 64 bytes)
     quint32 padding = 0;
