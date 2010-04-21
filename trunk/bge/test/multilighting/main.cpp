@@ -93,7 +93,6 @@ int main(int argc, char** argv)
   camera->rotateX(-90);
   camera->addChild(BGE::Canvas::canvas()->camera("Global camera"));
   BGE::Canvas::canvas()->addSceneObject(camera);
-  camera->setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/models/Cube"));
 
   // And the controller
   BGE::Canvas::canvas()->setController(new Controller(camera));

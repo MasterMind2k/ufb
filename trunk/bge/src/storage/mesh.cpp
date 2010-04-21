@@ -136,7 +136,7 @@ const Scene::BoundingVolume *Mesh::boundingVolume() const
 Scene::BoundingVolume *Mesh::calculateBoundingVolume()
 {
   if (m_boundingVolume)
-    return new Scene::BoundingVolume(m_boundingVolume->center(), m_boundingVolume->size());
+    return new Scene::BoundingVolume(m_boundingVolume->radius(), m_boundingVolume->min(), m_boundingVolume->max());
 
   QList<QVector<Vector3f> > vertices = m_vertices.values();
   Vector3f min, max;
@@ -155,7 +155,7 @@ Scene::BoundingVolume *Mesh::calculateBoundingVolume()
   }
 
   m_boundingVolume = new Scene::BoundingVolume(radius, min, max);
-  return new Scene::BoundingVolume(m_boundingVolume->center(), m_boundingVolume->size());
+  return new Scene::BoundingVolume(m_boundingVolume->radius(), m_boundingVolume->min(), m_boundingVolume->max());
 }
 
 void Mesh::bind()
