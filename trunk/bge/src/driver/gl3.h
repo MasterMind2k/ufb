@@ -60,7 +60,7 @@ class GL3 : public AbstractDriver
 
     void setTransformMatrix(const Transform3f& transform);
 
-    void draw(Scene::Object* object = 0l);
+    void draw();
 
     void init();
     void clear();

@@ -114,6 +114,8 @@ GL1::GL1()
 {
   m_usedLights = 0;
   m_renderedLights = 0;
+  m_boundMesh = 0l;
+  m_hasTexture = false;
 }
 
 void GL1::bind(Storage::Mesh *mesh)
@@ -121,6 +123,8 @@ void GL1::bind(Storage::Mesh *mesh)
   // Return if mesh is already created
   if (!mesh)
     return;
+
+  m_boundMesh = mesh;
 
   Storage::Material* firstMaterial = 0l;
   if (!m_materials.isEmpty())
@@ -217,8 +221,17 @@ void GL1::bind(Storage::Texture* texture)
   if (!texture->bindId())
     texture->setBindId(Canvas::canvas()->bindTexture(texture->texture()));
 
-  if (texture->bindId())
+  if (texture->bindId()) {
     glBindTexture(GL_TEXTURE_2D, texture->bindId());
+    m_hasTexture = true;
+  }
+}
+
+void GL1::unbind(Storage::Texture *texture)
+{
+  Q_UNUSED(texture);
+  glBindTexture(GL_TEXTURE2, 0);
+  m_hasTexture = false;
 }
 
 void GL1::unload(Storage::Mesh* mesh)
@@ -257,11 +270,9 @@ void GL1::setTransformMatrix(const Transform3f& transform)
   m_transform = transform;
 }
 
-void GL1::draw(Scene::Object* object)
+void GL1::draw()
 {
-  bool hasTexture = object->texture() && object->texture()->bindId();
-
-  if (hasTexture)
+  if (m_hasTexture)
     glEnable(GL_TEXTURE_2D);
 
   Storage::Material* firstMaterial = 0l;
@@ -270,9 +281,9 @@ void GL1::draw(Scene::Object* object)
 
   quint32 meshId;
   if (firstMaterial)
-    meshId = m_meshBindings.value(QPair<quint32, QString> (object->mesh()->bindId(), firstMaterial->name()));
+    meshId = m_meshBindings.value(QPair<quint32, QString> (m_boundMesh->bindId(), firstMaterial->name()));
   else
-    meshId = object->mesh()->bindId();
+    meshId = m_boundMesh->bindId();
 
   bool isFirstPass = true;
   bool isBlending = false;
@@ -295,16 +306,17 @@ void GL1::draw(Scene::Object* object)
     }
   }
 
-  if (hasTexture)
+  if (m_hasTexture)
     glDisable(GL_TEXTURE_2D);
+
   glDepthFunc(GL_LESS);
   glDisable(GL_BLEND);
 
+  /// @TODO!!!!
   if (Canvas::canvas()->drawBoundingVolumes())
-    draw(object->boundingVolume());
+    draw(m_boundMesh->calculateBoundingVolume());
 
   m_renderedLights = 0;
-
 }
 
 void GL1::init()

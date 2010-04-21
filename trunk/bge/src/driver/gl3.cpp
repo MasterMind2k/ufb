@@ -299,7 +299,7 @@ void GL3::setTransformMatrix(const Transform3f& transform)
   m_normalMatrix = inverse.block<3, 3>(0, 0);
 }
 
-void GL3::draw(Scene::Object *object)
+void GL3::draw()
 {
   if (!m_boundShader)
     qFatal("BGE::Driver::GL3::draw(): Shader not bound!");

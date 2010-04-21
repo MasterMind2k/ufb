@@ -62,7 +62,7 @@ class AbstractDriver
 
     virtual void setTransformMatrix(const Transform3f& transform) = 0;
 
-    virtual void draw(Scene::Object* object = 0l) = 0;
+    virtual void draw() = 0;
 
     virtual void init() = 0;
     virtual void clear() = 0;

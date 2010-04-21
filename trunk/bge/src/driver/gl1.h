@@ -40,12 +40,16 @@ class GL1 : public AbstractDriver
     void bind(Storage::Texture* texture);
     inline void bind(Storage::ShaderProgram* shaderProgram) {/* Ignore */}
 
-    inline void unbind(Storage::Mesh* mesh) {/* Ignore */}
+    inline void unbind(Storage::Mesh* mesh)
+    {
+      Q_UNUSED(mesh);
+      m_boundMesh = 0l;
+    }
     inline void unbind(const QHash<QString, Storage::Material*> &materials)
     {
       m_materials.clear();
     }
-    inline void unbind(Storage::Texture* texture) {/* Ignore */}
+    void unbind(Storage::Texture* texture);
     inline void unbind(Storage::ShaderProgram* shaderProgram) {/* Ignore */}
 
     void unload(Storage::Mesh* mesh);
@@ -57,7 +61,7 @@ class GL1 : public AbstractDriver
 
     void setTransformMatrix(const Transform3f& transform);
 
-    void draw(Scene::Object* object);
+    void draw();
 
     void init();
     void clear();
@@ -73,6 +77,8 @@ class GL1 : public AbstractDriver
     quint32 m_renderedLights;
     QHash<QString, Storage::Material*> m_materials;
     QHash<QPair<quint32, QString>, quint32> m_meshBindings;
+    Storage::Mesh *m_boundMesh;
+    bool m_hasTexture;
 
     void loadLights();
     void unloadLights();
