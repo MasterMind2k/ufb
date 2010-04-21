@@ -49,7 +49,10 @@ class Mesh : public Item
       Triangles
     };
 
-    inline Mesh(const QString& name) : Item(name) {}
+    inline Mesh(const QString& name) : Item(name)
+    {
+      m_boundingVolume = 0l;
+    }
 
     /**
      * Adds vertices to the list.
@@ -185,7 +188,8 @@ class Mesh : public Item
      */
     void addRectangle(const QString& objectName, const Vector3f& bottomLeft, const Vector3f& bottomRight, const Vector3f& topLeft, const Vector3f& topRight);
 
-    Scene::BoundingVolume *calculateBoundingVolume() const;
+    const Scene::BoundingVolume *boundingVolume() const;
+    Scene::BoundingVolume *calculateBoundingVolume();
 
     void bind();
     void unbind();
@@ -203,6 +207,7 @@ class Mesh : public Item
     QHash<QString, QVector<Vector3f> > m_normals;
     /* The uv texture mapping */
     QHash<QString, QVector<Vector2f> > m_textureMaps;
+    Scene::BoundingVolume *m_boundingVolume;
 };
 
 }

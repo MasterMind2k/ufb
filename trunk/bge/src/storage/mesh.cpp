@@ -128,8 +128,16 @@ void Mesh::addRectangle(const QString& objectName, const Vector3f& bottomLeft, c
   addFace(objectName, Quads, face);
 }
 
-Scene::BoundingVolume *Mesh::calculateBoundingVolume() const
+const Scene::BoundingVolume *Mesh::boundingVolume() const
 {
+  return m_boundingVolume;
+}
+
+Scene::BoundingVolume *Mesh::calculateBoundingVolume()
+{
+  if (m_boundingVolume)
+    return new Scene::BoundingVolume(m_boundingVolume->center(), m_boundingVolume->size());
+
   QList<QVector<Vector3f> > vertices = m_vertices.values();
   Vector3f min, max;
   float radius = 0;
@@ -146,7 +154,8 @@ Scene::BoundingVolume *Mesh::calculateBoundingVolume() const
     }
   }
 
-  return new Scene::BoundingVolume(radius, min, max);
+  m_boundingVolume = new Scene::BoundingVolume(radius, min, max);
+  return new Scene::BoundingVolume(m_boundingVolume->center(), m_boundingVolume->size());
 }
 
 void Mesh::bind()

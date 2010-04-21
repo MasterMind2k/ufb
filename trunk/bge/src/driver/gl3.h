@@ -37,15 +37,13 @@ class GL3 : public AbstractDriver
     void unbindFBO();
     void bind(Storage::Mesh* mesh);
     void bind(Storage::Texture* texture);
-    inline void bind(const QHash<QString, Storage::Material*> &materials)
-    {
-      m_materials = materials;
-    }
+    void bind(const QHash<QString, Storage::Material*> &materials);
     void bind(Storage::ShaderProgram* shaderProgram);
 
     void unbind(Storage::Mesh* mesh);
     inline void unbind(const QHash<QString, Storage::Material*> &materials)
     {
+      Q_UNUSED(materials);
       m_materials.clear();
     }
     inline void unbind(Storage::Texture* texture);
@@ -101,6 +99,7 @@ class GL3 : public AbstractDriver
     static const quint8 m_maxLights = 4;
     Storage::ShaderProgram *m_boundShader;
     Storage::Mesh *m_boundMesh;
+    Storage::Material *m_boundingMaterial;
     quint32 m_renderedLights;
     FBO *m_fbo;
     quint32 m_quad;
