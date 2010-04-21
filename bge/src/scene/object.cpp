@@ -45,7 +45,7 @@ Object::Object()
   m_texture = 0l;
   m_observed = 0l;
   m_partition = 0l;
-  m_boundingVolume = new BoundingVolume(Vector3f::Zero(), Vector3f::Zero());
+  m_boundingVolume = new BoundingVolume;
 }
 
 Object::~Object()

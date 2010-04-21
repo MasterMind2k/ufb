@@ -84,7 +84,10 @@ void Partition::partition()
 
     // Move center to it's proper position
     Vector3f center = m_boundingVolume->center() + (Vector3f(i & 0x01 ? -1 : 1, i & 0x02 ? -1 : 1, i & 0x04 ? -1 : 1).cwise() * size) / 2.0;
-    subPartition->m_boundingVolume = new BoundingVolume(center, size);
+    subPartition->m_boundingVolume = new BoundingVolume(Vector3f::Zero(), size);
+    Transform3f transform(Transform3f::Identity());
+    transform.translate(center);
+    subPartition->m_boundingVolume->setTransform(transform);
 
     m_partitions << subPartition;
     subPartition->m_parent = this;

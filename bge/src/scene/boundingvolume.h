@@ -82,11 +82,11 @@ class BoundingVolume
     }
     inline const Vector3f &min() const
     {
-      return m_corners.last();
+      return transformedCorners().last();
     }
     inline const Vector3f &max() const
     {
-      return m_corners.first();
+      return transformedCorners().first();
     }
 
     inline const Vector3f &center() const
