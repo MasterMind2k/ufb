@@ -59,9 +59,7 @@ void Renderer::renderScene()
   Driver::AbstractDriver::self()->unbindFBO();
 
   // Shading stage(s)
-  Driver::AbstractDriver::self()->bind(Storage::StorageManager::self()->get<Storage::ShaderProgram*>("/shaders/LightingStage")); // LightingStage
   Driver::AbstractDriver::self()->shading();
-  Driver::AbstractDriver::self()->unbind(Storage::StorageManager::self()->get<Storage::ShaderProgram*>("/shaders/LightingStage")); // LightingStage
 
   Driver::AbstractDriver::self()->resetLighting();
 }

@@ -26,6 +26,8 @@
 #include "storage/shaderprogram.h"
 #include "storage/shader.h"
 
+#include "rendering/stage.h"
+
 #include "shader_p.h"
 #include "buffer_p.h"
 #include "fbo_p.h"
@@ -452,29 +454,19 @@ void GL3::shading()
   bindUniformAttribute(m_boundShader, "GlobalAmbient", Vector4f(Scene::Light::globalAmbient().redF(), Scene::Light::globalAmbient().greenF(), Scene::Light::globalAmbient().blueF(), Scene::Light::globalAmbient().alphaF()));
   m_fbo->activateTextures();
 
-  bool isFirstPass = true;
+  m_firstPass = true;
 
-  while (m_renderedLights < m_lights.size()) {
-    loadLights(m_boundShader);
+  foreach (Rendering::Stage *stage, m_stages)
+    stage->render();
 
-    glDrawElements(GL_QUADS, 4, GL_UNSIGNED_SHORT, (GLushort*)0);
-
-    if (isFirstPass) {
-      isFirstPass = false;
-      glEnable(GL_BLEND);
-      glDisable(GL_DEPTH_TEST);
-      bindUniformAttribute(m_boundShader, "GlobalAmbient", Vector4f(0, 0, 0, 1));
-    }
-  }
+  glDisable(GL_BLEND);
+  glEnable(GL_DEPTH_TEST);
 
   unbindAttribute(m_boundShader, "Vertex");
   unbindAttribute(m_boundShader, "TexCoord0");
   unbindAttribute(m_boundShader, "TexCoord1");
   unbindAttribute(m_boundShader, "TexCoord2");
   m_fbo->deactivateTextures();
-
-  glDisable(GL_BLEND);
-  glEnable(GL_DEPTH_TEST);
 
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -484,6 +476,44 @@ void GL3::shading()
 
 void GL3::pass(Rendering::Stage *stage)
 {
+  quint8 loop = 1;
+  if (stage->m_needLights)
+    loop = m_lights.size();
+
+  if (stage->renderOutput() == Rendering::Stage::Textures) {
+    if (!stage->m_framebuffer) {
+      stage->m_framebuffer = createFBO(stage->m_tempTextures);
+    } else if (stage->m_framebuffer->size() != m_fbo->size() || stage->m_framebuffer->texturesCount() != stage->m_tempTextures) {
+      delete stage->m_framebuffer;
+      stage->m_framebuffer = createFBO(stage->m_tempTextures);
+    }
+
+    stage->m_framebuffer->bind();
+    stage->m_framebuffer->activateTextures();
+  }
+
+  for (quint8 i = 0; i < loop; i += m_maxLights) {
+    if (stage->m_needLights)
+      loadLights(m_boundShader);
+
+    glDrawElements(GL_QUADS, 4, GL_UNSIGNED_SHORT, (GLushort*)0);
+
+    if (stage->renderOutput() == Rendering::Stage::Display && m_firstPass) {
+      m_firstPass = false;
+      glEnable(GL_BLEND);
+      glDisable(GL_DEPTH_TEST);
+      if (stage->m_needLights)
+        bindUniformAttribute(m_boundShader, "GlobalAmbient", Vector4f(0, 0, 0, 1));
+    }
+  }
+
+  if (stage->m_renderOutput == Rendering::Stage::Textures) {
+    stage->m_framebuffer->deactivateTextures();
+    stage->m_framebuffer->unbind();
+  }
+
+  if (stage->m_needLights)
+    m_renderedLights = 0;
 }
 
 FBO *GL3::createFBO(qint8 texturesCount)

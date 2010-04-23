@@ -68,6 +68,7 @@ class GL1 : public AbstractDriver
     void setProjection(const Transform3f &projection);
 
     inline void shading() {}
+    inline void registerStage(quint8 index, Rendering::Stage *stage) {}
 
   private:
     quint8 m_usedLights;

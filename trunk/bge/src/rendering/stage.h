@@ -56,7 +56,7 @@ class Stage
     {
       m_renderOutput = renderOutput;
     }
-    inline qint16 renderOutput() const
+    inline Output renderOutput() const
     {
       return m_renderOutput;
     }

@@ -4,6 +4,7 @@ include_directories(.. ${CMAKE_CURRENT_BINARY_DIR} ${EIGEN2_INCLUDE_DIR} ${QT_IN
 set(rendering_SRCS
   renderer.cpp
   stage.cpp
+  lightingstage.cpp
 )
 
 add_library(rendering ${rendering_SRCS})
