@@ -42,8 +42,6 @@ struct BufferElement {
 #define VERTEX_OFFSET 0
 #define NORMAL_OFFSET (3 * sizeof(GLfloat))
 #define UV_OFFSET (6 * sizeof(GLfloat))
-#define UV1_OFFSET (8 * sizeof(GLfloat))
-#define UV2_OFFSET (10 * sizeof(GLfloat))
 
 using namespace BGE;
 using namespace BGE::Driver;
