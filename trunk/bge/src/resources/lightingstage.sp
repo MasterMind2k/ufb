@@ -1,21 +1,17 @@
 [vertex]
 in vec3 in_Vertex;
-in vec2 in_TexCoord0;
-in vec2 in_TexCoord1;
-in vec2 in_TexCoord2;
+in vec2 in_TexCoord;
 
-out vec2 ex_TexCoord[3];
+out vec2 ex_TexCoord;
 
 void main(void)
 {
   gl_Position = vec4(in_Vertex, 1.0);
 
-  ex_TexCoord[0] = in_TexCoord0;
-  ex_TexCoord[1] = in_TexCoord1;
-  ex_TexCoord[2] = in_TexCoord2;
+  ex_TexCoord = in_TexCoord;
 }
 [fragment]
-in vec2 ex_TexCoord[3];
+in vec2 ex_TexCoord;
 
 uniform sampler2D Tex0, Tex1, Tex2, Tex3, Tex4, Tex5, Tex6;
 
@@ -154,18 +150,18 @@ vec4 light4(in vec3 ecPos, in vec3 n, in vec4 colorMap, in MaterialStruct Materi
 
 void main(void)
 {
-  vec4 temp = texture2D(Tex0, ex_TexCoord[0].st);
+  vec4 temp = texture2D(Tex0, ex_TexCoord.st);
   vec3 position = temp.xyz;
-  vec3 normal = texture2D(Tex1, ex_TexCoord[1].st).xyz;
-  vec4 colorMap = texture2D(Tex2, ex_TexCoord[2].st);
+  vec3 normal = texture2D(Tex1, ex_TexCoord.st).xyz;
+  vec4 colorMap = texture2D(Tex2, ex_TexCoord.st);
 
   /* Material */
   MaterialStruct Material;
   Material.shininess = temp.w * 100;
-  Material.ambient = texture2D(Tex3, ex_TexCoord[2].st);
-  Material.diffuse = texture2D(Tex4, ex_TexCoord[2].st);
-  Material.specular = texture2D(Tex5, ex_TexCoord[2].st);
-  Material.emission = texture2D(Tex6, ex_TexCoord[2].st);
+  Material.ambient = texture2D(Tex3, ex_TexCoord.st);
+  Material.diffuse = texture2D(Tex4, ex_TexCoord.st);
+  Material.specular = texture2D(Tex5, ex_TexCoord.st);
+  Material.emission = texture2D(Tex6, ex_TexCoord.st);
   vec4 color = Material.emission;
 
   if (UsedLights > 0)

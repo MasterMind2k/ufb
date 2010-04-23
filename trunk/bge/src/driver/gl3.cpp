@@ -36,9 +36,7 @@ struct BufferElement {
   GLfloat vertex[3];
   GLfloat normal[3];
   GLfloat uvMap[2];
-  GLfloat uvMap1[2];
-  GLfloat uvMap2[2];
-  GLubyte padding[16];
+  GLubyte padding[32];
 };
 
 #define VERTEX_OFFSET 0
@@ -392,8 +390,6 @@ void GL3::shading()
     uvMap = Vector2f(0, 0);
     memcpy(temp.vertex, vertex.data(), 3 * sizeof(GLfloat));
     memcpy(temp.uvMap, uvMap.data(), 2 * sizeof(GLfloat));
-    memcpy(temp.uvMap1, uvMap.data(), 2 * sizeof(GLfloat));
-    memcpy(temp.uvMap2, uvMap.data(), 2 * sizeof(GLfloat));
     memcpy(bufPtr++, &temp, sizeof(BufferElement));
 
     // Second
@@ -401,8 +397,6 @@ void GL3::shading()
     uvMap = Vector2f(1, 0);
     memcpy(temp.vertex, vertex.data(), 3 * sizeof(GLfloat));
     memcpy(temp.uvMap, uvMap.data(), 2 * sizeof(GLfloat));
-    memcpy(temp.uvMap1, uvMap.data(), 2 * sizeof(GLfloat));
-    memcpy(temp.uvMap2, uvMap.data(), 2 * sizeof(GLfloat));
     memcpy(bufPtr++, &temp, sizeof(BufferElement));
 
     // Third
@@ -410,8 +404,6 @@ void GL3::shading()
     uvMap = Vector2f(1, 1);
     memcpy(temp.vertex, vertex.data(), 3 * sizeof(GLfloat));
     memcpy(temp.uvMap, uvMap.data(), 2 * sizeof(GLfloat));
-    memcpy(temp.uvMap1, uvMap.data(), 2 * sizeof(GLfloat));
-    memcpy(temp.uvMap2, uvMap.data(), 2 * sizeof(GLfloat));
     memcpy(bufPtr++, &temp, sizeof(BufferElement));
 
     // Fourth
@@ -419,8 +411,6 @@ void GL3::shading()
     uvMap = Vector2f(0, 1);
     memcpy(temp.vertex, vertex.data(), 3 * sizeof(GLfloat));
     memcpy(temp.uvMap, uvMap.data(), 2 * sizeof(GLfloat));
-    memcpy(temp.uvMap1, uvMap.data(), 2 * sizeof(GLfloat));
-    memcpy(temp.uvMap2, uvMap.data(), 2 * sizeof(GLfloat));
     memcpy(bufPtr++, &temp, sizeof(BufferElement));
 
     glGenBuffers(1, &m_quad);
@@ -441,9 +431,7 @@ void GL3::shading()
   bindUniformAttribute(m_boundShader, "ProjectionMatrix", m_projectionMatrix);
   bindUniformAttribute(m_boundShader, "ModelViewMatrix", m_transform.matrix());
   bindAttribute(m_boundShader, "Vertex", 3, GL_FLOAT, sizeof(BufferElement), VERTEX_OFFSET);
-  bindAttribute(m_boundShader, "TexCoord0", 2, GL_FLOAT, sizeof(BufferElement), UV_OFFSET);
-  bindAttribute(m_boundShader, "TexCoord1", 2, GL_FLOAT, sizeof(BufferElement), UV1_OFFSET);
-  bindAttribute(m_boundShader, "TexCoord2", 2, GL_FLOAT, sizeof(BufferElement), UV2_OFFSET);
+  bindAttribute(m_boundShader, "TexCoord", 2, GL_FLOAT, sizeof(BufferElement), UV_OFFSET);
   bindUniformAttribute(m_boundShader, "Tex0", 0);
   bindUniformAttribute(m_boundShader, "Tex1", 1);
   bindUniformAttribute(m_boundShader, "Tex2", 2);
@@ -463,9 +451,7 @@ void GL3::shading()
   glEnable(GL_DEPTH_TEST);
 
   unbindAttribute(m_boundShader, "Vertex");
-  unbindAttribute(m_boundShader, "TexCoord0");
-  unbindAttribute(m_boundShader, "TexCoord1");
-  unbindAttribute(m_boundShader, "TexCoord2");
+  unbindAttribute(m_boundShader, "TexCoord");
   m_fbo->deactivateTextures();
 
   glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -489,6 +475,7 @@ void GL3::pass(Rendering::Stage *stage)
     }
 
     stage->m_framebuffer->bind();
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     stage->m_framebuffer->activateTextures();
   }
 
