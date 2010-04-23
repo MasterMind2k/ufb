@@ -24,6 +24,9 @@ namespace BGE {
 namespace Storage {
 class Material;
 }
+namespace Rendering {
+class Stage;
+}
 namespace Driver {
 
 class GL3 : public AbstractDriver
@@ -65,6 +68,9 @@ class GL3 : public AbstractDriver
     void setProjection(const Transform3f &projection);
 
     void shading();
+    void pass(Rendering::Stage *stage);
+
+    FBO *createFBO(qint8 texturesCount);
 
   private:
     struct Plan {

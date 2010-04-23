@@ -51,7 +51,7 @@ using namespace BGE::Driver;
 class FBO
 {
   public:
-    inline FBO(const QSize &size)
+    inline FBO(const QSize &size, quint8 texturesCount)
     {
       glGenFramebuffers(1, &m_frame);
       glBindFramebuffer(GL_FRAMEBUFFER, m_frame);
@@ -61,9 +61,11 @@ class FBO
       glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, size.width(), size.height());
       glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_depth);
 
-      glGenTextures(7, m_textures);
+      m_texturesCount = texturesCount;
+      m_textures = (GLuint*) malloc(m_texturesCount * sizeof(GLuint));
+      glGenTextures(m_texturesCount, m_textures);
 
-      for (quint8 i = 0; i < 8; i++) {
+      for (quint8 i = 0; i < m_texturesCount; i++) {
         glBindTexture(GL_TEXTURE_2D, m_textures[i]);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F_ARB, size.width(), size.height(), 0, GL_RGB, GL_FLOAT, NULL);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -81,7 +83,7 @@ class FBO
 
     inline ~FBO()
     {
-      glDeleteTextures(7, m_textures);
+      glDeleteTextures(m_texturesCount, m_textures);
       glDeleteRenderbuffers(1, &m_depth);
       glDeleteFramebuffers(1, &m_frame);
     }
@@ -103,7 +105,7 @@ class FBO
 
     inline void activateTextures()
     {
-      for (quint8 i = 0; i < 7; i++) {
+      for (quint8 i = 0; i < m_texturesCount; i++) {
         glActiveTexture(GL_TEXTURE0 + i);
         glBindTexture(GL_TEXTURE_2D, m_textures[i]);
       }
@@ -111,15 +113,21 @@ class FBO
 
     inline void deactivateTextures()
     {
-      for (quint8 i = 0; i < 7; i++) {
+      for (quint8 i = 0; i < m_texturesCount; i++) {
         glActiveTexture(GL_TEXTURE0 + i);
         glBindTexture(GL_TEXTURE_2D, 0);
       }
       glActiveTexture(GL_TEXTURE0);
     }
 
+    inline quint8 texturesCount() const
+    {
+      return m_texturesCount;
+    }
+
   private:
-    GLuint m_textures[7];
+    GLuint *m_textures;
+    quint8 m_texturesCount;
     QSize m_size;
     GLuint m_frame;
     GLuint m_depth;
@@ -154,7 +162,7 @@ void GL3::bindFBO()
 {
   GLenum buffers[] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3, GL_COLOR_ATTACHMENT4, GL_COLOR_ATTACHMENT5, GL_COLOR_ATTACHMENT6};
   m_fbo->bind();
-  glDrawBuffers(7, buffers);
+  glDrawBuffers(m_fbo->texturesCount(), buffers);
 }
 
 void GL3::unbindFBO()
@@ -333,7 +341,7 @@ void GL3::init()
   glDisable(GL_DEPTH_TEST);
   glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_COLOR);
 
-  m_fbo = new FBO(Canvas::canvas()->size());
+  m_fbo = new FBO(Canvas::canvas()->size(), 7);
   m_fbo->bind();
   glClearColor(0, 0, 0, 0);
   glEnable(GL_DEPTH_TEST);
@@ -348,7 +356,7 @@ void GL3::clear()
 
   if (m_fbo->size() != Canvas::canvas()->size()) {
     delete m_fbo;
-    m_fbo = new FBO(Canvas::canvas()->size());
+    m_fbo = new FBO(Canvas::canvas()->size(), 7);
     m_fbo->bind();
     glClearColor(0, 0, 0, 0);
     glEnable(GL_DEPTH_TEST);
@@ -472,6 +480,19 @@ void GL3::shading()
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
   m_renderedLights = 0;
+}
+
+void GL3::pass(Rendering::Stage *stage)
+{
+}
+
+FBO *GL3::createFBO(qint8 texturesCount)
+{
+  FBO *output = new FBO(Canvas::canvas()->size(), texturesCount);
+  output->bind();
+  glClearColor(0, 0, 0, 0);
+  output->unbind();
+  return output;
 }
 
 void GL3::load(Storage::Mesh *mesh)
@@ -873,7 +894,7 @@ void GL3::setMaterial(Storage::Material *material, Storage::ShaderProgram *shade
   color = Vector4f(material->emission().redF(), material->emission().greenF(), material->emission().blueF(), material->emission().alphaF());
   bindUniformAttribute(shaderProgram, "Material.emission", color);
 
-  bindUniformAttribute(shaderProgram, "Material.shininess", (float) material->shininess());
+  bindUniformAttribute(shaderProgram, "Material.shininess", (float) material->shininess() / 100);
 
   if (deleteAfter)
     delete material;
