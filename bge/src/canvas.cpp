@@ -31,6 +31,8 @@
 
 #include "storage/storagemanager.h"
 
+#include "rendering/lightingstage.h"
+
 #include "abstractcontroller.h"
 #include "abstractoverlay.h"
 #include "recorder.h"
@@ -111,6 +113,7 @@ void Canvas::initializeGL()
   m_renderer = new Rendering::Renderer;
 
   Driver::AbstractDriver::self()->init();
+  registerStage(new Rendering::LightingStage);
 }
 
 void Canvas::resizeGL(int w, int h)
@@ -311,6 +314,11 @@ void Canvas::loadResource(const QString& fileName)
   Storage::StorageManager::self()->load();
   if (!QResource::unregisterResource(fileName, "/bge_resources"))
     qWarning("BGE::Canvas::loadResource: Cannot unregister '%s' resource!", fileName.toAscii().data());
+}
+
+void Canvas::registerStage(quint8 index, Rendering::Stage *stage)
+{
+  Driver::AbstractDriver::self()->registerStage(index, stage);
 }
 
 void Canvas::keyPressEvent(QKeyEvent* event)

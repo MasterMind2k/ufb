@@ -33,6 +33,7 @@ class Partition;
 namespace Rendering
 {
 class Renderer;
+class Stage;
 }
 
 /**
@@ -191,6 +192,12 @@ class Canvas : public QGLWidget
      * @note This method uses QResource class.
      */
     void loadResource(const QString& fileName = QString());
+
+    void registerStage(quint8 index, Rendering::Stage *stage);
+    inline void registerStage(Rendering::Stage *stage)
+    {
+      registerStage(-1, stage);
+    }
 
   private:
     /* Really private stuff */

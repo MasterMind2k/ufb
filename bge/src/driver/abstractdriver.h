@@ -25,6 +25,9 @@ namespace Scene {
 class Object;
 class Light;
 }
+namespace Rendering {
+class Stage;
+}
 
 namespace Storage {
 class Mesh;
@@ -69,6 +72,7 @@ class AbstractDriver
     virtual void setProjection(const Transform3f &projection) = 0;
 
     virtual void shading() = 0;
+    virtual void registerStage(quint8 index, Rendering::Stage *stage) = 0;
 
   protected:
     inline AbstractDriver() {}
