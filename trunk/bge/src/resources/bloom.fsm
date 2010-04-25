@@ -1,0 +1,46 @@
+float gauss(in int x)
+{
+  float GaussValues[10] = float[10](
+    0.199471,
+    0.176033,
+    0.120985,
+    0.064759,
+    0.026995,
+    0.008764,
+    0.002215,
+    0.000436,
+    0.000066,
+    0.000008
+  );
+
+  int y;
+  int absX = abs(x);
+  if (absX < 1)
+    y = 0;
+  else if (absX < 2)
+    y = 1;
+  else if (absX < 4)
+    y = 2;
+  else if (absX < 6)
+    y = 3;
+  else if (absX < 8)
+    y = 4;
+  else if (absX < 10)
+    y = 5;
+  else if (absX < 15)
+    y = 6;
+  else if (absX < 19)
+    y = 7;
+  else if (absX < 22)
+    y = 8;
+  else
+    y = 9;
+
+  return GaussValues[y];
+}
+
+float step()
+{
+  return 0.001;
+}
+
