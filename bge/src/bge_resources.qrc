@@ -6,6 +6,6 @@
       <file alias="BloomVerticalStage.sp">resources/bloomverticalstage.sp</file>
     </qresource>
     <qresource prefix="/bge_resources/shaders/fragment">
-      <file alias="gauss.fsm">resources/gauss.fsm</file>
+      <file alias="bloom.fsm">resources/bloom.fsm</file>
     </qresource>
 </RCC>

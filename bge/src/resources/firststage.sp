@@ -21,7 +21,7 @@ void main(void)
 [fragment]
 in vec3 position, normal;
 in vec2 ex_TexCoord;
-uniform sampler2D tex;
+uniform sampler2D Texture;
 
 struct MaterialStruct {
   vec4 ambient;
@@ -37,7 +37,7 @@ void main(void)
 {
   gl_FragData[0] = vec4(position.xyz, Material.shininess);
   gl_FragData[1] = vec4(normalize(normal.xyz), 0.0);
-  gl_FragData[2] = texture2D(tex, ex_TexCoord.st);
+  gl_FragData[2] = texture2D(Texture, ex_TexCoord.st);
   gl_FragData[3] = Material.ambient;
   gl_FragData[4] = Material.diffuse;
   gl_FragData[5] = Material.specular;

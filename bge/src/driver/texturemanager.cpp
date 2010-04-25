@@ -32,6 +32,7 @@ quint8 TextureManager::bind(quint8 textureId)
 
   glActiveTexture(GL_TEXTURE0 + slot);
   glBindTexture(GL_TEXTURE_2D, textureId);
+  glActiveTexture(GL_TEXTURE0);
 
   m_mapping.insert(textureId, slot);
   return slot;
@@ -50,6 +51,7 @@ void TextureManager::unbind(quint8 textureId)
 
   glActiveTexture(GL_TEXTURE0 + slot);
   glBindTexture(GL_TEXTURE_2D, 0);
+  glActiveTexture(GL_TEXTURE0);
   m_mapping.remove(textureId);
 }
 
@@ -59,6 +61,7 @@ void TextureManager::unbind()
     glActiveTexture(GL_TEXTURE0 + slot);
     glBindTexture(GL_TEXTURE_2D, 0);
   }
+  glActiveTexture(GL_TEXTURE0);
   m_mapping.clear();
   m_usedSlots = 0;
   m_availableSlots.clear();

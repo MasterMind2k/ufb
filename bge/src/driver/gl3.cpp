@@ -56,11 +56,10 @@ class FBO
       ReadWrite
     };
 
-    FBO(const QSize &size, const QStringList& nameMapping, Mode mode, GL3 *driver)
-      : m_size(size),
+    FBO(const QStringList& nameMapping, GL3 *driver)
+      : m_size(Canvas::canvas()->size()),
         m_texturesCount(nameMapping.size()),
-        m_mode(mode),
-        m_firstHalf(false),
+        m_bound(false),
         m_nameMapping(nameMapping),
         m_driver(driver)
     {
@@ -71,10 +70,6 @@ class FBO
       glBindRenderbuffer(GL_RENDERBUFFER, m_depth);
       glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, m_size.width(), m_size.height());
       glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_depth);
-
-      // For read write textures we need to double it's numbers
-      if (m_mode == ReadWrite)
-        m_texturesCount *= 2;
 
       m_textures = (GLuint*) malloc(m_texturesCount * sizeof(GLuint));
       glGenTextures(m_texturesCount, m_textures);
@@ -102,14 +97,16 @@ class FBO
       glDeleteFramebuffers(1, &m_frame);
     }
 
-    inline void bind() const
+    inline void bind()
     {
       glBindFramebuffer(GL_FRAMEBUFFER, m_frame);
+      m_bound = true;
     }
 
-    inline void unbind() const
+    inline void unbind()
     {
       glBindFramebuffer(GL_FRAMEBUFFER, 0);
+      m_bound = false;
     }
 
     inline const QSize &size() const
@@ -119,22 +116,41 @@ class FBO
 
     void activateTextures()
     {
+      if (m_bound)
+        return;
+
       for (quint8 i = 0; i < m_texturesCount; i++) {
         quint8 slot = TextureManager::self()->bind(m_textures[i]);
         m_driver->bindUniformAttribute(0l, m_nameMapping.at(i), slot);
-        /*glActiveTexture(GL_TEXTURE0 + i + m_offset);
-        glBindTexture(GL_TEXTURE_2D, m_textures[i]);*/
       }
     }
 
     void deactivateTextures()
     {
-      for (quint8 i = 0; i < m_texturesCount; i++) {
+      if (m_bound)
+        return;
+
+      for (quint8 i = 0; i < m_texturesCount; i++)
         TextureManager::self()->unbind(m_textures[i]);
-        /*glActiveTexture(GL_TEXTURE0 + i + m_offset);
-        glBindTexture(GL_TEXTURE_2D, 0);*/
-      }
-      glActiveTexture(GL_TEXTURE0);
+    }
+
+    void activateBuffers()
+    {
+      if (!m_bound)
+        return;
+
+      QVector<GLenum> buffers;
+      for (quint8 i = 0; i < m_texturesCount; i++)
+        buffers << GL_COLOR_ATTACHMENT0 + i;
+      glDrawBuffers(m_texturesCount, buffers.data());
+    }
+
+    void deactivateBuffers()
+    {
+      if (!m_bound)
+        return;
+
+      glDrawBuffer(GL_BACK);
     }
 
     inline quint8 texturesCount() const
@@ -148,8 +164,7 @@ class FBO
     QSize m_size;
     GLuint m_frame;
     GLuint m_depth;
-    Mode m_mode;
-    bool m_firstHalf;
+    bool m_bound;
     QStringList m_nameMapping;
     GL3 *m_driver;
 };
@@ -173,13 +188,13 @@ GL3::GL3()
 
   m_boundingMaterial = new Storage::Material("BGE::BoundingVolume", QColor(0, 0, 0), QColor(0, 0, 0), QColor(0, 0, 0), QColor(255, 255, 255), 0);
 
-  m_globalUniforms << "Tex0"
-                   << "Tex1"
-                   << "Tex2"
-                   << "Tex3"
-                   << "Tex4"
-                   << "Tex5"
-                   << "Tex6";
+  m_globalUniforms << "Positions" // With added specular power
+                   << "Normals"
+                   << "ColorMap"
+                   << "Ambient"
+                   << "Diffuse"
+                   << "Specular"
+                   << "Emission";
 }
 
 GL3::~GL3()
@@ -190,15 +205,14 @@ GL3::~GL3()
 
 void GL3::bindFBO()
 {
-  GLenum buffers[] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3, GL_COLOR_ATTACHMENT4, GL_COLOR_ATTACHMENT5, GL_COLOR_ATTACHMENT6};
   m_fbo->bind();
-  glDrawBuffers(m_fbo->texturesCount(), buffers);
+  m_fbo->activateBuffers();
 }
 
 void GL3::unbindFBO()
 {
+  m_fbo->deactivateBuffers();
   m_fbo->unbind();
-  glDrawBuffer(GL_BACK);
 }
 
 void GL3::bind(Storage::Mesh *mesh)
@@ -238,7 +252,7 @@ void GL3::bind(Storage::Texture *texture)
     texture->setBindId(Canvas::canvas()->bindTexture(texture->texture()));
 
   if (texture->bindId())
-    bindUniformAttribute(m_boundShader, "tex", TextureManager::self()->bind(texture->bindId()));
+    bindUniformAttribute(m_boundShader, "Texture", TextureManager::self()->bind(texture->bindId()));
 }
 
 void GL3::bind(Storage::ShaderProgram *shaderProgram)
@@ -380,7 +394,7 @@ void GL3::init()
   glDisable(GL_DEPTH_TEST);
   glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_COLOR);
 
-  m_fbo = new FBO(Canvas::canvas()->size(), m_globalUniforms, FBO::WriteOnly, this);
+  m_fbo = new FBO(m_globalUniforms, this);
   m_fbo->bind();
   glClearColor(0, 0, 0, 0);
   glEnable(GL_DEPTH_TEST);
@@ -395,7 +409,7 @@ void GL3::clear()
 
   if (m_fbo->size() != Canvas::canvas()->size()) {
     delete m_fbo;
-    m_fbo = new FBO(Canvas::canvas()->size(), m_globalUniforms, FBO::WriteOnly, this);
+    m_fbo = new FBO(m_globalUniforms, this);
     m_fbo->bind();
     glClearColor(0, 0, 0, 0);
     glEnable(GL_DEPTH_TEST);
@@ -507,7 +521,7 @@ void GL3::pass(Rendering::Stage *stage)
     }
 
     if (!stage->m_framebuffer) {
-      stage->m_framebuffer = new FBO(Canvas::canvas()->size(), stage->m_textures, FBO::WriteOnly, this);
+      stage->m_framebuffer = new FBO(stage->m_textures, this);
       stage->m_framebuffer->bind();
       glClearColor(0, 0, 0, 0);
     } else {
@@ -515,9 +529,8 @@ void GL3::pass(Rendering::Stage *stage)
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
-    // Rebind shader
-    //m_boundShader->bind();
     stage->m_framebuffer->activateTextures();
+    stage->m_framebuffer->activateBuffers();
   } else if (stage->m_framebuffer) {
     stage->m_framebuffer->activateTextures();
   }
@@ -538,12 +551,10 @@ void GL3::pass(Rendering::Stage *stage)
     }
   }
 
-  if (stage->m_renderOutput == Rendering::Stage::Textures) {
+  if (stage->m_framebuffer) {
+    stage->m_framebuffer->deactivateBuffers();
     stage->m_framebuffer->deactivateTextures();
-    //Storage::ShaderProgram *temp = m_boundShader;
-    //m_boundShader->unbind();
     stage->m_framebuffer->unbind();
-    //temp->bind();
   }
 
   if (stage->m_needLights)
