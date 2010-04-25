@@ -17,6 +17,7 @@
 
 #include <QtCore/QHash>
 #include <QtCore/QVector>
+#include <QtCore/QStringList>
 
 class FBO;
 
@@ -65,13 +66,8 @@ class GL3 : public AbstractDriver
     void setProjection(const Transform3f &projection);
 
     void shading();
-    inline void registerStage(quint8 index, Rendering::Stage *stage)
-    {
-      m_stages.insert(index, stage);
-    }
+    void registerStage(quint8 index, Rendering::Stage *stage);
     void pass(Rendering::Stage *stage);
-
-    FBO *createFBO(qint8 texturesCount);
 
   private:
     struct Plan {
@@ -114,54 +110,59 @@ class GL3 : public AbstractDriver
     QList<Rendering::Stage*> m_stages;
     bool m_shading;
     bool m_firstPass;
+    QStringList m_globalUniforms;
 
     void load(Storage::Mesh* mesh);
     void load(Storage::ShaderProgram* shaderProgram);
 
-    static void bindAttribute(Storage::ShaderProgram* shaderProgram, QString name, qint32 size, quint32 type, quint32 stride, quint32 offset);
-    static void unbindAttribute(Storage::ShaderProgram* shaderProgram, QString name);
+  public:
 
-    static void bindUniformAttribute(Storage::ShaderProgram* shaderProgram, const QString& name, const QVector<float>& values);
-    static void bindUniformAttribute(Storage::ShaderProgram* shaderProgram, const QString& name, const QList<Vector2f>& values);
-    static void bindUniformAttribute(Storage::ShaderProgram* shaderProgram, const QString& name, const QList<Vector3f>& values);
-    static void bindUniformAttribute(Storage::ShaderProgram* shaderProgram, const QString& name, const QList<Vector4f>& values);
-    static void bindUniformAttribute(Storage::ShaderProgram* shaderProgram, const QString& name, const QList<Matrix2f>& values);
-    static void bindUniformAttribute(Storage::ShaderProgram* shaderProgram, const QString& name, const QList<Matrix3f>& values);
-    static void bindUniformAttribute(Storage::ShaderProgram* shaderProgram, const QString& name, const QList<Matrix4f>& values);
+    void bindAttribute(Storage::ShaderProgram* shaderProgram, QString name, qint32 size, quint32 type, quint32 stride, quint32 offset);
+    void unbindAttribute(Storage::ShaderProgram* shaderProgram, QString name);
 
-    inline static void bindUniformAttribute(Storage::ShaderProgram* shaderProgram, const QString &name, float value)
+    void bindUniformAttribute(Storage::ShaderProgram* shaderProgram, const QString& name, const QVector<float>& values);
+    void bindUniformAttribute(Storage::ShaderProgram* shaderProgram, const QString& name, const QList<Vector2f>& values);
+    void bindUniformAttribute(Storage::ShaderProgram* shaderProgram, const QString& name, const QList<Vector3f>& values);
+    void bindUniformAttribute(Storage::ShaderProgram* shaderProgram, const QString& name, const QList<Vector4f>& values);
+    void bindUniformAttribute(Storage::ShaderProgram* shaderProgram, const QString& name, const QList<Matrix2f>& values);
+    void bindUniformAttribute(Storage::ShaderProgram* shaderProgram, const QString& name, const QList<Matrix3f>& values);
+    void bindUniformAttribute(Storage::ShaderProgram* shaderProgram, const QString& name, const QList<Matrix4f>& values);
+
+    inline void bindUniformAttribute(Storage::ShaderProgram* shaderProgram, const QString &name, float value)
     {
       QVector<float> params;
       params << value;
       bindUniformAttribute(shaderProgram, name, params);
     }
-    inline static void bindUniformAttribute(Storage::ShaderProgram* shaderProgram, const QString &name, const Vector3f& value)
+    inline void bindUniformAttribute(Storage::ShaderProgram* shaderProgram, const QString &name, const Vector3f& value)
     {
       QList<Vector3f> params;
       params << value;
       bindUniformAttribute(shaderProgram, name, params);
     }
-    inline static void bindUniformAttribute(Storage::ShaderProgram* shaderProgram, const QString &name, const Vector4f& value)
+    inline void bindUniformAttribute(Storage::ShaderProgram* shaderProgram, const QString &name, const Vector4f& value)
     {
       QList<Vector4f> params;
       params << value;
       bindUniformAttribute(shaderProgram, name, params);
     }
-    inline static void bindUniformAttribute(Storage::ShaderProgram* shaderProgram, const QString &name, const Matrix4f& value)
+    inline void bindUniformAttribute(Storage::ShaderProgram* shaderProgram, const QString &name, const Matrix4f& value)
     {
       QList<Matrix4f> params;
       params << value;
       bindUniformAttribute(shaderProgram, name, params);
     }
-    inline static void bindUniformAttribute(Storage::ShaderProgram* shaderProgram, const QString &name, const Matrix3f& value)
+    inline void bindUniformAttribute(Storage::ShaderProgram* shaderProgram, const QString &name, const Matrix3f& value)
     {
       QList<Matrix3f> params;
       params << value;
       bindUniformAttribute(shaderProgram, name, params);
     }
-    static void bindUniformAttribute(Storage::ShaderProgram* shaderProgram, const QString& name, int value);
+    void bindUniformAttribute(Storage::ShaderProgram* shaderProgram, const QString& name, int value);
 
-    static void setMaterial(Storage::Material *material, Storage::ShaderProgram* shaderProgram);
+  private:
+
+    void setMaterial(Storage::Material *material, Storage::ShaderProgram* shaderProgram = 0l);
 
     static char** prepareShaderSource(const QString &source, qint32 &count, qint32 **length);
 

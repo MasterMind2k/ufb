@@ -2,5 +2,10 @@
     <qresource prefix="/bge_resources/shaders">
       <file alias="FirstStage.sp">resources/firststage.sp</file>
       <file alias="LightingStage.sp">resources/lightingstage.sp</file>
+      <file alias="BloomHorizontalStage.sp">resources/bloomhorizontalstage.sp</file>
+      <file alias="BloomVerticalStage.sp">resources/bloomverticalstage.sp</file>
+    </qresource>
+    <qresource prefix="/bge_resources/shaders/fragment">
+      <file alias="gauss.fsm">resources/gauss.fsm</file>
     </qresource>
 </RCC>
