@@ -83,8 +83,6 @@ vec4 positionalLight(in vec3 ecPos, in vec3 n, in vec4 colorMap, in MaterialStru
     }
   }
   
-  if (length(colorMap.rgb) > 0.0)
-    color *= colorMap;
   return color;
 }
 
@@ -111,8 +109,6 @@ vec4 directionalLight(in vec3 ecPos, in vec3 n, in vec4 colorMap, in MaterialStr
              pow(NdotHV, Material.shininess);
   }
   
-  if (length(colorMap.rgb) > 0.0)
-    color *= colorMap;
   return color;
 }
 
@@ -164,14 +160,18 @@ void main(void)
   Material.emission = texture2D(Tex6, ex_TexCoord.st);
   vec4 color = Material.emission;
 
-  if (UsedLights > 0)
-    color += light1(position, normal, colorMap, Material);
-  if (UsedLights > 1)
-    color += light2(position, normal, colorMap, Material);
-  if (UsedLights > 2)
-    color += light3(position, normal, colorMap, Material);
-  if (UsedLights > 3)
-    color += light4(position, normal, colorMap, Material);
+  if (color.r + color.g + color.b == 0.0) {
+    if (UsedLights > 0)
+      color += light1(position, normal, colorMap, Material);
+    if (UsedLights > 1)
+      color += light2(position, normal, colorMap, Material);
+    if (UsedLights > 2)
+      color += light3(position, normal, colorMap, Material);
+    if (UsedLights > 3)
+      color += light4(position, normal, colorMap, Material);
+  }
+  if (colorMap.r + colorMap.g + colorMap.g > 0.0)
+    color *= colorMap;
   out_Color = color;
 }
 

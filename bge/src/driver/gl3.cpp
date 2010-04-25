@@ -16,6 +16,8 @@
 
 #include "canvas.h"
 
+#include "driver/texturemanager.h"
+
 #include "scene/object.h"
 #include "scene/light.h"
 #include "scene/boundingvolume.h"
@@ -49,23 +51,37 @@ using namespace BGE::Driver;
 class FBO
 {
   public:
-    inline FBO(const QSize &size, quint8 texturesCount)
+    enum Mode {
+      WriteOnly,
+      ReadWrite
+    };
+
+    FBO(const QSize &size, const QStringList& nameMapping, Mode mode, GL3 *driver)
+      : m_size(size),
+        m_texturesCount(nameMapping.size()),
+        m_mode(mode),
+        m_firstHalf(false),
+        m_nameMapping(nameMapping),
+        m_driver(driver)
     {
       glGenFramebuffers(1, &m_frame);
       glBindFramebuffer(GL_FRAMEBUFFER, m_frame);
 
       glGenRenderbuffers(1, &m_depth);
       glBindRenderbuffer(GL_RENDERBUFFER, m_depth);
-      glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, size.width(), size.height());
+      glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, m_size.width(), m_size.height());
       glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_depth);
 
-      m_texturesCount = texturesCount;
+      // For read write textures we need to double it's numbers
+      if (m_mode == ReadWrite)
+        m_texturesCount *= 2;
+
       m_textures = (GLuint*) malloc(m_texturesCount * sizeof(GLuint));
       glGenTextures(m_texturesCount, m_textures);
 
       for (quint8 i = 0; i < m_texturesCount; i++) {
         glBindTexture(GL_TEXTURE_2D, m_textures[i]);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F_ARB, size.width(), size.height(), 0, GL_RGB, GL_FLOAT, NULL);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F_ARB, m_size.width(), m_size.height(), 0, GL_RGB, GL_FLOAT, NULL);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, m_textures[i], 0);
@@ -75,7 +91,7 @@ class FBO
       if (status != GL_FRAMEBUFFER_COMPLETE)
         qFatal("FBO error!");
 
-      m_size = size;
+      glBindTexture(GL_TEXTURE_2D, 0);
       glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
@@ -101,19 +117,22 @@ class FBO
       return m_size;
     }
 
-    inline void activateTextures()
+    void activateTextures()
     {
       for (quint8 i = 0; i < m_texturesCount; i++) {
-        glActiveTexture(GL_TEXTURE0 + i);
-        glBindTexture(GL_TEXTURE_2D, m_textures[i]);
+        quint8 slot = TextureManager::self()->bind(m_textures[i]);
+        m_driver->bindUniformAttribute(0l, m_nameMapping.at(i), slot);
+        /*glActiveTexture(GL_TEXTURE0 + i + m_offset);
+        glBindTexture(GL_TEXTURE_2D, m_textures[i]);*/
       }
     }
 
-    inline void deactivateTextures()
+    void deactivateTextures()
     {
       for (quint8 i = 0; i < m_texturesCount; i++) {
-        glActiveTexture(GL_TEXTURE0 + i);
-        glBindTexture(GL_TEXTURE_2D, 0);
+        TextureManager::self()->unbind(m_textures[i]);
+        /*glActiveTexture(GL_TEXTURE0 + i + m_offset);
+        glBindTexture(GL_TEXTURE_2D, 0);*/
       }
       glActiveTexture(GL_TEXTURE0);
     }
@@ -129,6 +148,10 @@ class FBO
     QSize m_size;
     GLuint m_frame;
     GLuint m_depth;
+    Mode m_mode;
+    bool m_firstHalf;
+    QStringList m_nameMapping;
+    GL3 *m_driver;
 };
 
 GL3::GL3()
@@ -141,6 +164,7 @@ GL3::GL3()
   m_boundMesh = 0l;
   m_quad = 0;
   m_quadIdxs = 0;
+  m_shading = false;
 
   if (m_quad != 0 && m_quadIdxs != 0) {
     GLuint ids[2] = {m_quad, m_quadIdxs};
@@ -148,6 +172,14 @@ GL3::GL3()
   }
 
   m_boundingMaterial = new Storage::Material("BGE::BoundingVolume", QColor(0, 0, 0), QColor(0, 0, 0), QColor(0, 0, 0), QColor(255, 255, 255), 0);
+
+  m_globalUniforms << "Tex0"
+                   << "Tex1"
+                   << "Tex2"
+                   << "Tex3"
+                   << "Tex4"
+                   << "Tex5"
+                   << "Tex6";
 }
 
 GL3::~GL3()
@@ -206,7 +238,7 @@ void GL3::bind(Storage::Texture *texture)
     texture->setBindId(Canvas::canvas()->bindTexture(texture->texture()));
 
   if (texture->bindId())
-    glBindTexture(GL_TEXTURE_2D, texture->bindId());
+    bindUniformAttribute(m_boundShader, "tex", TextureManager::self()->bind(texture->bindId()));
 }
 
 void GL3::bind(Storage::ShaderProgram *shaderProgram)
@@ -219,6 +251,14 @@ void GL3::bind(Storage::ShaderProgram *shaderProgram)
 
   glUseProgram(shaderProgram->bindId());
   m_boundShader = shaderProgram;
+
+  // Bind our shading shader attributes
+  if (m_shading) {
+    bindUniformAttribute(m_boundShader, "ProjectionMatrix", m_projectionMatrix);
+    bindUniformAttribute(m_boundShader, "ModelViewMatrix", m_transform.matrix());
+    bindAttribute(m_boundShader, "Vertex", 3, GL_FLOAT, sizeof(BufferElement), VERTEX_OFFSET);
+    bindAttribute(m_boundShader, "TexCoord", 2, GL_FLOAT, sizeof(BufferElement), UV_OFFSET);
+  }
 }
 
 void GL3::unbind(Storage::Mesh *mesh)
@@ -237,8 +277,7 @@ void GL3::unbind(Storage::Mesh *mesh)
 
 void GL3::unbind(Storage::Texture *texture)
 {
-  Q_UNUSED(texture);
-  glBindTexture(GL_TEXTURE_2D, 0);
+  TextureManager::self()->unbind(texture->bindId());
 }
 
 void GL3::unbind(Storage::ShaderProgram *shaderProgram)
@@ -246,6 +285,8 @@ void GL3::unbind(Storage::ShaderProgram *shaderProgram)
   if (!shaderProgram || !shaderProgram->bindId())
     return;
 
+  unbindAttribute(m_boundShader, "Vertex");
+  unbindAttribute(m_boundShader, "TexCoord");
   glUseProgram(0);
   m_boundShader = 0l;
 }
@@ -339,7 +380,7 @@ void GL3::init()
   glDisable(GL_DEPTH_TEST);
   glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_COLOR);
 
-  m_fbo = new FBO(Canvas::canvas()->size(), 7);
+  m_fbo = new FBO(Canvas::canvas()->size(), m_globalUniforms, FBO::WriteOnly, this);
   m_fbo->bind();
   glClearColor(0, 0, 0, 0);
   glEnable(GL_DEPTH_TEST);
@@ -354,7 +395,7 @@ void GL3::clear()
 
   if (m_fbo->size() != Canvas::canvas()->size()) {
     delete m_fbo;
-    m_fbo = new FBO(Canvas::canvas()->size(), 7);
+    m_fbo = new FBO(Canvas::canvas()->size(), m_globalUniforms, FBO::WriteOnly, this);
     m_fbo->bind();
     glClearColor(0, 0, 0, 0);
     glEnable(GL_DEPTH_TEST);
@@ -425,20 +466,7 @@ void GL3::shading()
     glBindBuffer(GL_ARRAY_BUFFER, m_quad);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_quadIdxs);
   }
-
-  bindUniformAttribute(m_boundShader, "ProjectionMatrix", m_projectionMatrix);
-  bindUniformAttribute(m_boundShader, "ModelViewMatrix", m_transform.matrix());
-  bindAttribute(m_boundShader, "Vertex", 3, GL_FLOAT, sizeof(BufferElement), VERTEX_OFFSET);
-  bindAttribute(m_boundShader, "TexCoord", 2, GL_FLOAT, sizeof(BufferElement), UV_OFFSET);
-  bindUniformAttribute(m_boundShader, "Tex0", 0);
-  bindUniformAttribute(m_boundShader, "Tex1", 1);
-  bindUniformAttribute(m_boundShader, "Tex2", 2);
-  bindUniformAttribute(m_boundShader, "Tex3", 3);
-  bindUniformAttribute(m_boundShader, "Tex4", 4);
-  bindUniformAttribute(m_boundShader, "Tex5", 5);
-  bindUniformAttribute(m_boundShader, "Tex6", 6);
-  bindUniformAttribute(m_boundShader, "GlobalAmbient", Vector4f(Scene::Light::globalAmbient().redF(), Scene::Light::globalAmbient().greenF(), Scene::Light::globalAmbient().blueF(), Scene::Light::globalAmbient().alphaF()));
-  m_fbo->activateTextures();
+  m_shading = true;
 
   m_firstPass = true;
 
@@ -448,34 +476,52 @@ void GL3::shading()
   glDisable(GL_BLEND);
   glEnable(GL_DEPTH_TEST);
 
-  unbindAttribute(m_boundShader, "Vertex");
-  unbindAttribute(m_boundShader, "TexCoord");
   m_fbo->deactivateTextures();
 
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
   m_renderedLights = 0;
+  m_shading = false;
+}
+
+void GL3::registerStage(quint8 index, Rendering::Stage *stage)
+{
+  stage->m_driver = this;
+  m_stages.insert(index, stage);
 }
 
 void GL3::pass(Rendering::Stage *stage)
 {
   quint8 loop = 1;
-  if (stage->m_needLights)
+  if (stage->m_needLights) {
+    if (m_firstPass)
+      bindUniformAttribute(m_boundShader, "GlobalAmbient", Vector4f(Scene::Light::globalAmbient().redF(), Scene::Light::globalAmbient().greenF(), Scene::Light::globalAmbient().blueF(), Scene::Light::globalAmbient().alphaF()));
     loop = m_lights.size();
+  }
 
   if (stage->renderOutput() == Rendering::Stage::Textures) {
-    if (!stage->m_framebuffer) {
-      stage->m_framebuffer = createFBO(stage->m_tempTextures);
-    } else if (stage->m_framebuffer->size() != m_fbo->size() || stage->m_framebuffer->texturesCount() != stage->m_tempTextures) {
+    if (stage->m_framebuffer && (stage->m_framebuffer->size() != m_fbo->size() || stage->m_framebuffer->texturesCount() != stage->m_textures.size())) {
       delete stage->m_framebuffer;
-      stage->m_framebuffer = createFBO(stage->m_tempTextures);
+      stage->m_framebuffer = 0l;
     }
 
-    stage->m_framebuffer->bind();
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    if (!stage->m_framebuffer) {
+      stage->m_framebuffer = new FBO(Canvas::canvas()->size(), stage->m_textures, FBO::WriteOnly, this);
+      stage->m_framebuffer->bind();
+      glClearColor(0, 0, 0, 0);
+    } else {
+      stage->m_framebuffer->bind();
+      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    }
+
+    // Rebind shader
+    //m_boundShader->bind();
+    stage->m_framebuffer->activateTextures();
+  } else if (stage->m_framebuffer) {
     stage->m_framebuffer->activateTextures();
   }
+  m_fbo->activateTextures();
 
   for (quint8 i = 0; i < loop; i += m_maxLights) {
     if (stage->m_needLights)
@@ -494,20 +540,14 @@ void GL3::pass(Rendering::Stage *stage)
 
   if (stage->m_renderOutput == Rendering::Stage::Textures) {
     stage->m_framebuffer->deactivateTextures();
+    //Storage::ShaderProgram *temp = m_boundShader;
+    //m_boundShader->unbind();
     stage->m_framebuffer->unbind();
+    //temp->bind();
   }
 
   if (stage->m_needLights)
     m_renderedLights = 0;
-}
-
-FBO *GL3::createFBO(qint8 texturesCount)
-{
-  FBO *output = new FBO(Canvas::canvas()->size(), texturesCount);
-  output->bind();
-  glClearColor(0, 0, 0, 0);
-  output->unbind();
-  return output;
 }
 
 void GL3::load(Storage::Mesh *mesh)
@@ -684,6 +724,9 @@ void GL3::load(Storage::ShaderProgram *shaderProgram)
   if (!shaderProgram || shaderProgram->bindId())
     return;
 
+  if (!shaderProgram->prepareProgram())
+    return;
+
   shaderProgram->setBindId(glCreateProgram());
 
   foreach (Storage::Shader* shader, shaderProgram->shaders()) {
@@ -752,7 +795,9 @@ void GL3::load(Storage::ShaderProgram *shaderProgram)
 void GL3::bindAttribute(Storage::ShaderProgram *shaderProgram, QString name, qint32 size, quint32 type, quint32 stride, quint32 offset)
 {
   if (!shaderProgram || !shaderProgram->bindId())
-    return;
+    shaderProgram = m_boundShader;
+  if (!shaderProgram || !shaderProgram->bindId())
+    qFatal("No shader bound!");
 
   name.prepend("in_");
   GLint loc = glGetAttribLocation(shaderProgram->bindId(), name.toAscii().data());
@@ -765,7 +810,9 @@ void GL3::bindAttribute(Storage::ShaderProgram *shaderProgram, QString name, qin
 void GL3::unbindAttribute(Storage::ShaderProgram *shaderProgram, QString name)
 {
   if (!shaderProgram || !shaderProgram->bindId())
-    return;
+    shaderProgram = m_boundShader;
+  if (!shaderProgram || !shaderProgram->bindId())
+    qFatal("No shader bound!");
 
   name.prepend("in_");
   GLint loc = glGetAttribLocation(shaderProgram->bindId(), name.toAscii().data());
@@ -776,7 +823,9 @@ void GL3::unbindAttribute(Storage::ShaderProgram *shaderProgram, QString name)
 void GL3::bindUniformAttribute(Storage::ShaderProgram *shaderProgram, const QString &name, const QVector<float>& values)
 {
   if (!shaderProgram || !shaderProgram->bindId())
-    return;
+    shaderProgram = m_boundShader;
+  if (!shaderProgram || !shaderProgram->bindId())
+    qFatal("No shader bound!");
 
   GLint loc = glGetUniformLocation(shaderProgram->bindId(), name.toAscii());
   if (loc != -1)
@@ -786,7 +835,9 @@ void GL3::bindUniformAttribute(Storage::ShaderProgram *shaderProgram, const QStr
 void GL3::bindUniformAttribute(Storage::ShaderProgram *shaderProgram, const QString &name, const QList<Vector2f>& values)
 {
   if (!shaderProgram || !shaderProgram->bindId())
-    return;
+    shaderProgram = m_boundShader;
+  if (!shaderProgram || !shaderProgram->bindId())
+    qFatal("No shader bound!");
 
   GLint loc = glGetUniformLocation(shaderProgram->bindId(), name.toAscii());
   if (loc != -1) {
@@ -802,7 +853,9 @@ void GL3::bindUniformAttribute(Storage::ShaderProgram *shaderProgram, const QStr
 void GL3::bindUniformAttribute(Storage::ShaderProgram *shaderProgram, const QString &name, const QList<Vector3f>& values)
 {
   if (!shaderProgram || !shaderProgram->bindId())
-    return;
+    shaderProgram = m_boundShader;
+  if (!shaderProgram || !shaderProgram->bindId())
+    qFatal("No shader bound!");
 
   GLint loc = glGetUniformLocation(shaderProgram->bindId(), name.toAscii());
   if (loc != -1) {
@@ -818,7 +871,9 @@ void GL3::bindUniformAttribute(Storage::ShaderProgram *shaderProgram, const QStr
 void GL3::bindUniformAttribute(Storage::ShaderProgram *shaderProgram, const QString &name, const QList<Vector4f>& values)
 {
   if (!shaderProgram || !shaderProgram->bindId())
-    return;
+    shaderProgram = m_boundShader;
+  if (!shaderProgram || !shaderProgram->bindId())
+    qFatal("No shader bound!");
 
   GLint loc = glGetUniformLocation(shaderProgram->bindId(), name.toAscii());
   if (loc != -1) {
@@ -834,7 +889,9 @@ void GL3::bindUniformAttribute(Storage::ShaderProgram *shaderProgram, const QStr
 void GL3::bindUniformAttribute(Storage::ShaderProgram *shaderProgram, const QString &name, const QList<Matrix2f>& values)
 {
   if (!shaderProgram || !shaderProgram->bindId())
-    return;
+    shaderProgram = m_boundShader;
+  if (!shaderProgram || !shaderProgram->bindId())
+    qFatal("No shader bound!");
 
   GLint loc = glGetUniformLocation(shaderProgram->bindId(), name.toAscii());
   if (loc != -1) {
@@ -850,7 +907,9 @@ void GL3::bindUniformAttribute(Storage::ShaderProgram *shaderProgram, const QStr
 void GL3::bindUniformAttribute(Storage::ShaderProgram *shaderProgram, const QString &name, const QList<Matrix3f>& values)
 {
   if (!shaderProgram || !shaderProgram->bindId())
-    return;
+    shaderProgram = m_boundShader;
+  if (!shaderProgram || !shaderProgram->bindId())
+    qFatal("No shader bound!");
 
   GLint loc = glGetUniformLocation(shaderProgram->bindId(), name.toAscii());
   if (loc != -1) {
@@ -866,7 +925,9 @@ void GL3::bindUniformAttribute(Storage::ShaderProgram *shaderProgram, const QStr
 void GL3::bindUniformAttribute(Storage::ShaderProgram *shaderProgram, const QString &name, const QList<Matrix4f>& values)
 {
   if (!shaderProgram || !shaderProgram->bindId())
-    return;
+    shaderProgram = m_boundShader;
+  if (!shaderProgram || !shaderProgram->bindId())
+    qFatal("No shader bound!");
 
   GLint loc = glGetUniformLocation(shaderProgram->bindId(), name.toAscii());
   if (loc != -1) {
@@ -882,7 +943,9 @@ void GL3::bindUniformAttribute(Storage::ShaderProgram *shaderProgram, const QStr
 void GL3::bindUniformAttribute(Storage::ShaderProgram *shaderProgram, const QString &name, int value)
 {
   if (!shaderProgram || !shaderProgram->bindId())
-    return;
+    shaderProgram = m_boundShader;
+  if (!shaderProgram || !shaderProgram->bindId())
+    qFatal("No shader bound!");
 
   GLint loc = glGetUniformLocation(shaderProgram->bindId(), name.toAscii());
   if (loc != -1)
@@ -891,6 +954,9 @@ void GL3::bindUniformAttribute(Storage::ShaderProgram *shaderProgram, const QStr
 
 void GL3::setMaterial(Storage::Material *material, Storage::ShaderProgram *shaderProgram)
 {
+  if (!shaderProgram)
+    shaderProgram = m_boundShader;
+
   bool deleteAfter = false;
   if (!material) {
     material = new Storage::Material("default");

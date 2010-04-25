@@ -13,7 +13,7 @@
 #ifndef __BGE_RENDERING_STAGE_H
 #define __BGE_RENDERING_STAGE_H
 
-#include <QtCore/QList>
+#include <QtCore/QStringList>
 #include <QtCore/QHash>
 
 class FBO;
@@ -41,7 +41,7 @@ class Stage
       m_renderOutput = Display;
       m_needLights = false;
       m_framebuffer = 0l;
-      m_tempTextures = 0;
+      m_needPrevious = false;
     }
 
     virtual void render() = 0;
@@ -70,17 +70,23 @@ class Stage
       m_needLights = false;
     }
 
-    inline void setTempTextures(quint8 texturesCount)
+    inline void addTexture(const QString &name)
     {
-      m_tempTextures = texturesCount;
+      m_textures << name;
+    }
+
+    inline void needPreviousRender()
+    {
+      m_needPrevious = true;
     }
 
   private:
     FBO *m_framebuffer;
     Driver::GL3 *m_driver;
     Output m_renderOutput;
-    quint8 m_tempTextures;
+    QStringList m_textures;
     bool m_needLights;
+    bool m_needPrevious;
 
     friend class BGE::Driver::GL3;
 };

@@ -5,6 +5,7 @@ set(driver_SRCS
   abstractdriver.cpp
   gl1.cpp
   gl3.cpp
+  texturemanager.cpp
 )
 
 set(driver_HDRS

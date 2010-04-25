@@ -32,6 +32,7 @@
 #include "storage/storagemanager.h"
 
 #include "rendering/lightingstage.h"
+#include "rendering/bloomstage.h"
 
 #include "abstractcontroller.h"
 #include "abstractoverlay.h"
@@ -114,6 +115,7 @@ void Canvas::initializeGL()
 
   Driver::AbstractDriver::self()->init();
   registerStage(new Rendering::LightingStage);
+  registerStage(new Rendering::BloomStage);
 }
 
 void Canvas::resizeGL(int w, int h)

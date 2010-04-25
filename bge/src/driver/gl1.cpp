@@ -16,6 +16,8 @@
 
 #include "canvas.h"
 
+#include "driver/texturemanager.h"
+
 #include "scene/object.h"
 #include "scene/boundingvolume.h"
 #include "scene/light.h"
@@ -225,15 +227,14 @@ void GL1::bind(Storage::Texture* texture)
     texture->setBindId(Canvas::canvas()->bindTexture(texture->texture()));
 
   if (texture->bindId()) {
-    glBindTexture(GL_TEXTURE_2D, texture->bindId());
+    TextureManager::self()->bind(texture->bindId());
     m_hasTexture = true;
   }
 }
 
 void GL1::unbind(Storage::Texture *texture)
 {
-  Q_UNUSED(texture);
-  glBindTexture(GL_TEXTURE2, 0);
+  TextureManager::self()->unbind(texture->bindId());
   m_hasTexture = false;
 }
 
