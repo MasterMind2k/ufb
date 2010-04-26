@@ -231,8 +231,6 @@ void GL3::bind(Storage::Mesh *mesh)
 
   // Let's bind our shader thingies :)
   bindUniformAttribute(m_boundShader, "ProjectionMatrix", m_projectionMatrix);
-  bindUniformAttribute(m_boundShader, "ModelViewMatrix", m_transform.matrix());
-  bindUniformAttribute(m_boundShader, "NormalMatrix", m_normalMatrix);
   bindAttribute(m_boundShader, "Vertex", 3, GL_FLOAT, sizeof(BufferElement), VERTEX_OFFSET);
   bindAttribute(m_boundShader, "Normal", 3, GL_FLOAT, sizeof(BufferElement), NORMAL_OFFSET);
   bindAttribute(m_boundShader, "TexCoord", 2, GL_FLOAT, sizeof(BufferElement), UV_OFFSET);
@@ -302,8 +300,10 @@ void GL3::unbind(Storage::ShaderProgram *shaderProgram)
   if (!shaderProgram || !shaderProgram->bindId())
     return;
 
-  unbindAttribute(m_boundShader, "Vertex");
-  unbindAttribute(m_boundShader, "TexCoord");
+  if (m_shading) {
+    unbindAttribute(m_boundShader, "Vertex");
+    unbindAttribute(m_boundShader, "TexCoord");
+  }
   glUseProgram(0);
   m_boundShader = 0l;
 }
@@ -372,6 +372,11 @@ void GL3::setTransformMatrix(const Transform3f& transform)
   transform.matrix().computeInverse(&inverse);
   inverse.transposeInPlace();
   m_normalMatrix = inverse.block<3, 3>(0, 0);
+
+  if (m_boundShader) {
+    bindUniformAttribute(m_boundShader, "ModelViewMatrix", m_transform.matrix());
+    bindUniformAttribute(m_boundShader, "NormalMatrix", m_normalMatrix);
+  }
 }
 
 void GL3::draw()
