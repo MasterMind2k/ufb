@@ -33,6 +33,7 @@
 
 #include "rendering/lightingstage.h"
 #include "rendering/bloomstage.h"
+#include "rendering/outputstage.h"
 
 #include "abstractcontroller.h"
 #include "abstractoverlay.h"
@@ -90,6 +91,11 @@ Canvas::Canvas()
   // Needed to "block" any idiotic loading of a idiotic shaders :D
   QGL::setPreferredPaintEngine(QPaintEngine::OpenGL);
 
+  // Setup default rendering stages
+  registerStage(-1, new Rendering::LightingStage);
+  registerStage(-1, new Rendering::BloomStage);
+  registerStage(-1, new Rendering::OutputStage);
+
   connect(m_timer, SIGNAL(timeout()), SLOT(updateGL()));
   connect(QApplication::instance(), SIGNAL(aboutToQuit()), SLOT(cleanup()));
 }
@@ -114,8 +120,6 @@ void Canvas::initializeGL()
   m_renderer = new Rendering::Renderer;
 
   Driver::AbstractDriver::self()->init();
-  registerStage(new Rendering::LightingStage);
-  registerStage(new Rendering::BloomStage);
 }
 
 void Canvas::resizeGL(int w, int h)
@@ -316,6 +320,21 @@ void Canvas::loadResource(const QString& fileName)
   Storage::StorageManager::self()->load();
   if (!QResource::unregisterResource(fileName, "/bge_resources"))
     qWarning("BGE::Canvas::loadResource: Cannot unregister '%s' resource!", fileName.toAscii().data());
+}
+
+void Canvas::replaceStage(quint8 index, Rendering::Stage *stage)
+{
+  Driver::AbstractDriver::self()->replaceStage(index, stage);
+}
+
+void Canvas::unregisterStage(quint8 index)
+{
+  Driver::AbstractDriver::self()->unregisterStage(index);
+}
+
+Rendering::Stage *Canvas::stage(quint8 index) const
+{
+  return Driver::AbstractDriver::self()->stage(index);
 }
 
 void Canvas::registerStage(quint8 index, Rendering::Stage *stage)

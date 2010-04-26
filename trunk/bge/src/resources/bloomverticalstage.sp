@@ -16,7 +16,7 @@ in vec2 ex_TexCoord;
 
 uniform sampler2D BlurredEmission;
 
-out vec4 out_Color;
+/*out vec4 out_Color;*/
 
 float gauss(in int x);
 float step();
@@ -26,9 +26,10 @@ void main(void)
   vec4 blurSample = vec4(0.0, 0.0, 0.0, 0.0);
   float sampleStep = step();
 
-  for (int i = -20; i < 21; i++) {
+  for (int i = -10; i < 11; i++) {
     blurSample += texture2D(BlurredEmission, ex_TexCoord + vec2(0, i * sampleStep)) * gauss(i);
   }
 
-  out_Color = blurSample * 1.5;
+  /*out_Color = blurSample * 1.5;*/
+  gl_FragData[0] = blurSample * 1.5;
 }

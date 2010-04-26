@@ -4,6 +4,7 @@
       <file alias="LightingStage.sp">resources/lightingstage.sp</file>
       <file alias="BloomHorizontalStage.sp">resources/bloomhorizontalstage.sp</file>
       <file alias="BloomVerticalStage.sp">resources/bloomverticalstage.sp</file>
+      <file alias="OutputStage.sp">resources/outputstage.sp</file>
     </qresource>
     <qresource prefix="/bge_resources/shaders/fragment">
       <file alias="bloom.fsm">resources/bloom.fsm</file>

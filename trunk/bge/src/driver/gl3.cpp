@@ -56,20 +56,23 @@ class FBO
       ReadWrite
     };
 
-    FBO(const QStringList& nameMapping, GL3 *driver)
+    FBO(const QStringList& nameMapping, GL3 *driver, bool useDepth = false)
       : m_size(Canvas::canvas()->size()),
         m_texturesCount(nameMapping.size()),
         m_bound(false),
         m_nameMapping(nameMapping),
-        m_driver(driver)
+        m_driver(driver),
+        m_previouslyBound(0)
     {
       glGenFramebuffers(1, &m_frame);
       glBindFramebuffer(GL_FRAMEBUFFER, m_frame);
 
-      glGenRenderbuffers(1, &m_depth);
-      glBindRenderbuffer(GL_RENDERBUFFER, m_depth);
-      glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, m_size.width(), m_size.height());
-      glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_depth);
+      if (useDepth) {
+        glGenRenderbuffers(1, &m_depth);
+        glBindRenderbuffer(GL_RENDERBUFFER, m_depth);
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, m_size.width(), m_size.height());
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_depth);
+      }
 
       m_textures = (GLuint*) malloc(m_texturesCount * sizeof(GLuint));
       glGenTextures(m_texturesCount, m_textures);
@@ -99,13 +102,16 @@ class FBO
 
     inline void bind()
     {
+      int previous;
+      glGetIntegerv(GL_FRAMEBUFFER_BINDING, &previous);
+      m_previouslyBound = previous;
       glBindFramebuffer(GL_FRAMEBUFFER, m_frame);
       m_bound = true;
     }
 
     inline void unbind()
     {
-      glBindFramebuffer(GL_FRAMEBUFFER, 0);
+      glBindFramebuffer(GL_FRAMEBUFFER, m_previouslyBound);
       m_bound = false;
     }
 
@@ -164,6 +170,7 @@ class FBO
     QSize m_size;
     GLuint m_frame;
     GLuint m_depth;
+    GLuint m_previouslyBound;
     bool m_bound;
     QStringList m_nameMapping;
     GL3 *m_driver;
@@ -171,20 +178,12 @@ class FBO
 
 GL3::GL3()
 {
-  getShaderFunctions();
-  getBufferFunctions();
-  getFBOFunctions();
   m_renderedLights = 0;
   m_boundShader = 0l;
   m_boundMesh = 0l;
   m_quad = 0;
   m_quadIdxs = 0;
   m_shading = false;
-
-  if (m_quad != 0 && m_quadIdxs != 0) {
-    GLuint ids[2] = {m_quad, m_quadIdxs};
-    glDeleteBuffers(2, ids);
-  }
 
   m_boundingMaterial = new Storage::Material("BGE::BoundingVolume", QColor(0, 0, 0), QColor(0, 0, 0), QColor(0, 0, 0), QColor(255, 255, 255), 0);
 
@@ -199,6 +198,10 @@ GL3::GL3()
 
 GL3::~GL3()
 {
+  if (m_quad != 0 && m_quadIdxs != 0) {
+    GLuint ids[2] = {m_quad, m_quadIdxs};
+    glDeleteBuffers(2, ids);
+  }
   delete m_fbo;
   delete m_boundingMaterial;
 }
@@ -390,17 +393,28 @@ void GL3::draw()
 
 void GL3::init()
 {
+  getShaderFunctions();
+  getBufferFunctions();
+  getFBOFunctions();
+
   glClearColor(0, 0, 0, 0);
   glDisable(GL_DEPTH_TEST);
   glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_COLOR);
 
-  m_fbo = new FBO(m_globalUniforms, this);
+  m_fbo = new FBO(m_globalUniforms, this, true);
   m_fbo->bind();
   glClearColor(0, 0, 0, 0);
   glEnable(GL_DEPTH_TEST);
 
   glEnable(GL_CULL_FACE);
   m_fbo->unbind();
+
+  m_renderer = new FBO(QStringList("Output"), this);
+  m_renderer->bind();
+  glClearColor(0, 0, 0, 0);
+  m_renderer->unbind();
+
+  glGenTextures(1, &m_renderTexture);
 }
 
 void GL3::clear()
@@ -409,17 +423,26 @@ void GL3::clear()
 
   if (m_fbo->size() != Canvas::canvas()->size()) {
     delete m_fbo;
-    m_fbo = new FBO(m_globalUniforms, this);
+    m_fbo = new FBO(m_globalUniforms, this, true);
     m_fbo->bind();
     glClearColor(0, 0, 0, 0);
     glEnable(GL_DEPTH_TEST);
 
     glEnable(GL_CULL_FACE);
     m_fbo->unbind();
+
+    delete m_renderer;
+    m_renderer = new FBO(QStringList("Output"), this);
+    m_renderer->bind();
+    glClearColor(0, 0, 0, 0);
+    m_renderer->unbind();
   } else {
     m_fbo->bind();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     m_fbo->unbind();
+    m_renderer->bind();
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    m_renderer->unbind();
   }
 }
 
@@ -430,6 +453,9 @@ void GL3::setProjection(const Transform3f &projection)
 
 void GL3::shading()
 {
+  if (m_stages.isEmpty())
+    return;
+
   if (!m_quad) {
     // Vertices
     BufferElement *buffer = (BufferElement*) malloc(4 * sizeof(BufferElement));
@@ -484,13 +510,21 @@ void GL3::shading()
 
   m_firstPass = true;
 
+  m_renderer->bind();
+  m_renderer->activateBuffers();
+
+  Rendering::Stage *lastStage = m_stages.takeLast();
+
   foreach (Rendering::Stage *stage, m_stages)
     stage->render();
 
   glDisable(GL_BLEND);
   glEnable(GL_DEPTH_TEST);
 
-  m_fbo->deactivateTextures();
+  m_renderer->deactivateBuffers();
+  m_renderer->unbind();
+  lastStage->render();
+  m_stages << lastStage;
 
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -503,6 +537,12 @@ void GL3::registerStage(quint8 index, Rendering::Stage *stage)
 {
   stage->m_driver = this;
   m_stages.insert(index, stage);
+}
+
+void GL3::replaceStage(quint8 index, Rendering::Stage *stage)
+{
+  stage->m_driver = this;
+  m_stages.replace(index, stage);
 }
 
 void GL3::pass(Rendering::Stage *stage)
@@ -535,6 +575,8 @@ void GL3::pass(Rendering::Stage *stage)
     stage->m_framebuffer->activateTextures();
   }
   m_fbo->activateTextures();
+  if (!m_stages.contains(stage))
+    m_renderer->activateTextures();
 
   for (quint8 i = 0; i < loop; i += m_maxLights) {
     if (stage->m_needLights)
@@ -559,6 +601,10 @@ void GL3::pass(Rendering::Stage *stage)
 
   if (stage->m_needLights)
     m_renderedLights = 0;
+
+  m_fbo->deactivateTextures();
+  if (!m_stages.contains(stage))
+    m_renderer->deactivateTextures();
 }
 
 void GL3::load(Storage::Mesh *mesh)

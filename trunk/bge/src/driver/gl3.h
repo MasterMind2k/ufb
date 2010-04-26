@@ -66,7 +66,18 @@ class GL3 : public AbstractDriver
     void setProjection(const Transform3f &projection);
 
     void shading();
+
     void registerStage(quint8 index, Rendering::Stage *stage);
+    inline void unregisterStage(quint8 index)
+    {
+      m_stages.removeAt(index);
+    }
+    void replaceStage(quint8 index, Rendering::Stage *stage);
+    inline Rendering::Stage *stage(quint8 index) const
+    {
+      return m_stages.at(index);
+    }
+
     void pass(Rendering::Stage *stage);
 
   private:
@@ -105,11 +116,13 @@ class GL3 : public AbstractDriver
     Storage::Material *m_boundingMaterial;
     quint32 m_renderedLights;
     FBO *m_fbo;
+    FBO *m_renderer;
     quint32 m_quad;
     quint32 m_quadIdxs;
     QList<Rendering::Stage*> m_stages;
     bool m_shading;
     bool m_firstPass;
+    quint32 m_renderTexture;
     QStringList m_globalUniforms;
 
     void load(Storage::Mesh* mesh);

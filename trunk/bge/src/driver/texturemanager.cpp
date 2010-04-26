@@ -19,7 +19,7 @@ using namespace Driver;
 
 TextureManager *TextureManager::m_self = 0l;
 
-quint8 TextureManager::bind(quint8 textureId)
+quint8 TextureManager::bind(quint32 textureId)
 {
   if (m_mapping.contains(textureId))
     return m_mapping.value(textureId);
@@ -38,7 +38,7 @@ quint8 TextureManager::bind(quint8 textureId)
   return slot;
 }
 
-void TextureManager::unbind(quint8 textureId)
+void TextureManager::unbind(quint32 textureId)
 {
   if (!m_mapping.contains(textureId))
     return;
@@ -65,4 +65,16 @@ void TextureManager::unbind()
   m_mapping.clear();
   m_usedSlots = 0;
   m_availableSlots.clear();
+}
+
+void TextureManager::copyRenderedToTexture(quint32 textureId)
+{
+  glActiveTexture(bind(textureId));
+
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F_ARB, Canvas::canvas()->size().width(), Canvas::canvas()->size().height(), 0, GL_RGB, GL_FLOAT, NULL);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+  glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F_ARB, 0, 0, Canvas::canvas()->size().width(), Canvas::canvas()->size().height(), 0);
+  unbind(textureId);
 }

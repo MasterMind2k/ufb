@@ -34,11 +34,11 @@ class TextureManager
      *
      * @return Slot of binded texture
      */
-    quint8 bind(quint8 textureId);
+    quint8 bind(quint32 textureId);
     /**
      * Unbinds the texture.
      */
-    void unbind(quint8 textureId);
+    void unbind(quint32 textureId);
     /**
      * Unbinds all textures.
      */
@@ -46,17 +46,22 @@ class TextureManager
     /**
      * Returns texture's slot.
      */
-    inline qint16 slot(quint8 textureId) const
+    inline qint16 slot(quint32 textureId) const
     {
       return m_mapping.value(textureId, -1);
     }
 
+    /**
+     * Copies rendered image to texture.
+     */
+    void copyRenderedToTexture(quint32 textureId);
+
   private:
     static TextureManager *m_self;
     // Maps texture id and slot
-    QHash<quint8, qint8> m_mapping;
+    QHash<quint16, qint8> m_mapping;
     QList<quint8> m_availableSlots;
-    quint8 m_usedSlots;
+    quint16 m_usedSlots;
 
     // A forbidden constructor :D
     inline TextureManager()

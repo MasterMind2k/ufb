@@ -15,7 +15,7 @@ in vec2 ex_TexCoord;
 
 uniform sampler2D Positions, Normals, ColorMap, Ambient, Diffuse, Specular, Emission;
 
-out vec4 out_Color;
+/*out vec4 out_Color;*/
 
 struct LightStruct {
   vec4 position;
@@ -60,9 +60,7 @@ vec4 positionalLight(in vec3 ecPos, in vec3 n, in MaterialStruct Material, in Li
   lightDir = normalize(aux);
 
   color = Material.ambient * GlobalAmbient;
-  ambient = Material.ambient * Light.ambient;
 
-  diffuse = Material.diffuse * Light.diffuse;
   NdotL = max(dot(n, lightDir), 0.0);
 
   if (NdotL > 0.0) {
@@ -71,6 +69,9 @@ vec4 positionalLight(in vec3 ecPos, in vec3 n, in MaterialStruct Material, in Li
       spotEffect = dot(normalize(Light.spot_direction), normalize(-lightDir));
 
     if (spotEffect > cos(Light.spot_cutoff)) {
+      diffuse = Material.diffuse * Light.diffuse;
+      ambient = Material.ambient * Light.ambient;
+
       spotEffect = pow(spotEffect, Light.spot_exponent);
       att = spotEffect / (Light.constant +
             Light.linear * dist +
@@ -172,6 +173,7 @@ void main(void)
   }
   if (colorMap.r + colorMap.g + colorMap.g > 0.0)
     color *= colorMap;
-  out_Color = color;
+  /*out_Color = color;*/
+  gl_FragData[0] = color;
 }
 

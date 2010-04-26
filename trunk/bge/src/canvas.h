@@ -193,11 +193,17 @@ class Canvas : public QGLWidget
      */
     void loadResource(const QString& fileName = QString());
 
+    /**
+     * Replaces the occupiing stage.
+     */
+    void replaceStage(quint8 index, Rendering::Stage *stage);
+    void unregisterStage(quint8 index);
+    Rendering::Stage *stage(quint8 index) const;
+    /**
+     * Inserts the stage at that position.
+     * @warning Last stage is rendering stage!
+     */
     void registerStage(quint8 index, Rendering::Stage *stage);
-    inline void registerStage(Rendering::Stage *stage)
-    {
-      registerStage(-1, stage);
-    }
 
   private:
     /* Really private stuff */
