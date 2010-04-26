@@ -130,56 +130,56 @@ class GL3 : public AbstractDriver
 
   public:
 
-    void bindAttribute(Storage::ShaderProgram* shaderProgram, QString name, qint32 size, quint32 type, quint32 stride, quint32 offset);
-    void unbindAttribute(Storage::ShaderProgram* shaderProgram, QString name);
+    void bindAttribute(QString name, qint32 size, quint32 type, quint32 stride, quint32 offset);
+    void unbindAttribute(QString name);
 
-    void bindUniformAttribute(Storage::ShaderProgram* shaderProgram, const QString& name, const QVector<float>& values);
-    void bindUniformAttribute(Storage::ShaderProgram* shaderProgram, const QString& name, const QList<Vector2f>& values);
-    void bindUniformAttribute(Storage::ShaderProgram* shaderProgram, const QString& name, const QList<Vector3f>& values);
-    void bindUniformAttribute(Storage::ShaderProgram* shaderProgram, const QString& name, const QList<Vector4f>& values);
-    void bindUniformAttribute(Storage::ShaderProgram* shaderProgram, const QString& name, const QList<Matrix2f>& values);
-    void bindUniformAttribute(Storage::ShaderProgram* shaderProgram, const QString& name, const QList<Matrix3f>& values);
-    void bindUniformAttribute(Storage::ShaderProgram* shaderProgram, const QString& name, const QList<Matrix4f>& values);
+    void bindUniformAttribute(const QString& name, const QVector<float>& values);
+    void bindUniformAttribute(const QString& name, const QList<Vector2f>& values);
+    void bindUniformAttribute(const QString& name, const QList<Vector3f>& values);
+    void bindUniformAttribute(const QString& name, const QList<Vector4f>& values);
+    void bindUniformAttribute(const QString& name, const QList<Matrix2f>& values);
+    void bindUniformAttribute(const QString& name, const QList<Matrix3f>& values);
+    void bindUniformAttribute(const QString& name, const QList<Matrix4f>& values);
 
-    inline void bindUniformAttribute(Storage::ShaderProgram* shaderProgram, const QString &name, float value)
+    inline void bindUniformAttribute(const QString &name, float value)
     {
       QVector<float> params;
       params << value;
-      bindUniformAttribute(shaderProgram, name, params);
+      bindUniformAttribute(name, params);
     }
-    inline void bindUniformAttribute(Storage::ShaderProgram* shaderProgram, const QString &name, const Vector3f& value)
+    inline void bindUniformAttribute(const QString &name, const Vector3f& value)
     {
       QList<Vector3f> params;
       params << value;
-      bindUniformAttribute(shaderProgram, name, params);
+      bindUniformAttribute(name, params);
     }
-    inline void bindUniformAttribute(Storage::ShaderProgram* shaderProgram, const QString &name, const Vector4f& value)
+    inline void bindUniformAttribute(const QString &name, const Vector4f& value)
     {
       QList<Vector4f> params;
       params << value;
-      bindUniformAttribute(shaderProgram, name, params);
+      bindUniformAttribute(name, params);
     }
-    inline void bindUniformAttribute(Storage::ShaderProgram* shaderProgram, const QString &name, const Matrix4f& value)
+    inline void bindUniformAttribute(const QString &name, const Matrix4f& value)
     {
       QList<Matrix4f> params;
       params << value;
-      bindUniformAttribute(shaderProgram, name, params);
+      bindUniformAttribute(name, params);
     }
-    inline void bindUniformAttribute(Storage::ShaderProgram* shaderProgram, const QString &name, const Matrix3f& value)
+    inline void bindUniformAttribute(const QString &name, const Matrix3f& value)
     {
       QList<Matrix3f> params;
       params << value;
-      bindUniformAttribute(shaderProgram, name, params);
+      bindUniformAttribute(name, params);
     }
-    void bindUniformAttribute(Storage::ShaderProgram* shaderProgram, const QString& name, int value);
+    void bindUniformAttribute(const QString& name, int value);
 
   private:
 
-    void setMaterial(Storage::Material *material, Storage::ShaderProgram* shaderProgram = 0l);
+    void setMaterial(Storage::Material *material);
 
     static char** prepareShaderSource(const QString &source, qint32 &count, qint32 **length);
 
-    void loadLights(Storage::ShaderProgram *shaderProgram);
+    void loadLights();
     void initFBO();
 };
 
