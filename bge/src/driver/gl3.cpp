@@ -127,7 +127,7 @@ class FBO
 
       for (quint8 i = 0; i < m_texturesCount; i++) {
         quint8 slot = TextureManager::self()->bind(m_textures[i]);
-        m_driver->bindUniformAttribute(0l, m_nameMapping.at(i), slot);
+        m_driver->bindUniformAttribute(m_nameMapping.at(i), slot);
       }
     }
 
@@ -230,10 +230,10 @@ void GL3::bind(Storage::Mesh *mesh)
   }
 
   // Let's bind our shader thingies :)
-  bindUniformAttribute(m_boundShader, "ProjectionMatrix", m_projectionMatrix);
-  bindAttribute(m_boundShader, "Vertex", 3, GL_FLOAT, sizeof(BufferElement), VERTEX_OFFSET);
-  bindAttribute(m_boundShader, "Normal", 3, GL_FLOAT, sizeof(BufferElement), NORMAL_OFFSET);
-  bindAttribute(m_boundShader, "TexCoord", 2, GL_FLOAT, sizeof(BufferElement), UV_OFFSET);
+  bindUniformAttribute("ProjectionMatrix", m_projectionMatrix);
+  bindAttribute("Vertex", 3, GL_FLOAT, sizeof(BufferElement), VERTEX_OFFSET);
+  bindAttribute("Normal", 3, GL_FLOAT, sizeof(BufferElement), NORMAL_OFFSET);
+  bindAttribute("TexCoord", 2, GL_FLOAT, sizeof(BufferElement), UV_OFFSET);
   m_boundMesh = mesh;
 }
 
@@ -253,7 +253,7 @@ void GL3::bind(Storage::Texture *texture)
     texture->setBindId(Canvas::canvas()->bindTexture(texture->texture()));
 
   if (texture->bindId())
-    bindUniformAttribute(m_boundShader, "Texture", TextureManager::self()->bind(texture->bindId()));
+    bindUniformAttribute("Texture", TextureManager::self()->bind(texture->bindId()));
 }
 
 void GL3::bind(Storage::ShaderProgram *shaderProgram)
@@ -269,10 +269,10 @@ void GL3::bind(Storage::ShaderProgram *shaderProgram)
 
   // Bind our shading shader attributes
   if (m_shading) {
-    bindUniformAttribute(m_boundShader, "ProjectionMatrix", m_projectionMatrix);
-    bindUniformAttribute(m_boundShader, "ModelViewMatrix", m_transform.matrix());
-    bindAttribute(m_boundShader, "Vertex", 3, GL_FLOAT, sizeof(BufferElement), VERTEX_OFFSET);
-    bindAttribute(m_boundShader, "TexCoord", 2, GL_FLOAT, sizeof(BufferElement), UV_OFFSET);
+    bindUniformAttribute("ProjectionMatrix", m_projectionMatrix);
+    bindUniformAttribute("ModelViewMatrix", m_transform.matrix());
+    bindAttribute("Vertex", 3, GL_FLOAT, sizeof(BufferElement), VERTEX_OFFSET);
+    bindAttribute("TexCoord", 2, GL_FLOAT, sizeof(BufferElement), UV_OFFSET);
   }
 }
 
@@ -281,9 +281,9 @@ void GL3::unbind(Storage::Mesh *mesh)
   if (!mesh || !mesh->bindId())
     return;
 
-  unbindAttribute(m_boundShader, "Vertex");
-  unbindAttribute(m_boundShader, "Normal");
-  unbindAttribute(m_boundShader, "TexCoord");
+  unbindAttribute("Vertex");
+  unbindAttribute("Normal");
+  unbindAttribute("TexCoord");
 
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -301,8 +301,8 @@ void GL3::unbind(Storage::ShaderProgram *shaderProgram)
     return;
 
   if (m_shading) {
-    unbindAttribute(m_boundShader, "Vertex");
-    unbindAttribute(m_boundShader, "TexCoord");
+    unbindAttribute("Vertex");
+    unbindAttribute("TexCoord");
   }
   glUseProgram(0);
   m_boundShader = 0l;
@@ -374,8 +374,8 @@ void GL3::setTransformMatrix(const Transform3f& transform)
   m_normalMatrix = inverse.block<3, 3>(0, 0);
 
   if (m_boundShader) {
-    bindUniformAttribute(m_boundShader, "ModelViewMatrix", m_transform.matrix());
-    bindUniformAttribute(m_boundShader, "NormalMatrix", m_normalMatrix);
+    bindUniformAttribute("ModelViewMatrix", m_transform.matrix());
+    bindUniformAttribute("NormalMatrix", m_normalMatrix);
   }
 }
 
@@ -385,11 +385,11 @@ void GL3::draw()
     qFatal("BGE::Driver::GL3::draw(): Shader not bound!");
 
   Storage::Material* currentMaterial = 0l;
-  setMaterial(currentMaterial, m_boundShader);
+  setMaterial(currentMaterial);
   foreach (Plan plan, m_plans.value(m_boundMesh->bindId())) {
     if (currentMaterial != m_materials.value(plan.materialName)) {
       currentMaterial = m_materials.value(plan.materialName);
-      setMaterial(currentMaterial, m_boundShader);
+      setMaterial(currentMaterial);
     }
 
     glDrawElements(plan.primitive, plan.count, GL_UNSIGNED_SHORT, (GLushort*)0 + plan.offset);
@@ -555,7 +555,7 @@ void GL3::pass(Rendering::Stage *stage)
   quint8 loop = 1;
   if (stage->m_needLights) {
     if (m_firstPass)
-      bindUniformAttribute(m_boundShader, "GlobalAmbient", Vector4f(Scene::Light::globalAmbient().redF(), Scene::Light::globalAmbient().greenF(), Scene::Light::globalAmbient().blueF(), Scene::Light::globalAmbient().alphaF()));
+      bindUniformAttribute("GlobalAmbient", Vector4f(Scene::Light::globalAmbient().redF(), Scene::Light::globalAmbient().greenF(), Scene::Light::globalAmbient().blueF(), Scene::Light::globalAmbient().alphaF()));
     loop = m_lights.size();
   }
 
@@ -585,7 +585,7 @@ void GL3::pass(Rendering::Stage *stage)
 
   for (quint8 i = 0; i < loop; i += m_maxLights) {
     if (stage->m_needLights)
-      loadLights(m_boundShader);
+      loadLights();
 
     glDrawElements(GL_QUADS, 4, GL_UNSIGNED_SHORT, (GLushort*)0);
 
@@ -594,7 +594,7 @@ void GL3::pass(Rendering::Stage *stage)
       glEnable(GL_BLEND);
       glDisable(GL_DEPTH_TEST);
       if (stage->m_needLights)
-        bindUniformAttribute(m_boundShader, "GlobalAmbient", Vector4f(0, 0, 0, 1));
+        bindUniformAttribute("GlobalAmbient", Vector4f(0, 0, 0, 1));
     }
   }
 
@@ -854,54 +854,34 @@ void GL3::load(Storage::ShaderProgram *shaderProgram)
   }
 }
 
-void GL3::bindAttribute(Storage::ShaderProgram *shaderProgram, QString name, qint32 size, quint32 type, quint32 stride, quint32 offset)
+void GL3::bindAttribute(QString name, qint32 size, quint32 type, quint32 stride, quint32 offset)
 {
-  if (!shaderProgram || !shaderProgram->bindId())
-    shaderProgram = m_boundShader;
-  if (!shaderProgram || !shaderProgram->bindId())
-    qFatal("No shader bound!");
-
   name.prepend("in_");
-  GLint loc = glGetAttribLocation(shaderProgram->bindId(), name.toAscii().data());
+  GLint loc = glGetAttribLocation(m_boundShader->bindId(), name.toAscii().data());
   if (loc != -1) {
     glEnableVertexAttribArray(loc);
     glVertexAttribPointer(loc, size, type, GL_FALSE, stride, (void*) offset);
   }
 }
 
-void GL3::unbindAttribute(Storage::ShaderProgram *shaderProgram, QString name)
+void GL3::unbindAttribute(QString name)
 {
-  if (!shaderProgram || !shaderProgram->bindId())
-    shaderProgram = m_boundShader;
-  if (!shaderProgram || !shaderProgram->bindId())
-    qFatal("No shader bound!");
-
   name.prepend("in_");
-  GLint loc = glGetAttribLocation(shaderProgram->bindId(), name.toAscii().data());
+  GLint loc = glGetAttribLocation(m_boundShader->bindId(), name.toAscii().data());
   if (loc != -1)
     glDisableVertexAttribArray(loc);
 }
 
-void GL3::bindUniformAttribute(Storage::ShaderProgram *shaderProgram, const QString &name, const QVector<float>& values)
+void GL3::bindUniformAttribute(const QString &name, const QVector<float>& values)
 {
-  if (!shaderProgram || !shaderProgram->bindId())
-    shaderProgram = m_boundShader;
-  if (!shaderProgram || !shaderProgram->bindId())
-    qFatal("No shader bound!");
-
-  GLint loc = glGetUniformLocation(shaderProgram->bindId(), name.toAscii());
+  GLint loc = glGetUniformLocation(m_boundShader->bindId(), name.toAscii());
   if (loc != -1)
     glUniform1fv(loc, values.size(), (GLfloat*) values.data());
 }
 
-void GL3::bindUniformAttribute(Storage::ShaderProgram *shaderProgram, const QString &name, const QList<Vector2f>& values)
+void GL3::bindUniformAttribute(const QString &name, const QList<Vector2f>& values)
 {
-  if (!shaderProgram || !shaderProgram->bindId())
-    shaderProgram = m_boundShader;
-  if (!shaderProgram || !shaderProgram->bindId())
-    qFatal("No shader bound!");
-
-  GLint loc = glGetUniformLocation(shaderProgram->bindId(), name.toAscii());
+  GLint loc = glGetUniformLocation(m_boundShader->bindId(), name.toAscii());
   if (loc != -1) {
     GLfloat *data = (GLfloat*) malloc(values.size() * 2 * sizeof(GLfloat));
     foreach (Vector2f value, values)
@@ -912,14 +892,9 @@ void GL3::bindUniformAttribute(Storage::ShaderProgram *shaderProgram, const QStr
   }
 }
 
-void GL3::bindUniformAttribute(Storage::ShaderProgram *shaderProgram, const QString &name, const QList<Vector3f>& values)
+void GL3::bindUniformAttribute(const QString &name, const QList<Vector3f>& values)
 {
-  if (!shaderProgram || !shaderProgram->bindId())
-    shaderProgram = m_boundShader;
-  if (!shaderProgram || !shaderProgram->bindId())
-    qFatal("No shader bound!");
-
-  GLint loc = glGetUniformLocation(shaderProgram->bindId(), name.toAscii());
+  GLint loc = glGetUniformLocation(m_boundShader->bindId(), name.toAscii());
   if (loc != -1) {
     GLfloat *data = (GLfloat*) malloc(values.size() * 3 * sizeof(GLfloat));
     foreach (Vector3f value, values)
@@ -930,14 +905,9 @@ void GL3::bindUniformAttribute(Storage::ShaderProgram *shaderProgram, const QStr
   }
 }
 
-void GL3::bindUniformAttribute(Storage::ShaderProgram *shaderProgram, const QString &name, const QList<Vector4f>& values)
+void GL3::bindUniformAttribute(const QString &name, const QList<Vector4f>& values)
 {
-  if (!shaderProgram || !shaderProgram->bindId())
-    shaderProgram = m_boundShader;
-  if (!shaderProgram || !shaderProgram->bindId())
-    qFatal("No shader bound!");
-
-  GLint loc = glGetUniformLocation(shaderProgram->bindId(), name.toAscii());
+  GLint loc = glGetUniformLocation(m_boundShader->bindId(), name.toAscii());
   if (loc != -1) {
     GLfloat *data = (GLfloat*) malloc(values.size() * 4 * sizeof(GLfloat));
     foreach (Vector4f value, values)
@@ -948,14 +918,9 @@ void GL3::bindUniformAttribute(Storage::ShaderProgram *shaderProgram, const QStr
   }
 }
 
-void GL3::bindUniformAttribute(Storage::ShaderProgram *shaderProgram, const QString &name, const QList<Matrix2f>& values)
+void GL3::bindUniformAttribute(const QString &name, const QList<Matrix2f>& values)
 {
-  if (!shaderProgram || !shaderProgram->bindId())
-    shaderProgram = m_boundShader;
-  if (!shaderProgram || !shaderProgram->bindId())
-    qFatal("No shader bound!");
-
-  GLint loc = glGetUniformLocation(shaderProgram->bindId(), name.toAscii());
+  GLint loc = glGetUniformLocation(m_boundShader->bindId(), name.toAscii());
   if (loc != -1) {
     GLfloat *data = (GLfloat*) malloc(values.size() * 4 * sizeof(GLfloat));
     foreach (Matrix2f value, values)
@@ -966,14 +931,9 @@ void GL3::bindUniformAttribute(Storage::ShaderProgram *shaderProgram, const QStr
   }
 }
 
-void GL3::bindUniformAttribute(Storage::ShaderProgram *shaderProgram, const QString &name, const QList<Matrix3f>& values)
+void GL3::bindUniformAttribute(const QString &name, const QList<Matrix3f>& values)
 {
-  if (!shaderProgram || !shaderProgram->bindId())
-    shaderProgram = m_boundShader;
-  if (!shaderProgram || !shaderProgram->bindId())
-    qFatal("No shader bound!");
-
-  GLint loc = glGetUniformLocation(shaderProgram->bindId(), name.toAscii());
+  GLint loc = glGetUniformLocation(m_boundShader->bindId(), name.toAscii());
   if (loc != -1) {
     GLfloat *data = (GLfloat*) malloc(values.size() * 9 * sizeof(GLfloat));
     foreach (Matrix3f value, values)
@@ -984,14 +944,9 @@ void GL3::bindUniformAttribute(Storage::ShaderProgram *shaderProgram, const QStr
   }
 }
 
-void GL3::bindUniformAttribute(Storage::ShaderProgram *shaderProgram, const QString &name, const QList<Matrix4f>& values)
+void GL3::bindUniformAttribute(const QString &name, const QList<Matrix4f>& values)
 {
-  if (!shaderProgram || !shaderProgram->bindId())
-    shaderProgram = m_boundShader;
-  if (!shaderProgram || !shaderProgram->bindId())
-    qFatal("No shader bound!");
-
-  GLint loc = glGetUniformLocation(shaderProgram->bindId(), name.toAscii());
+  GLint loc = glGetUniformLocation(m_boundShader->bindId(), name.toAscii());
   if (loc != -1) {
     GLfloat *data = (GLfloat*) malloc(values.size() * 16 * sizeof(GLfloat));
     foreach (Matrix4f value, values)
@@ -1002,23 +957,15 @@ void GL3::bindUniformAttribute(Storage::ShaderProgram *shaderProgram, const QStr
   }
 }
 
-void GL3::bindUniformAttribute(Storage::ShaderProgram *shaderProgram, const QString &name, int value)
+void GL3::bindUniformAttribute(const QString &name, int value)
 {
-  if (!shaderProgram || !shaderProgram->bindId())
-    shaderProgram = m_boundShader;
-  if (!shaderProgram || !shaderProgram->bindId())
-    qFatal("No shader bound!");
-
-  GLint loc = glGetUniformLocation(shaderProgram->bindId(), name.toAscii());
+  GLint loc = glGetUniformLocation(m_boundShader->bindId(), name.toAscii());
   if (loc != -1)
     glUniform1i(loc, value);
 }
 
-void GL3::setMaterial(Storage::Material *material, Storage::ShaderProgram *shaderProgram)
+void GL3::setMaterial(Storage::Material *material)
 {
-  if (!shaderProgram)
-    shaderProgram = m_boundShader;
-
   bool deleteAfter = false;
   if (!material) {
     material = new Storage::Material("default");
@@ -1026,18 +973,18 @@ void GL3::setMaterial(Storage::Material *material, Storage::ShaderProgram *shade
   }
 
   Vector4f color(material->ambient().redF(), material->ambient().greenF(), material->ambient().blueF(), material->ambient().alphaF());
-  bindUniformAttribute(shaderProgram, "Material.ambient", color);
+  bindUniformAttribute("Material.ambient", color);
 
   color = Vector4f(material->diffuse().redF(), material->diffuse().greenF(), material->diffuse().blueF(), material->diffuse().alphaF());
-  bindUniformAttribute(shaderProgram, "Material.diffuse", color);
+  bindUniformAttribute("Material.diffuse", color);
 
   color = Vector4f(material->specular().redF(), material->specular().greenF(), material->specular().blueF(), material->specular().alphaF());
-  bindUniformAttribute(shaderProgram, "Material.specular", color);
+  bindUniformAttribute("Material.specular", color);
 
   color = Vector4f(material->emission().redF(), material->emission().greenF(), material->emission().blueF(), material->emission().alphaF());
-  bindUniformAttribute(shaderProgram, "Material.emission", color);
+  bindUniformAttribute("Material.emission", color);
 
-  bindUniformAttribute(shaderProgram, "Material.shininess", (float) material->shininess() / 100);
+  bindUniformAttribute("Material.shininess", (float) material->shininess() / 100);
 
   if (deleteAfter)
     delete material;
@@ -1061,10 +1008,8 @@ char** GL3::prepareShaderSource(const QString &source, qint32 &count, qint32 **l
   return output;
 }
 
-void GL3::loadLights(Storage::ShaderProgram *shaderProgram)
+void GL3::loadLights()
 {
-  //quint32 i = 0;
-  //foreach (Light light, m_lights) {
   quint8 offset = m_renderedLights;
   if (offset)
     offset--;
@@ -1074,18 +1019,18 @@ void GL3::loadLights(Storage::ShaderProgram *shaderProgram)
     if (i + offset >= size)
       break;
     Light light = m_lights.at(i + offset);
-    bindUniformAttribute(shaderProgram, QString("Lights%0.position").arg(i), light.position);
-    bindUniformAttribute(shaderProgram, QString("Lights%0.ambient").arg(i), light.ambient);
-    bindUniformAttribute(shaderProgram, QString("Lights%0.diffuse").arg(i), light.diffuse);
-    bindUniformAttribute(shaderProgram, QString("Lights%0.specular").arg(i), light.specular);
-    bindUniformAttribute(shaderProgram, QString("Lights%0.constant").arg(i), light.constant);
-    bindUniformAttribute(shaderProgram, QString("Lights%0.linear").arg(i), light.linear);
-    bindUniformAttribute(shaderProgram, QString("Lights%0.quadratic").arg(i), light.quadratic);
-    bindUniformAttribute(shaderProgram, QString("Lights%0.spot_cutoff").arg(i), light.spot_cutoff);
-    bindUniformAttribute(shaderProgram, QString("Lights%0.spot_exponent").arg(i), light.spot_exponent);
-    bindUniformAttribute(shaderProgram, QString("Lights%0.spot_direction").arg(i), light.spot_direction);
+    bindUniformAttribute(QString("Lights%0.position").arg(i), light.position);
+    bindUniformAttribute(QString("Lights%0.ambient").arg(i), light.ambient);
+    bindUniformAttribute(QString("Lights%0.diffuse").arg(i), light.diffuse);
+    bindUniformAttribute(QString("Lights%0.specular").arg(i), light.specular);
+    bindUniformAttribute(QString("Lights%0.constant").arg(i), light.constant);
+    bindUniformAttribute(QString("Lights%0.linear").arg(i), light.linear);
+    bindUniformAttribute(QString("Lights%0.quadratic").arg(i), light.quadratic);
+    bindUniformAttribute(QString("Lights%0.spot_cutoff").arg(i), light.spot_cutoff);
+    bindUniformAttribute(QString("Lights%0.spot_exponent").arg(i), light.spot_exponent);
+    bindUniformAttribute(QString("Lights%0.spot_direction").arg(i), light.spot_direction);
     m_renderedLights++;
     usedLights++;
   }
-  bindUniformAttribute(shaderProgram, "UsedLights", usedLights);
+  bindUniformAttribute("UsedLights", usedLights);
 }
