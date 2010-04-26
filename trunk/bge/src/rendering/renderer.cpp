@@ -81,6 +81,7 @@ void Renderer::drawScene()
     if (currentMesh != object->mesh()) {
       if (currentMesh)
         currentMesh->unbind();
+
       object->mesh()->bind();
       currentMesh = object->mesh();
     }
