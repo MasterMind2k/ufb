@@ -73,6 +73,9 @@ class AbstractDriver
 
     virtual void shading() = 0;
     virtual void registerStage(quint8 index, Rendering::Stage *stage) = 0;
+    virtual void unregisterStage(quint8 index) = 0;
+    virtual void replaceStage(quint8 index, Rendering::Stage *stage) = 0;
+    virtual Rendering::Stage *stage(quint8 index) const = 0;
 
   protected:
     inline AbstractDriver() {}

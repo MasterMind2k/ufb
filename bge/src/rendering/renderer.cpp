@@ -66,6 +66,9 @@ void Renderer::renderScene()
 
 void Renderer::drawScene()
 {
+  Storage::Mesh *currentMesh = 0l;
+  Storage::Texture *currentTexture = 0l;
+
   while (!m_renderQueue.isEmpty()) {
     Scene::Object* object = m_renderQueue.dequeue();
 
@@ -75,12 +78,22 @@ void Renderer::drawScene()
 
     Driver::AbstractDriver::self()->bind(object->materials());
 
-    object->mesh()->bind();
-    if (object->texture())
-      object->texture()->bind();
+    if (currentMesh != object->mesh()) {
+      if (currentMesh)
+        currentMesh->unbind();
+      object->mesh()->bind();
+      currentMesh = object->mesh();
+    }
+
+    if (currentTexture != object->texture()) {
+      if (currentTexture)
+        currentTexture->unbind();
+
+      if (object->texture())
+        object->texture()->bind();
+      currentTexture = object->texture();
+    }
+
     Driver::AbstractDriver::self()->draw();
-    if (object->texture())
-      object->texture()->unbind();
-    object->mesh()->unbind();
   }
 }

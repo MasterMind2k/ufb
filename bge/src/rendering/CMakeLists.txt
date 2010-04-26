@@ -6,6 +6,7 @@ set(rendering_SRCS
   stage.cpp
   lightingstage.cpp
   bloomstage.cpp
+  outputstage.cpp
 )
 
 add_library(rendering ${rendering_SRCS})

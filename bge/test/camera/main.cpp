@@ -65,6 +65,9 @@ int main(int argc, char** argv)
   QApplication app(argc, argv);
   Cameras cameras;
 
+  // Remove blooming stage
+  BGE::Canvas::canvas()->unregisterStage(1);
+
   // Setup global light
   BGE::Scene::Light* light = BGE::Canvas::canvas()->createLight("Sun");
   light->setPositional(false);

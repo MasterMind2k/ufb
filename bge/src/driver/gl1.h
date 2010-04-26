@@ -69,6 +69,9 @@ class GL1 : public AbstractDriver
 
     inline void shading() {}
     inline void registerStage(quint8 index, Rendering::Stage *stage) {}
+    inline void unregisterStage(quint8 index) {}
+    inline void replaceStage(quint8 index, Rendering::Stage *stage) {}
+    inline Rendering::Stage *stage(quint8 index) const {}
 
   private:
     quint8 m_usedLights;

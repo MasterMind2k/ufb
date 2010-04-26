@@ -41,7 +41,6 @@ class Stage
       m_renderOutput = Display;
       m_needLights = false;
       m_framebuffer = 0l;
-      m_needPrevious = false;
     }
 
     virtual void render() = 0;
@@ -75,18 +74,12 @@ class Stage
       m_textures << name;
     }
 
-    inline void needPreviousRender()
-    {
-      m_needPrevious = true;
-    }
-
   private:
     FBO *m_framebuffer;
     Driver::GL3 *m_driver;
     Output m_renderOutput;
     QStringList m_textures;
     bool m_needLights;
-    bool m_needPrevious;
 
     friend class BGE::Driver::GL3;
 };

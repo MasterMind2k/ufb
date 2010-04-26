@@ -25,7 +25,7 @@ void main(void)
   vec4 blurSample = vec4(0.0);
   float sampleStep = step();
 
-  for(int i = -20; i < 21; i++) {
+  for(int i = -10; i < 11; i++) {
     blurSample += texture2D(Emission, ex_TexCoord + vec2(i * sampleStep, 0)) * gauss(i);
   }
 
