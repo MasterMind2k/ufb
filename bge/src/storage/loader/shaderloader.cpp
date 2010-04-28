@@ -31,7 +31,8 @@ QStringList parseSource(QString& source)
   int length = 0;
   while ((pos = matcher.indexIn(source, pos + 1)) != -1) {
     modules << matcher.cap(1);
-    length += matcher.matchedLength();
+    length += matcher.matchedLength() + 1;
+    pos += matcher.matchedLength();
   }
 
   source = source.mid(length + 1).simplified();
