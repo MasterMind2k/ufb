@@ -9,6 +9,7 @@ add_subdirectory(driver)
 add_subdirectory(rendering)
 add_subdirectory(scene)
 add_subdirectory(storage)
+add_subdirectory(3rdparty)
 
 set(bge_SRCS
   canvas.cpp
