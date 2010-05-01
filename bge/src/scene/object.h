@@ -87,15 +87,6 @@ class Object
     }
 
     /**
-     * Sets orientation.
-     */
-    inline void setOrientation(const Quaternionf& orientation)
-    {
-      m_globalOrientation = orientation.normalized();
-      m_orientation = orientation.normalized();
-      m_transformModified = true;
-    }
-    /**
      * Rotates the object by rotation.
      *
      * @see rotateX
@@ -176,6 +167,15 @@ class Object
     {
       return m_position;
     }
+    inline void setPosition(float x, float y, float z)
+    {
+      setPosition(Vector3f(x, y, z));
+    }
+    inline void setPosition(const Vector3f &pos)
+    {
+      m_position = pos;
+      m_transformModified = true;
+    }
     /**
      * Returns the global position.
      *
@@ -194,6 +194,18 @@ class Object
     inline const Quaternionf& orientation() const
     {
       return m_orientation;
+    }
+    /**
+     * Sets orientation.
+     */
+    inline void setOrientation(const Quaternionf& orientation)
+    {
+      m_orientation = orientation.normalized();
+      m_transformModified = true;
+    }
+    inline void setOrientation(float w, float x, float y, float z)
+    {
+      setOrientation(Quaternionf(w, x, y, z));
     }
     /**
      * Returns the global orientation.

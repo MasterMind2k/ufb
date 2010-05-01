@@ -58,10 +58,6 @@ Object::~Object()
 void Object::move(const Vector3f& direction)
 {
   m_position += direction;
-  if (parent())
-    m_globalPosition = parent()->globalPosition() + m_position;
-  else
-    m_globalPosition = m_position;
 
   // Mark for recalculation
   m_transformModified = true;
@@ -70,11 +66,6 @@ void Object::move(const Vector3f& direction)
 void Object::rotate(const AngleAxisf& rotation)
 {
   m_orientation = (m_orientation * rotation).normalized();
-  if (parent())
-    m_globalOrientation = (parent()->globalOrientation() * m_orientation).normalized();
-  else
-    m_globalOrientation = m_orientation;
-
 
   // Mark for recalculation
   m_transformModified = true;
