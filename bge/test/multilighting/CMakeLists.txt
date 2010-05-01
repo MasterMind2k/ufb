@@ -2,7 +2,7 @@ set(QT_USE_QTOPENGL TRUE)
 
 include(${QT_USE_FILE})
 
-include_directories(. ../../src ${CMAKE_CURRENT_BINARY_DIR} ${QT_INCLUDES} ${EIGEN2_INCLUDE_DIR}
+include_directories(. ../../src ../../src/3rdparty/bullet/src ${CMAKE_CURRENT_BINARY_DIR} ${QT_INCLUDES} ${EIGEN2_INCLUDE_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR})
 
 set(bge_multilighting_SRCS

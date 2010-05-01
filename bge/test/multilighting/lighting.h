@@ -15,21 +15,13 @@
 
 #include <QtCore/QObject>
 
-#include "scene/object.h"
+class btRigidBody;
 
-class Lighting : public QObject, public BGE::Scene::Object
+class Lighting : public QObject
 {
   Q_OBJECT
   public:
     Lighting();
-
-  private:
-    QList<Vector3f> m_directions;
-
-    void calculateTransforms(qint32 timeDiff);
-
-  private slots:
-    void setDirections();
 };
 
 #endif

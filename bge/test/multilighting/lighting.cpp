@@ -16,9 +16,16 @@
 
 #include <QtCore/QTimer>
 
+#include "BulletDynamics/Dynamics/btDynamicsWorld.h"
+#include "BulletDynamics/Dynamics/btRigidBody.h"
+
+#include "BulletCollision/CollisionShapes/btBoxShape.h"
+
 #include "canvas.h"
+#include "motionstate.h"
 
 #include "scene/light.h"
+#include "scene/boundingvolume.h"
 
 #include "storage/storagemanager.h"
 #include "storage/mesh.h"
@@ -26,45 +33,28 @@
 #include "storage/shaderprogram.h"
 
 Lighting::Lighting()
-  : QObject(), BGE::Scene::Object()
+  : QObject()
 {
+  qsrand(time(0l));
   BGE::Storage::Material *material = BGE::Storage::StorageManager::self()->get<BGE::Storage::Material*>("/materials/Light");
   // Setup lights
   for (quint16 i = 0; i < 15; i ++) {
     QString lightName = "Light_" + QString::number(i);
-    addChild(BGE::Canvas::canvas()->createLight(lightName));
-    BGE::Canvas::canvas()->light(lightName)->setQuadraticAttenuation(0.0005);
-    BGE::Canvas::canvas()->light(lightName)->move(qrand() % 500 - 300, 50, qrand() % 500 - 300);
-    BGE::Canvas::canvas()->light(lightName)->setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/models/Cube"));
-    BGE::Canvas::canvas()->light(lightName)->addMaterial(material);
+    BGE::Scene::Light *light = BGE::Canvas::canvas()->createLight(lightName);
+    BGE::Canvas::canvas()->addSceneObject(light);
+    light->setQuadraticAttenuation(0.0005);
+    light->move(qrand() % 500 - 300, 50, qrand() % 500 - 300);
+    light->setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/models/Cube"));
+    light->addMaterial(material);
+
+    // Make rigid body
+    btRigidBody *body = new btRigidBody(1, new BGE::MotionState(light), new btBoxShape(btVector3(light->boundingVolume()->size().x(), light->boundingVolume()->size().y(), light->boundingVolume()->size().z())), btVector3(0, 0, 0));
+    BGE::Canvas::canvas()->dynamicsWorld()->addRigidBody(body);
+
+    // Setup forces
+    body->applyCentralImpulse(btVector3(qrand() % 100 - 50, 0, qrand() % 100 - 50));
+    body->setRestitution(1);
+    body->setGravity(btVector3(0, 0, 0));
+    body->applyGravity();
   }
-
-  qsrand(time(0l));
-
-  // Init directions
-  setDirections();
-}
-
-void Lighting::calculateTransforms(qint32 timeDiff)
-{
-  quint32 i = 0;
-  foreach (BGE::Scene::Object *light, BGE::Scene::Object::children()) {
-    Vector3f direction = m_directions.at(i);
-    if (light->globalPosition().x() > 300 || light->globalPosition().x() < -300)
-      direction = direction.cwise() * Vector3f(-1, 1, 1);
-
-    if (light->globalPosition().z() > 300 || light->globalPosition().z() < -300)
-      direction = direction.cwise() * Vector3f(1, 1, -1);
-
-    m_directions[i++] = direction;
-    light->move(direction * (qreal) timeDiff / 1000.0);
-  }
-}
-
-void Lighting::setDirections()
-{
-  quint32 size = BGE::Canvas::canvas()->lights().size();
-  m_directions.clear();
-  for (quint32 i = 0; i < size; i++)
-    m_directions << Vector3f(qrand() % 50, 0, qrand() % 50);
 }

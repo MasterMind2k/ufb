@@ -12,6 +12,13 @@
  ***************************************************************************/
 #include <QtGui/QApplication>
 
+#include "LinearMath/btDefaultMotionState.h"
+
+#include "BulletDynamics/Dynamics/btDynamicsWorld.h"
+#include "BulletDynamics/Dynamics/btRigidBody.h"
+
+#include "BulletCollision/CollisionShapes/btBoxShape.h"
+
 #include "canvas.h"
 
 #include "storage/storagemanager.h"
@@ -83,6 +90,29 @@ int main(int argc, char** argv)
   material->setFaceName("side");
   BGE::Storage::StorageManager::self()->set(material, "/materials/");
 
+  // Make the invisible fence
+  btTransform transfom;
+  transfom.setIdentity();
+  transfom.setOrigin(btVector3(300, 0, 0));
+  btRigidBody *box = new btRigidBody(0, new btDefaultMotionState(transfom), new btBoxShape(btVector3(1, 150, 300)), btVector3(0, 0, 0));
+  BGE::Canvas::canvas()->dynamicsWorld()->addRigidBody(box);
+  box->setRestitution(1);
+
+  transfom.setOrigin(btVector3(-300, 0, 0));
+  box = new btRigidBody(0, new btDefaultMotionState(transfom), new btBoxShape(btVector3(1, 150, 300)), btVector3(0, 0, 0));
+  BGE::Canvas::canvas()->dynamicsWorld()->addRigidBody(box);
+  box->setRestitution(1);
+
+  transfom.setOrigin(btVector3(0, 0, 300));
+  box = new btRigidBody(0, new btDefaultMotionState(transfom), new btBoxShape(btVector3(300, 150, 1)), btVector3(0, 0, 0));
+  BGE::Canvas::canvas()->dynamicsWorld()->addRigidBody(box);
+  box->setRestitution(1);
+
+  transfom.setOrigin(btVector3(0, 0, -300));
+  box = new btRigidBody(0, new btDefaultMotionState(transfom), new btBoxShape(btVector3(300, 150, 1)), btVector3(0, 0, 0));
+  BGE::Canvas::canvas()->dynamicsWorld()->addRigidBody(box);
+  box->setRestitution(1);
+
   // Setup camera
   BGE::Canvas::canvas()->createCamera("Global camera");
   BGE::Canvas::canvas()->activateCamera("Global camera");
@@ -153,7 +183,7 @@ int main(int argc, char** argv)
   BGE::Canvas::canvas()->addSceneObject(object);
 
   // Add light container
-  BGE::Canvas::canvas()->addSceneObject(new Lighting);
+  new Lighting;
 
   // Make FPS shown
   BGE::Canvas::canvas()->setFPSShown(true);
