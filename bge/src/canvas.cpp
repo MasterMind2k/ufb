@@ -22,6 +22,12 @@
 #include <QtGui/QApplication>
 #include <QtGui/QMatrix4x4>
 
+#include "BulletDynamics/Dynamics/btDiscreteDynamicsWorld.h"
+#include "BulletDynamics/ConstraintSolver/btSequentialImpulseConstraintSolver.h"
+
+#include "BulletCollision/CollisionDispatch/btDefaultCollisionConfiguration.h"
+#include "BulletCollision/BroadphaseCollision/btDbvtBroadphase.h"
+
 #include "driver/abstractdriver.h"
 
 #include "scene/object.h"
@@ -96,6 +102,10 @@ Canvas::Canvas()
   registerStage(-1, new Rendering::BloomStage);
   registerStage(-1, new Rendering::OutputStage);
 
+  // Setup default dynamics world
+  btDefaultCollisionConfiguration *collisionConfiguration = new btDefaultCollisionConfiguration;
+  m_dynamicsWorld = new btDiscreteDynamicsWorld(new btCollisionDispatcher(collisionConfiguration), new btDbvtBroadphase, new btSequentialImpulseConstraintSolver, collisionConfiguration);
+
   connect(m_timer, SIGNAL(timeout()), SLOT(updateGL()));
   connect(QApplication::instance(), SIGNAL(aboutToQuit()), SLOT(cleanup()));
 }
@@ -148,6 +158,7 @@ void Canvas::paintGL()
 
   // Calculate all the transforms (recursive)
   if (elapsed > 0) {
+    m_dynamicsWorld->stepSimulation(elapsed / 1000000.f);
     m_scene->prepareTransforms(elapsed);
 
     // Calculate list of visible objects

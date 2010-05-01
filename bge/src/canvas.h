@@ -18,6 +18,8 @@
 
 #include <QtOpenGL/QGLWidget>
 
+class btDynamicsWorld;
+
 namespace BGE {
 
 class AbstractController;
@@ -205,6 +207,15 @@ class Canvas : public QGLWidget
      */
     void registerStage(quint8 index, Rendering::Stage *stage);
 
+    inline btDynamicsWorld *dynamicsWorld() const
+    {
+      return m_dynamicsWorld;
+    }
+    inline void setDynamicsWorld(btDynamicsWorld *dynamicsWorld)
+    {
+      m_dynamicsWorld = dynamicsWorld;
+    }
+
   private:
     /* Really private stuff */
     Scene::Object *m_scene;
@@ -230,10 +241,11 @@ class Canvas : public QGLWidget
 
     bool m_drawBoundingVolumes;
 
+    btDynamicsWorld *m_dynamicsWorld;
+
     static Canvas* m_self;
 
     Canvas();
-
 
     /* Reimplemented methods */
     void initializeGL();
