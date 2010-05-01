@@ -105,6 +105,7 @@ Canvas::Canvas()
   // Setup default dynamics world
   btDefaultCollisionConfiguration *collisionConfiguration = new btDefaultCollisionConfiguration;
   m_dynamicsWorld = new btDiscreteDynamicsWorld(new btCollisionDispatcher(collisionConfiguration), new btDbvtBroadphase, new btSequentialImpulseConstraintSolver, collisionConfiguration);
+  m_dynamicsWorld->setGravity(btVector3(0, -10, 0));
 
   connect(m_timer, SIGNAL(timeout()), SLOT(updateGL()));
   connect(QApplication::instance(), SIGNAL(aboutToQuit()), SLOT(cleanup()));
@@ -158,7 +159,7 @@ void Canvas::paintGL()
 
   // Calculate all the transforms (recursive)
   if (elapsed > 0) {
-    m_dynamicsWorld->stepSimulation(elapsed / 1000000.f);
+    m_dynamicsWorld->stepSimulation(elapsed);
     m_scene->prepareTransforms(elapsed);
 
     // Calculate list of visible objects

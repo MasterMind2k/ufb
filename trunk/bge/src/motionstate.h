@@ -36,7 +36,14 @@ class MotionState : public btMotionState
     }
     inline void getWorldTransform(btTransform &worldTrans) const
     {
-      worldTrans.setFromOpenGLMatrix(m_object->globalTransform().data());
+      if (m_object->isTransformModified()) {
+        /* Calculate from local position and rotation, since physics should
+           be used only on global objects */
+        worldTrans.setRotation(btQuaternion(m_object->orientation().x(), m_object->orientation().y(), m_object->orientation().z(), m_object->orientation().w()));
+        worldTrans.setOrigin(btVector3(m_object->position().x(), m_object->position().y(), m_object->position().z()));
+      } else {
+        worldTrans.setFromOpenGLMatrix(m_object->globalTransform().data());
+      }
     }
 
   private:

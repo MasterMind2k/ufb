@@ -284,7 +284,6 @@ class Object
     }
 
     /**
-     * @TODO Does this method has to be public?
      * True if transformations have to be recalculated.
      */
     inline bool isTransformModified() const
