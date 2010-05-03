@@ -22,6 +22,12 @@ class Lighting : public QObject
   Q_OBJECT
   public:
     Lighting();
+
+  private:
+    QList<btRigidBody*> m_bodies;
+
+  private slots:
+    void setDirections();
 };
 
 #endif
