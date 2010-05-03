@@ -24,6 +24,7 @@ namespace BGE {
 namespace Scene {
 class Object;
 class Light;
+class ParticleEmitter;
 }
 namespace Rendering {
 class Stage;
@@ -66,6 +67,7 @@ class AbstractDriver
     virtual void setTransformMatrix(const Transform3f& transform) = 0;
 
     virtual void draw() = 0;
+    virtual void draw(Scene::ParticleEmitter *emitter) = 0;
 
     virtual void init() = 0;
     virtual void clear() = 0;

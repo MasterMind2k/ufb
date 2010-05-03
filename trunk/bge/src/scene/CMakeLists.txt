@@ -6,6 +6,7 @@ set(scene_SRCS
   object.cpp
   camera.cpp
   light.cpp
+  particleemitter.cpp
   partition.cpp
   boundingvolume.cpp
 )

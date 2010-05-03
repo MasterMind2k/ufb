@@ -377,6 +377,11 @@ class Object
       return m_boundingVolume;
     }
 
+    inline bool isRenderable() const
+    {
+      return m_isRenderable;
+    }
+
   protected:
     /**
      * This method gets called _before_ transform matrices get updated. Reimplement
@@ -385,6 +390,16 @@ class Object
     virtual inline void calculateTransforms(qint32 timeDiff)
     {
       Q_UNUSED(timeDiff);
+    }
+
+    virtual inline void postTransformCalculations(qint32 timeDiff)
+    {
+      Q_UNUSED(timeDiff);
+    }
+
+    inline void setRenderable(bool isRenderable)
+    {
+      m_isRenderable = isRenderable;
     }
 
   private:
@@ -399,6 +414,7 @@ class Object
     QList<Object*> m_children;
     Object *m_parent;
     bool m_transformModified;
+    bool m_isRenderable;
 
     Storage::Mesh* m_mesh;
     QHash<QString, Storage::Material*> m_materials;

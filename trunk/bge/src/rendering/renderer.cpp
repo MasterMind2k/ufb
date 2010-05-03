@@ -19,6 +19,7 @@
 #include "scene/object.h"
 #include "scene/camera.h"
 #include "scene/light.h"
+#include "scene/particleemitter.h"
 
 #include "storage/storagemanager.h"
 #include "storage/mesh.h"
@@ -72,29 +73,37 @@ void Renderer::drawScene()
   while (!m_renderQueue.isEmpty()) {
     Scene::Object* object = m_renderQueue.dequeue();
 
-    // Calculate world transform
-    Transform3f worldTransform = Canvas::canvas()->activeCamera()->cameraTransform() * object->globalTransform();
-    Driver::AbstractDriver::self()->setTransformMatrix(worldTransform);
+    if (object->mesh()) {
+      // Calculate world transform
+      Transform3f worldTransform = Canvas::canvas()->activeCamera()->cameraTransform() * object->globalTransform();
+      Driver::AbstractDriver::self()->setTransformMatrix(worldTransform);
 
-    Driver::AbstractDriver::self()->bind(object->materials());
+      Driver::AbstractDriver::self()->bind(object->materials());
 
-    if (currentMesh != object->mesh()) {
-      if (currentMesh)
-        currentMesh->unbind();
+      if (currentMesh != object->mesh()) {
+        if (currentMesh)
+          currentMesh->unbind();
 
-      object->mesh()->bind();
-      currentMesh = object->mesh();
+        object->mesh()->bind();
+        currentMesh = object->mesh();
+      }
+
+      if (currentTexture != object->texture()) {
+        if (currentTexture)
+          currentTexture->unbind();
+
+        if (object->texture())
+          object->texture()->bind();
+        currentTexture = object->texture();
+      }
+
+      Driver::AbstractDriver::self()->draw();
+    } else {
+      // Draw particle emitter
+      Transform3f worldTransform = Canvas::canvas()->activeCamera()->cameraTransform();
+      Driver::AbstractDriver::self()->setTransformMatrix(worldTransform);
+
+      Driver::AbstractDriver::self()->draw(static_cast<Scene::ParticleEmitter*> (object));
     }
-
-    if (currentTexture != object->texture()) {
-      if (currentTexture)
-        currentTexture->unbind();
-
-      if (object->texture())
-        object->texture()->bind();
-      currentTexture = object->texture();
-    }
-
-    Driver::AbstractDriver::self()->draw();
   }
 }
