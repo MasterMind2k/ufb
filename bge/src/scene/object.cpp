@@ -27,6 +27,7 @@ using namespace BGE;
 using namespace BGE::Scene;
 
 Object::Object()
+  : m_isRenderable(false)
 {
   // Set the default transforms
   m_transform.setIdentity();
@@ -84,6 +85,7 @@ void Object::setMesh(Storage::Mesh *mesh)
   m_mesh = mesh;
   delete m_boundingVolume;
   m_boundingVolume = m_mesh->calculateBoundingVolume();
+  setRenderable(true);
 }
 
 void Object::lookAt(Object *object)
@@ -215,6 +217,8 @@ void Object::prepareTransforms(qint32 timeDiff)
     // Make the recursion
     child->prepareTransforms(timeDiff);
   }
+
+  postTransformCalculations(timeDiff);
 }
 
 void Object::setPartition(Partition *partition)

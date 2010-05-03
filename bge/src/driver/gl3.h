@@ -60,6 +60,7 @@ class GL3 : public AbstractDriver
     void setTransformMatrix(const Transform3f& transform);
 
     void draw();
+    void draw(Scene::ParticleEmitter *emitter);
 
     void init();
     void clear();

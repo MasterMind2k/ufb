@@ -396,6 +396,10 @@ void GL3::draw()
   }
 }
 
+void GL3::draw(Scene::ParticleEmitter *emitter)
+{
+}
+
 void GL3::init()
 {
   getShaderFunctions();

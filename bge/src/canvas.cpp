@@ -186,7 +186,8 @@ void Canvas::paintGL()
               objectQueue.append(object->children());
 
               // Put object to the rendering queue
-              m_renderer->enqueueObject(object);
+              if (object->isRenderable())
+                m_renderer->enqueueObject(object);
             }
           }
           break;
@@ -204,7 +205,8 @@ void Canvas::paintGL()
               objectQueue.append(object->children());
 
               // Put object to the rendering queue
-              m_renderer->enqueueObject(object);
+              if (object->isRenderable())
+                m_renderer->enqueueObject(object);
             }
             queue.append(partition->partitions().toList());
           }
