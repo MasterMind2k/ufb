@@ -96,22 +96,22 @@ int main(int argc, char** argv)
   transfom.setOrigin(btVector3(300, 0, 0));
   btRigidBody *box = new btRigidBody(0, new btDefaultMotionState(transfom), new btBoxShape(btVector3(1, 150, 300)), btVector3(0, 0, 0));
   BGE::Canvas::canvas()->dynamicsWorld()->addRigidBody(box);
-  box->setRestitution(1);
+  box->setRestitution(0.5);
 
   transfom.setOrigin(btVector3(-300, 0, 0));
   box = new btRigidBody(0, new btDefaultMotionState(transfom), new btBoxShape(btVector3(1, 150, 300)), btVector3(0, 0, 0));
   BGE::Canvas::canvas()->dynamicsWorld()->addRigidBody(box);
-  box->setRestitution(1);
+  box->setRestitution(0.5);
 
   transfom.setOrigin(btVector3(0, 0, 300));
   box = new btRigidBody(0, new btDefaultMotionState(transfom), new btBoxShape(btVector3(300, 150, 1)), btVector3(0, 0, 0));
   BGE::Canvas::canvas()->dynamicsWorld()->addRigidBody(box);
-  box->setRestitution(1);
+  box->setRestitution(0.5);
 
   transfom.setOrigin(btVector3(0, 0, -300));
   box = new btRigidBody(0, new btDefaultMotionState(transfom), new btBoxShape(btVector3(300, 150, 1)), btVector3(0, 0, 0));
   BGE::Canvas::canvas()->dynamicsWorld()->addRigidBody(box);
-  box->setRestitution(1);
+  box->setRestitution(0.5);
 
   // Setup camera
   BGE::Canvas::canvas()->createCamera("Global camera");

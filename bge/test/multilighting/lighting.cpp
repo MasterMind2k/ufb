@@ -49,6 +49,7 @@ Lighting::Lighting()
 
     // Make rigid body
     btRigidBody *body = new btRigidBody(1, new BGE::MotionState(light), new btBoxShape(btVector3(light->boundingVolume()->size().x(), light->boundingVolume()->size().y(), light->boundingVolume()->size().z())), btVector3(0, 0, 0));
+    m_bodies << body;
     BGE::Canvas::canvas()->dynamicsWorld()->addRigidBody(body);
 
     // Setup forces
@@ -57,4 +58,15 @@ Lighting::Lighting()
     body->setGravity(btVector3(0, 0, 0));
     body->applyGravity();
   }
+
+  QTimer *timer = new QTimer(this);
+  timer->setInterval(5000);
+  timer->start();
+  connect(timer, SIGNAL(timeout()), SLOT(setDirections()));
+}
+
+void Lighting::setDirections()
+{
+  foreach (btRigidBody *body, m_bodies)
+    body->applyCentralImpulse(btVector3(qrand() % 100 - 50, 0, qrand() % 100 - 50));
 }
