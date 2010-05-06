@@ -38,6 +38,7 @@ class ParticleEmitter : public Object
     inline ParticleEmitter()
     {
       setRenderable(true);
+      m_verticesBufferId = m_indicesBufferId = 0;
     }
 
     inline const QList<Particle> &particles() const
@@ -50,10 +51,12 @@ class ParticleEmitter : public Object
       m_particles << particle;
     }
 
-  protected:
-
   private:
     QList<Particle> m_particles;
+    quint32 m_verticesBufferId;
+    quint32 m_indicesBufferId;
+
+    friend class Driver::GL3;
 };
 
 }
