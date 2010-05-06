@@ -102,6 +102,7 @@ void Renderer::drawScene()
       // Draw particle emitter
       Transform3f worldTransform = Canvas::canvas()->activeCamera()->cameraTransform();
       Driver::AbstractDriver::self()->setTransformMatrix(worldTransform);
+      Driver::AbstractDriver::self()->bind(object->materials());
 
       Driver::AbstractDriver::self()->draw(static_cast<Scene::ParticleEmitter*> (object));
     }

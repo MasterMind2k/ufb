@@ -20,6 +20,7 @@
 
 #include "scene/object.h"
 #include "scene/light.h"
+#include "scene/particleemitter.h"
 #include "scene/boundingvolume.h"
 
 #include "storage/mesh.h"
@@ -44,6 +45,13 @@ struct BufferElement {
 #define VERTEX_OFFSET 0
 #define NORMAL_OFFSET (3 * sizeof(GLfloat))
 #define UV_OFFSET (6 * sizeof(GLfloat))
+
+struct ParticlePlan {
+  GLushort index;
+  GLsizei count;
+  // First is color - emission, second is alpha
+  qreal weights[2];
+};
 
 using namespace BGE;
 using namespace BGE::Driver;
@@ -398,6 +406,109 @@ void GL3::draw()
 
 void GL3::draw(Scene::ParticleEmitter *emitter)
 {
+  const quint16 size = 2;
+  QList<ParticlePlan> plans;
+  ParticlePlan plan;
+  plan.index = 0;
+  plan.count = 0;
+  plan.weights[0] = 0, plan.weights[1] = 0;
+
+  BufferElement *vertices = (BufferElement*) malloc(4 * emitter->particles().size() * sizeof(BufferElement));
+  BufferElement *verticesPtr = vertices;
+  quint16 *indices = (quint16*) malloc(4 * emitter->particles().size() * sizeof(quint16));
+  quint16 *indicesPtr = indices;
+
+  BufferElement temp;
+  memcpy(temp.normal, Vector3f(0, 0, 1).data(), 3 * sizeof(GLfloat));
+  quint16 i = 0;
+  foreach (Scene::Particle particle, emitter->particles()) {
+    if (particle.colorWeight != plan.weights[0] && particle.alpha != plan.weights[1]) {
+      if (plan.count)
+        plans << plan;
+      plan.index = i;
+      plan.count = 0;
+      plan.weights[0] = particle.colorWeight, plan.weights[1] = particle.alpha;
+    }
+
+    // Firstly we transform position
+    Vector3f position = m_transform * particle.position;
+    Vector3f corner;
+
+    // Each particle is a small quad
+    corner = Vector3f(position.x() - size, position.y() - size, position.z());
+    memcpy(temp.vertex, corner.data(), 3 * sizeof(GLfloat));
+    memcpy(temp.uvMap, Vector2f(0, 0).data(), 2 * sizeof(GLfloat));
+    memcpy(verticesPtr++, &temp, sizeof(BufferElement));
+    *indicesPtr++ = i++;
+
+    corner = Vector3f(position.x() - size, position.y() + size, position.z());
+    memcpy(temp.vertex, corner.data(), 3 * sizeof(GLfloat));
+    memcpy(temp.uvMap, Vector2f(0, 1).data(), 2 * sizeof(GLfloat));
+    memcpy(verticesPtr++, &temp, sizeof(BufferElement));
+    *indicesPtr++ = i++;
+
+    corner = Vector3f(position.x() + size, position.y() + size, position.z());
+    memcpy(temp.vertex, corner.data(), 3 * sizeof(GLfloat));
+    memcpy(temp.uvMap, Vector2f(1, 1).data(), 2 * sizeof(GLfloat));
+    memcpy(verticesPtr++, &temp, sizeof(BufferElement));
+    *indicesPtr++ = i++;
+
+    corner = Vector3f(position.x() + size, position.y() - size, position.z());
+    memcpy(temp.vertex, corner.data(), 3 * sizeof(GLfloat));
+    memcpy(temp.uvMap, Vector2f(1, 0).data(), 2 * sizeof(GLfloat));
+    memcpy(verticesPtr++, &temp, sizeof(BufferElement));
+    *indicesPtr++ = i++;
+
+    plan.count += 4;
+  }
+
+  // Bind VBO
+  if (!emitter->m_verticesBufferId)
+    glGenBuffers(1, &emitter->m_verticesBufferId);
+  glBindBuffer(GL_ARRAY_BUFFER, emitter->m_verticesBufferId);
+  glBufferData(GL_ARRAY_BUFFER, 4 * emitter->particles().size() * sizeof(BufferElement), vertices, GL_STREAM_DRAW);
+  free(vertices);
+
+  if (!emitter->m_indicesBufferId)
+    glGenBuffers(1, &emitter->m_indicesBufferId);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, emitter->m_indicesBufferId);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, 4 * emitter->particles().size() * sizeof(quint16), indices, GL_STREAM_DRAW);
+  free(indices);
+
+  // Do the actual drawing :)
+  Storage::Material *particleMaterial = m_materials.value("Particles");
+  foreach (ParticlePlan plan, plans) {
+    qreal emissionWeight = 1 - plan.weights[0];
+    Storage::Material *material = new Storage::Material("Particles",
+                                                        particleMaterial->ambient(),
+                                                        particleMaterial->diffuse(),
+                                                        particleMaterial->specular(),
+                                                        particleMaterial->emission(),
+                                                        particleMaterial->shininess());
+    material->setAmbient(QColor(material->ambient().red() * plan.weights[0],
+                         material->ambient().green() * plan.weights[0],
+                         material->ambient().blue() * plan.weights[0],
+                         material->ambient().alpha() * plan.weights[1]));
+    material->setDiffuse(QColor(material->diffuse().red() * plan.weights[0],
+                         material->diffuse().green() * plan.weights[0],
+                         material->diffuse().blue() * plan.weights[0],
+                         material->diffuse().alpha() * plan.weights[1]));
+    material->setSpecular(QColor(material->specular().red() * plan.weights[0],
+                          material->specular().green() * plan.weights[0],
+                          material->specular().blue() * plan.weights[0],
+                          material->specular().alpha() * plan.weights[1]));
+    material->setEmission(QColor(material->emission().red() * emissionWeight,
+                          material->emission().green() * emissionWeight,
+                          material->emission().blue() * emissionWeight,
+                          material->emission().alpha() * plan.weights[1]));
+
+    glDrawElements(GL_QUADS, plan.count, GL_UNSIGNED_SHORT, (GLushort*)0 + plan.index);
+
+    delete material;
+  }
+
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
 void GL3::init()
