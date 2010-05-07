@@ -53,7 +53,7 @@ Lighting::Lighting()
     BGE::Canvas::canvas()->dynamicsWorld()->addRigidBody(body);
 
     // Setup forces
-    body->applyCentralImpulse(btVector3(qrand() % 1000 - 500, 0, qrand() % 1000 - 500));
+    body->applyCentralImpulse(btVector3(qrand() % 100 - 50, 0, qrand() % 100 - 50));
     body->setRestitution(1);
     body->setGravity(btVector3(0, 0, 0));
     body->applyGravity();
@@ -68,5 +68,5 @@ Lighting::Lighting()
 void Lighting::setDirections()
 {
   foreach (btRigidBody *body, m_bodies)
-    body->applyCentralImpulse(btVector3(qrand() % 1000 - 500, 0, qrand() % 1000 - 500));
+    body->applyCentralImpulse(btVector3(qrand() % 100 - 50, 0, qrand() % 100 - 50));
 }
