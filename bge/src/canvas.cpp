@@ -159,7 +159,7 @@ void Canvas::paintGL()
 
   // Calculate all the transforms (recursive)
   if (elapsed > 0) {
-    m_dynamicsWorld->stepSimulation(elapsed);
+    m_dynamicsWorld->stepSimulation((qreal) elapsed / 1000.0);
     m_scene->prepareTransforms(elapsed);
 
     // Calculate list of visible objects
