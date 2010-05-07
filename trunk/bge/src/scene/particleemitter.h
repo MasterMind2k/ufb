@@ -29,6 +29,7 @@ struct Particle {
   Vector3f velocity;
   qreal colorWeight;
   qreal alpha;
+  quint32 lifetime;
   QVariant custom;
 };
 
@@ -50,6 +51,15 @@ class ParticleEmitter : public Object
     {
       m_particles << particle;
     }
+
+  protected:
+    inline void postTransformCalculations(qint32 timeDiff)
+    {
+      for (qint32 i = 0; i < m_particles.size(); i++)
+        calculateParticle(m_particles[i], timeDiff);
+    }
+
+    virtual void calculateParticle(Particle &particle, qint32 timeDiff) = 0;
 
   private:
     QList<Particle> m_particles;
