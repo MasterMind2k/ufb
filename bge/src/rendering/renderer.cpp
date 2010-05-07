@@ -31,8 +31,7 @@ using namespace BGE::Rendering;
 
 void Renderer::enqueueObject(Scene::Object *object)
 {
-  if (object->isBindable())
-    m_renderQueue.enqueue(object);
+  m_renderQueue.enqueue(object);
 }
 
 void Renderer::renderScene()
@@ -73,11 +72,11 @@ void Renderer::drawScene()
   while (!m_renderQueue.isEmpty()) {
     Scene::Object* object = m_renderQueue.dequeue();
 
-    if (object->mesh()) {
-      // Calculate world transform
-      Transform3f worldTransform = Canvas::canvas()->activeCamera()->cameraTransform() * object->globalTransform();
-      Driver::AbstractDriver::self()->setTransformMatrix(worldTransform);
+    // Calculate world transform
+    Transform3f worldTransform = Canvas::canvas()->activeCamera()->cameraTransform() * object->globalTransform();
+    Driver::AbstractDriver::self()->setTransformMatrix(worldTransform);
 
+    if (object->mesh()) {
       Driver::AbstractDriver::self()->bind(object->materials());
 
       if (currentMesh != object->mesh()) {
@@ -99,9 +98,6 @@ void Renderer::drawScene()
 
       Driver::AbstractDriver::self()->draw();
     } else {
-      // Draw particle emitter
-      Transform3f worldTransform = Canvas::canvas()->activeCamera()->cameraTransform();
-      Driver::AbstractDriver::self()->setTransformMatrix(worldTransform);
       Driver::AbstractDriver::self()->bind(object->materials());
 
       Driver::AbstractDriver::self()->draw(static_cast<Scene::ParticleEmitter*> (object));

@@ -406,7 +406,7 @@ void GL3::draw()
 
 void GL3::draw(Scene::ParticleEmitter *emitter)
 {
-  const quint16 size = 2;
+  const quint16 size = 1;
   QList<ParticlePlan> plans;
   ParticlePlan plan;
   plan.index = 0;
@@ -422,45 +422,49 @@ void GL3::draw(Scene::ParticleEmitter *emitter)
   memcpy(temp.normal, Vector3f(0, 0, 1).data(), 3 * sizeof(GLfloat));
   quint16 i = 0;
   foreach (Scene::Particle particle, emitter->particles()) {
-    if (particle.colorWeight != plan.weights[0] && particle.alpha != plan.weights[1]) {
+    if (particle.colorWeight != plan.weights[0] || particle.alpha != plan.weights[1]) {
       if (plan.count)
         plans << plan;
       plan.index = i;
       plan.count = 0;
       plan.weights[0] = particle.colorWeight, plan.weights[1] = particle.alpha;
     }
+    qreal scaledSize = size * particle.alpha;
 
     // Firstly we transform position
     Vector3f position = m_transform * particle.position;
     Vector3f corner;
 
     // Each particle is a small quad
-    corner = Vector3f(position.x() - size, position.y() - size, position.z());
+    corner = Vector3f(position.x() - scaledSize, position.y() - scaledSize, position.z());
     memcpy(temp.vertex, corner.data(), 3 * sizeof(GLfloat));
     memcpy(temp.uvMap, Vector2f(0, 0).data(), 2 * sizeof(GLfloat));
     memcpy(verticesPtr++, &temp, sizeof(BufferElement));
     *indicesPtr++ = i++;
 
-    corner = Vector3f(position.x() - size, position.y() + size, position.z());
-    memcpy(temp.vertex, corner.data(), 3 * sizeof(GLfloat));
-    memcpy(temp.uvMap, Vector2f(0, 1).data(), 2 * sizeof(GLfloat));
-    memcpy(verticesPtr++, &temp, sizeof(BufferElement));
-    *indicesPtr++ = i++;
-
-    corner = Vector3f(position.x() + size, position.y() + size, position.z());
-    memcpy(temp.vertex, corner.data(), 3 * sizeof(GLfloat));
-    memcpy(temp.uvMap, Vector2f(1, 1).data(), 2 * sizeof(GLfloat));
-    memcpy(verticesPtr++, &temp, sizeof(BufferElement));
-    *indicesPtr++ = i++;
-
-    corner = Vector3f(position.x() + size, position.y() - size, position.z());
+    corner = Vector3f(position.x() + scaledSize, position.y() - scaledSize, position.z());
     memcpy(temp.vertex, corner.data(), 3 * sizeof(GLfloat));
     memcpy(temp.uvMap, Vector2f(1, 0).data(), 2 * sizeof(GLfloat));
     memcpy(verticesPtr++, &temp, sizeof(BufferElement));
     *indicesPtr++ = i++;
 
+    corner = Vector3f(position.x() + scaledSize, position.y() + scaledSize, position.z());
+    memcpy(temp.vertex, corner.data(), 3 * sizeof(GLfloat));
+    memcpy(temp.uvMap, Vector2f(1, 1).data(), 2 * sizeof(GLfloat));
+    memcpy(verticesPtr++, &temp, sizeof(BufferElement));
+    *indicesPtr++ = i++;
+
+    corner = Vector3f(position.x() - scaledSize, position.y() + scaledSize, position.z());
+    memcpy(temp.vertex, corner.data(), 3 * sizeof(GLfloat));
+    memcpy(temp.uvMap, Vector2f(0, 1).data(), 2 * sizeof(GLfloat));
+    memcpy(verticesPtr++, &temp, sizeof(BufferElement));
+    *indicesPtr++ = i++;
+
     plan.count += 4;
   }
+
+  // Add last plan
+  plans << plan;
 
   // Bind VBO
   if (!emitter->m_verticesBufferId)
@@ -474,6 +478,15 @@ void GL3::draw(Scene::ParticleEmitter *emitter)
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, emitter->m_indicesBufferId);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, 4 * emitter->particles().size() * sizeof(quint16), indices, GL_STREAM_DRAW);
   free(indices);
+
+  Transform3f backup = m_transform;
+  setTransformMatrix(Transform3f(Transform3f::Identity()));
+
+  // Bind
+  bindUniformAttribute("ProjectionMatrix", m_projectionMatrix);
+  bindAttribute("Vertex", 3, GL_FLOAT, sizeof(BufferElement), VERTEX_OFFSET);
+  bindAttribute("Normal", 3, GL_FLOAT, sizeof(BufferElement), NORMAL_OFFSET);
+  bindAttribute("TexCoord", 2, GL_FLOAT, sizeof(BufferElement), UV_OFFSET);
 
   // Do the actual drawing :)
   Storage::Material *particleMaterial = m_materials.value("Particles");
@@ -501,11 +514,20 @@ void GL3::draw(Scene::ParticleEmitter *emitter)
                           material->emission().green() * emissionWeight,
                           material->emission().blue() * emissionWeight,
                           material->emission().alpha() * plan.weights[1]));
+    setMaterial(material);
 
     glDrawElements(GL_QUADS, plan.count, GL_UNSIGNED_SHORT, (GLushort*)0 + plan.index);
 
+    setMaterial(0l);
     delete material;
   }
+
+  setTransformMatrix(backup);
+
+  // Unbind
+  unbindAttribute("Vertex");
+  unbindAttribute("Normal");
+  unbindAttribute("TexCoord");
 
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);

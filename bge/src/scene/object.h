@@ -334,18 +334,6 @@ class Object
     }
 
     /**
-     * Returns the bindable property. It has to be true, for renderer to use the
-     * bindMesh method.
-     *
-     * @see setBindable
-     * @see bindMesh
-     */
-    inline bool isBindable() const
-    {
-      return m_mesh != 0l;
-    }
-
-    /**
      * Sets the orientation so the camera looks at the center of the
      * specified object.
      */
@@ -400,6 +388,11 @@ class Object
     inline void setRenderable(bool isRenderable)
     {
       m_isRenderable = isRenderable;
+    }
+
+    inline void setBoundingVolume(BoundingVolume *boundingVolume)
+    {
+      m_boundingVolume = boundingVolume;
     }
 
   private:
