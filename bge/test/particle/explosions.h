@@ -10,28 +10,26 @@
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
  ***************************************************************************/
-#include "particleemitter.h"
+#ifndef EXPLOSIONS_H
+#define EXPLOSIONS_H
 
-using namespace BGE;
-using namespace BGE::Scene;
+#include <QtCore/QObject>
 
-void ParticleEmitter::postTransformCalculations(qint32 timeDiff)
+class QTimer;
+class Explosion;
+
+class Explosions : public QObject
 {
-  if (m_particles.isEmpty()) {
-    setRenderable(false);
-    // Remove itself
-    parent()->removeChild(this);
-    return;
-  }
+  Q_OBJECT
+  public:
+    Explosions(QObject *parent);
 
-  QList<quint16> removeList;
-  for (quint16 i = 0; i < m_particles.size(); i++) {
-    calculateParticle(m_particles[i], timeDiff);
-    if (m_particles.at(i).alpha < 0.01)
-      removeList << i;
-  }
+  private:
+    QTimer *m_timer;
+    QList<Explosion*> m_explosions;
 
-  // Remove invisible particles
-  for (qint32 i = removeList.size() - 1; i >= 0; i--)
-    m_particles.removeAt(i);
-}
+  private slots:
+    void ignite();
+};
+
+#endif

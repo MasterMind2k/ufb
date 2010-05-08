@@ -10,28 +10,29 @@
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
  ***************************************************************************/
-#include "particleemitter.h"
+#ifndef EXPLOSION_H
+#define EXPLOSION_H
 
-using namespace BGE;
-using namespace BGE::Scene;
+#include "scene/particleemitter.h"
 
-void ParticleEmitter::postTransformCalculations(qint32 timeDiff)
+class Explosion : public BGE::Scene::ParticleEmitter
 {
-  if (m_particles.isEmpty()) {
-    setRenderable(false);
-    // Remove itself
-    parent()->removeChild(this);
-    return;
-  }
+  public:
+    inline Explosion() : BGE::Scene::ParticleEmitter()
+    {
+      init();
+    }
 
-  QList<quint16> removeList;
-  for (quint16 i = 0; i < m_particles.size(); i++) {
-    calculateParticle(m_particles[i], timeDiff);
-    if (m_particles.at(i).alpha < 0.01)
-      removeList << i;
-  }
+    void init();
 
-  // Remove invisible particles
-  for (qint32 i = removeList.size() - 1; i >= 0; i--)
-    m_particles.removeAt(i);
-}
+  protected:
+    inline void calculateParticle(BGE::Scene::Particle &particle, qint32 timeDiff)
+    {
+      calc(particle, timeDiff);
+    }
+
+  private:
+    void calc(BGE::Scene::Particle &particle, qint32 timeDiff);
+};
+
+#endif
