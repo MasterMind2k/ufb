@@ -48,9 +48,11 @@
 #define glUniform2fv _glUniform2fv
 #define glUniform3fv _glUniform3fv
 #define glUniform4fv _glUniform4fv
+#define glUniform4iv _glUniform4iv
 #define glUniformMatrix2fv _glUniformMatrix2fv
 #define glUniformMatrix3fv _glUniformMatrix3fv
 #define glUniformMatrix4fv _glUniformMatrix4fv
+#define glUniformMatrix4iv _glUniformMatrix4iv
 
 typedef GLuint (APIENTRY *glCreateShader_t) (GLenum type);
 typedef void (APIENTRY *glShaderSource_t) (GLuint shader, GLsizei count, const GLchar** strings, const GLint* length);
@@ -80,9 +82,11 @@ typedef void (APIENTRY *glUniform1fv_t) (GLint location, GLsizei count, GLfloat 
 typedef void (APIENTRY *glUniform2fv_t) (GLint location, GLsizei count, GLfloat *value);
 typedef void (APIENTRY *glUniform3fv_t) (GLint location, GLsizei count, GLfloat *value);
 typedef void (APIENTRY *glUniform4fv_t) (GLint location, GLsizei count, GLfloat *value);
+typedef void (APIENTRY *glUniform4iv_t) (GLint location, GLsizei count, GLint *value);
 typedef void (APIENTRY *glUniformMatrix2fv_t) (GLint location, GLsizei count, GLboolean transpose, GLfloat *value);
 typedef void (APIENTRY *glUniformMatrix3fv_t) (GLint location, GLsizei count, GLboolean transpose, GLfloat *value);
 typedef void (APIENTRY *glUniformMatrix4fv_t) (GLint location, GLsizei count, GLboolean transpose, GLfloat *value);
+typedef void (APIENTRY *glUniformMatrix4iv_t) (GLint location, GLsizei count, GLboolean transpose, GLint *value);
 
 /* Shader */
 glCreateShader_t _glCreateShader = 0l;
@@ -117,9 +121,11 @@ glUniform1fv_t _glUniform1fv = 0l;
 glUniform2fv_t _glUniform2fv = 0l;
 glUniform3fv_t _glUniform3fv = 0l;
 glUniform4fv_t _glUniform4fv = 0l;
+glUniform4iv_t _glUniform4iv = 0l;
 glUniformMatrix2fv_t _glUniformMatrix2fv = 0l;
 glUniformMatrix3fv_t _glUniformMatrix3fv = 0l;
 glUniformMatrix4fv_t _glUniformMatrix4fv = 0l;
+glUniformMatrix4iv_t _glUniformMatrix4iv = 0l;
 
 GLenum VERTEX_SHADER;
 GLenum FRAGMENT_SHADER;
@@ -168,9 +174,11 @@ void getShaderFunctions()
   _glUniform2fv = (glUniform2fv_t) context->getProcAddress("glUniform2fv");
   _glUniform3fv = (glUniform3fv_t) context->getProcAddress("glUniform3fv");
   _glUniform4fv = (glUniform4fv_t) context->getProcAddress("glUniform4fv");
+  _glUniform4iv = (glUniform4iv_t) context->getProcAddress("glUniform4iv");
   _glUniformMatrix2fv = (glUniformMatrix2fv_t) context->getProcAddress("glUniformMatrix2fv");
   _glUniformMatrix3fv = (glUniformMatrix3fv_t) context->getProcAddress("glUniformMatrix3fv");
   _glUniformMatrix4fv = (glUniformMatrix4fv_t) context->getProcAddress("glUniformMatrix4fv");
+  _glUniformMatrix4iv = (glUniformMatrix4iv_t) context->getProcAddress("glUniformMatrix4iv");
 
   VERTEX_SHADER = GL_VERTEX_SHADER;
   FRAGMENT_SHADER = GL_FRAGMENT_SHADER;
