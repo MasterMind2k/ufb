@@ -21,6 +21,7 @@
 #include "scene/object.h"
 #include "scene/boundingvolume.h"
 #include "scene/light.h"
+#include "scene/particleemitter.h"
 
 #include "storage/mesh.h"
 #include "storage/material.h"
@@ -317,6 +318,77 @@ void GL1::draw()
   glDisable(GL_BLEND);
 
   m_renderedLights = 0;
+}
+
+void GL1::draw(Scene::ParticleEmitter *emitter)
+{
+  const qreal size = 0.5;
+
+  Transform3f transform = m_transform;
+  setTransformMatrix(Transform3f(Transform3f::Identity()));
+
+  Vector3f normal(0, 0, 1);
+  Storage::Material *particleMaterial = m_materials.value("Particles");
+  foreach (Scene::Particle particle, emitter->particles()) {
+    // Set material
+    qreal emissionWeight = 1 - particle.colorWeight;
+    Storage::Material *material = new Storage::Material("Particles",
+                                                        particleMaterial->ambient(),
+                                                        particleMaterial->diffuse(),
+                                                        particleMaterial->specular(),
+                                                        particleMaterial->emission(),
+                                                        particleMaterial->shininess());
+    material->setAmbient(QColor(material->ambient().red() * particle.colorWeight,
+                         material->ambient().green() * particle.colorWeight,
+                         material->ambient().blue() * particle.colorWeight,
+                         material->ambient().alpha() * particle.alpha));
+    material->setDiffuse(QColor(material->diffuse().red() * particle.colorWeight,
+                         material->diffuse().green() * particle.colorWeight,
+                         material->diffuse().blue() * particle.colorWeight,
+                         material->diffuse().alpha() * particle.alpha));
+    material->setSpecular(QColor(material->specular().red() * particle.colorWeight,
+                          material->specular().green() * particle.colorWeight,
+                          material->specular().blue() * particle.colorWeight,
+                          material->specular().alpha() * particle.alpha));
+    material->setEmission(QColor(material->emission().red() * emissionWeight,
+                          material->emission().green() * emissionWeight,
+                          material->emission().blue() * emissionWeight,
+                          material->emission().alpha() * particle.alpha));
+    setMaterial(material);
+
+    // Firstly we transform position
+    Vector3f position = transform * particle.position;
+    Vector3f corner;
+
+    // Each particle is a small quad
+    glBegin(GL_QUADS);
+    corner = Vector3f(position.x() - size, position.y() - size, position.z());
+    glTexCoord2fv(Vector2f(0, 0).data());
+    glNormal3fv(normal.data());
+    glVertex3fv(corner.data());
+
+    corner = Vector3f(position.x() + size, position.y() - size, position.z());
+    glTexCoord2fv(Vector2f(0, 0).data());
+    glNormal3fv(normal.data());
+    glVertex3fv(corner.data());
+
+    corner = Vector3f(position.x() + size, position.y() + size, position.z());
+    glTexCoord2fv(Vector2f(0, 0).data());
+    glNormal3fv(normal.data());
+    glVertex3fv(corner.data());
+
+    corner = Vector3f(position.x() - size, position.y() + size, position.z());
+    glTexCoord2fv(Vector2f(0, 0).data());
+    glNormal3fv(normal.data());
+    glVertex3fv(corner.data());
+
+    glEnd();
+
+    setMaterial(0l);
+    delete material;
+  }
+
+  setTransformMatrix(transform);
 }
 
 void GL1::init()
