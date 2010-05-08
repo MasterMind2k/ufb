@@ -27,6 +27,7 @@ namespace Scene {
 struct Particle {
   Vector3f position;
   Vector3f velocity;
+  Vector3f initialVelocity;
   qreal colorWeight;
   qreal alpha;
   quint32 lifetime;
@@ -38,7 +39,6 @@ class ParticleEmitter : public Object
   public:
     inline ParticleEmitter()
     {
-      setRenderable(true);
       m_verticesBufferId = m_indicesBufferId = 0;
     }
 
@@ -49,15 +49,12 @@ class ParticleEmitter : public Object
 
     inline void emitParticle(const Particle &particle)
     {
+      setRenderable(true);
       m_particles << particle;
     }
 
   protected:
-    inline void postTransformCalculations(qint32 timeDiff)
-    {
-      for (qint32 i = 0; i < m_particles.size(); i++)
-        calculateParticle(m_particles[i], timeDiff);
-    }
+    void postTransformCalculations(qint32 timeDiff);
 
     virtual void calculateParticle(Particle &particle, qint32 timeDiff) = 0;
 

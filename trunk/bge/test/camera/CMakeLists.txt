@@ -22,5 +22,4 @@ qt4_wrap_cpp(bge_camera_MOC ${bge_camera_HDRS})
 add_executable(bge_camera ${bge_camera_SRCS} ${bge_camera_MOC})
 
 target_link_libraries(bge_camera bge ${QT_LIBRARIES})
-
 add_dependencies(bge_camera bge)

@@ -406,7 +406,7 @@ void GL3::draw()
 
 void GL3::draw(Scene::ParticleEmitter *emitter)
 {
-  const quint16 size = 1;
+  const qreal size = 0.5;
   QList<ParticlePlan> plans;
   ParticlePlan plan;
   plan.index = 0;

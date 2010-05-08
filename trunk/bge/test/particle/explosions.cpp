@@ -10,28 +10,32 @@
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
  ***************************************************************************/
-#include "particleemitter.h"
+#include "explosions.h"
 
-using namespace BGE;
-using namespace BGE::Scene;
+#include <QtCore/QTimer>
 
-void ParticleEmitter::postTransformCalculations(qint32 timeDiff)
+#include "canvas.h"
+
+#include "explosion.h"
+
+Explosions::Explosions(QObject *parent)
+  : QObject(parent)
 {
-  if (m_particles.isEmpty()) {
-    setRenderable(false);
-    // Remove itself
-    parent()->removeChild(this);
-    return;
-  }
+  qsrand(time(0l));
+  m_timer = new QTimer(this);
 
-  QList<quint16> removeList;
-  for (quint16 i = 0; i < m_particles.size(); i++) {
-    calculateParticle(m_particles[i], timeDiff);
-    if (m_particles.at(i).alpha < 0.01)
-      removeList << i;
-  }
+  connect(m_timer, SIGNAL(timeout()), SLOT(ignite()));
+  m_timer->start(qrand() % 1000);
 
-  // Remove invisible particles
-  for (qint32 i = removeList.size() - 1; i >= 0; i--)
-    m_particles.removeAt(i);
+  ignite();
+}
+
+void Explosions::ignite()
+{
+  Explosion *explosion = new Explosion;
+  explosion->move(qrand() % 500 - 250, qrand() % 500 - 250, qrand() % 100 - 50);
+  BGE::Canvas::canvas()->addSceneObject(explosion);
+  m_explosions << explosion;
+
+  m_timer->start(qrand() % 1000);
 }
