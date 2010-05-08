@@ -16,7 +16,8 @@
 
 #include "storage/material.h"
 
-void Explosion::init()
+Explosion::Explosion()
+  : BGE::Scene::ParticleEmitter()
 {
   for (quint16 i = 0; i < 1000; i++) {
     BGE::Scene::Particle particle;
@@ -40,7 +41,7 @@ void Explosion::init()
   setBoundingVolume(new BGE::Scene::BoundingVolume(Vector3f::Zero(), Vector3f(200, 200, 200)));
 }
 
-void Explosion::calc(BGE::Scene::Particle &particle, qint32 timeDiff)
+void Explosion::calculateParticle(BGE::Scene::Particle &particle, qint32 timeDiff)
 {
   particle.lifetime += timeDiff;
   particle.position += particle.velocity * timeDiff / 1000.0;
