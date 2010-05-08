@@ -18,21 +18,10 @@
 class Explosion : public BGE::Scene::ParticleEmitter
 {
   public:
-    inline Explosion() : BGE::Scene::ParticleEmitter()
-    {
-      init();
-    }
-
-    void init();
+    Explosion();
 
   protected:
-    inline void calculateParticle(BGE::Scene::Particle &particle, qint32 timeDiff)
-    {
-      calc(particle, timeDiff);
-    }
-
-  private:
-    void calc(BGE::Scene::Particle &particle, qint32 timeDiff);
+    void calculateParticle(BGE::Scene::Particle &particle, qint32 timeDiff);
 };
 
 #endif
