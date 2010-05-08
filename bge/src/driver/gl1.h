@@ -62,7 +62,7 @@ class GL1 : public AbstractDriver
     void setTransformMatrix(const Transform3f& transform);
 
     void draw();
-    inline void draw(Scene::ParticleEmitter *boundingVolume) {}
+    void draw(Scene::ParticleEmitter *particleEmitter);
 
     void init();
     void clear();
