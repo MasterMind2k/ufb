@@ -37,7 +37,7 @@ struct Particle {
 class ParticleEmitter : public Object
 {
   public:
-    inline ParticleEmitter()
+  inline ParticleEmitter() : m_autoremove(true)
     {
       m_verticesBufferId = m_indicesBufferId = 0;
     }
@@ -53,6 +53,15 @@ class ParticleEmitter : public Object
       m_particles << particle;
     }
 
+    inline void setAutoremove(bool autoremove)
+    {
+      m_autoremove = autoremove;
+    }
+    inline bool autoremove() const
+    {
+      return m_autoremove;
+    }
+
   protected:
     void postTransformCalculations(qint32 timeDiff);
 
@@ -62,6 +71,7 @@ class ParticleEmitter : public Object
     QList<Particle> m_particles;
     quint32 m_verticesBufferId;
     quint32 m_indicesBufferId;
+    bool m_autoremove;
 
     friend class Driver::GL3;
 };

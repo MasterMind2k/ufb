@@ -14,6 +14,7 @@
 #define EXPLOSIONS_H
 
 #include <QtCore/QObject>
+#include <QtCore/QQueue>
 
 class QTimer;
 class Explosion;
@@ -26,7 +27,6 @@ class Explosions : public QObject
 
   private:
     QTimer *m_timer;
-    QList<Explosion*> m_explosions;
 
   private slots:
     void ignite();

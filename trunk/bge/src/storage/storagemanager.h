@@ -10,7 +10,6 @@
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
  ***************************************************************************/
-
 #ifndef __BGE_STORAGE_STORAGEMANAGER_H
 #define __BGE_STORAGE_STORAGEMANAGER_H
 

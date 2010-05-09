@@ -12,15 +12,18 @@
  ***************************************************************************/
 #include "particleemitter.h"
 
+#include "canvas.h"
+
 using namespace BGE;
 using namespace BGE::Scene;
 
 void ParticleEmitter::postTransformCalculations(qint32 timeDiff)
 {
-  if (m_particles.isEmpty()) {
+  if (m_autoremove && m_particles.isEmpty()) {
     setRenderable(false);
     // Remove itself
     parent()->removeChild(this);
+    Canvas::canvas()->deleteSceneObject(this);
     return;
   }
 

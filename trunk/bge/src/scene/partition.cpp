@@ -33,6 +33,7 @@ Partition::~Partition()
     object->setPartition(0l);
 
   qDeleteAll(m_partitions);
+  m_partitions.clear();
 }
 
 void Partition::addObject(Object *object)
@@ -72,7 +73,7 @@ void Partition::removeObject(Object *object)
 {
   m_objects.removeOne(object);
 
-  if (!m_partitions.size() && !m_objects.size())
+  if (parent() && !m_partitions.size() && !m_objects.size())
     parent()->departition();
 }
 

@@ -15,6 +15,7 @@
 
 #include <QtCore/QHash>
 #include <QtCore/QDir>
+#include <QtCore/QQueue>
 
 #include <QtOpenGL/QGLWidget>
 
@@ -56,6 +57,13 @@ class Canvas : public QGLWidget
      * @see Scene::SceneObject
      */
     void addSceneObject(Scene::Object* object);
+    /**
+     * Delayed deletion of a scene object.
+     */
+    inline void deleteSceneObject(Scene::Object* object)
+    {
+      m_deletionQueue.enqueue(object);
+    }
     /**
      * Returns the root node of the scene.
      */
@@ -226,6 +234,7 @@ class Canvas : public QGLWidget
     QTime *m_time;
     QTimer *m_timer;
     qint32 m_totalElapsed;
+    QQueue<Scene::Object*> m_deletionQueue;
 
     Recorder *m_recorder;
     quint32 m_timeSinceSnap;

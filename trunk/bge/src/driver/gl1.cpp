@@ -322,12 +322,6 @@ void GL1::draw()
 
 void GL1::draw(Scene::ParticleEmitter *emitter)
 {
-  const qreal size = 0.5;
-
-  Transform3f transform = m_transform;
-  setTransformMatrix(Transform3f(Transform3f::Identity()));
-
-  Vector3f normal(0, 0, 1);
   Storage::Material *particleMaterial = m_materials.value("Particles");
   foreach (Scene::Particle particle, emitter->particles()) {
     // Set material
@@ -356,39 +350,14 @@ void GL1::draw(Scene::ParticleEmitter *emitter)
                           material->emission().alpha() * particle.alpha));
     setMaterial(material);
 
-    // Firstly we transform position
-    Vector3f position = transform * particle.position;
-    Vector3f corner;
-
     // Each particle is a small quad
-    glBegin(GL_QUADS);
-    corner = Vector3f(position.x() - size, position.y() - size, position.z());
-    glTexCoord2fv(Vector2f(0, 0).data());
-    glNormal3fv(normal.data());
-    glVertex3fv(corner.data());
-
-    corner = Vector3f(position.x() + size, position.y() - size, position.z());
-    glTexCoord2fv(Vector2f(0, 0).data());
-    glNormal3fv(normal.data());
-    glVertex3fv(corner.data());
-
-    corner = Vector3f(position.x() + size, position.y() + size, position.z());
-    glTexCoord2fv(Vector2f(0, 0).data());
-    glNormal3fv(normal.data());
-    glVertex3fv(corner.data());
-
-    corner = Vector3f(position.x() - size, position.y() + size, position.z());
-    glTexCoord2fv(Vector2f(0, 0).data());
-    glNormal3fv(normal.data());
-    glVertex3fv(corner.data());
-
+    glBegin(GL_POINTS);
+    glVertex3fv(particle.position.data());
     glEnd();
 
     setMaterial(0l);
     delete material;
   }
-
-  setTransformMatrix(transform);
 }
 
 void GL1::init()
