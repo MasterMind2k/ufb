@@ -48,6 +48,7 @@ class BoundingVolume;
 class Camera : public Object
 {
   public:
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     /**
      * Returns the name of the camera.
      */

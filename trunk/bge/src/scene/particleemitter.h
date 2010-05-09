@@ -25,6 +25,7 @@ class GL3;
 namespace Scene {
 
 struct Particle {
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   Vector3f position;
   Vector3f velocity;
   Vector3f initialVelocity;
