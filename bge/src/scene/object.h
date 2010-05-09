@@ -230,7 +230,8 @@ class Object
      */
     inline void removeChild(Object* child)
     {
-      m_children.removeOne(child);
+      if (m_children.removeOne(child))
+        child->setParent(0l);
     }
     /**
      * Returns a child.

@@ -35,7 +35,6 @@ void Explosions::ignite()
   Explosion *explosion = new Explosion;
   explosion->move(qrand() % 500 - 250, qrand() % 500 - 250, qrand() % 100 - 50);
   BGE::Canvas::canvas()->addSceneObject(explosion);
-  m_explosions << explosion;
 
   m_timer->start(qrand() % 1000);
 }

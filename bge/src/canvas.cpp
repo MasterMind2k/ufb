@@ -179,7 +179,8 @@ void Canvas::paintGL()
             objectQueue.append(partition->objects());
             while (!objectQueue.isEmpty()) {
               Scene::Object *object = objectQueue.dequeue();
-              if (cont == PartialyInside) {
+
+              if (object->isRenderable() && cont == PartialyInside) {
                 if (activeCamera()->isBoxInFrustrum(object->boundingVolume()) == Outside)
                   continue;
               }
@@ -251,6 +252,10 @@ void Canvas::paintGL()
     QImage img = grabFrameBuffer();
     m_recorder->enqueueImage(img);
   }
+
+  // Delete the marked for deletion
+  while (!m_deletionQueue.isEmpty())
+    delete m_deletionQueue.dequeue();
 
   // Set next rendering
   m_timer->start();

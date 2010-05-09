@@ -53,6 +53,8 @@ Object::~Object()
 {
   if (m_boundingVolume)
     delete m_boundingVolume;
+  if (m_partition)
+    m_partition->removeObject(this);
   qDeleteAll(m_children);
 }
 

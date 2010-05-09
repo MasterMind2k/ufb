@@ -11,7 +11,7 @@
  *   GNU General Public License for more details.                          *
  ***************************************************************************/
 #ifndef __BGE_STORAGE_LOADER_OBJLOADER_H
-#define __OBJ_STORAGE_LOADER_OBJLOADER_H
+#define __BGE_STORAGE_LOADER_OBJLOADER_H
 
 #include "storage/loader/abstractloader.h"
 
