@@ -27,11 +27,11 @@ int main(int argc, char **argv)
 
   QApplication app(argc, argv);
 
-  BGE::Storage::StorageManager::self()->load();
+  BGE::Canvas::canvas()->loadResource();
 
-  BGE::Canvas::canvas()->addSceneObject(BGE::Canvas::canvas()->createCamera("globalCamera"));
-  BGE::Canvas::canvas()->camera("globalCamera")->move(0, 0, 300);
-  BGE::Canvas::canvas()->activateCamera("globalCamera");
+  BGE::Canvas::canvas()->addSceneObject(BGE::Canvas::canvas()->createCamera("Global Camera"));
+  BGE::Canvas::canvas()->camera("Global Camera")->move(0, 0, 300);
+  BGE::Canvas::canvas()->activateCamera("Global Camera");
 
   BGE::Canvas::canvas()->addSceneObject(BGE::Canvas::canvas()->createLight("Global light"));
   BGE::Canvas::canvas()->light("Global light")->setPositional(false);
