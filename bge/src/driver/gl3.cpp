@@ -406,6 +406,13 @@ void GL3::draw()
 
 void GL3::draw(Scene::ParticleEmitter *emitter)
 {
+  quint16 indicesSize, verticesSize = 4 * emitter->particles().size();
+  indicesSize = verticesSize;
+  if (Canvas::canvas()->drawBoundingVolumes()) {
+    verticesSize += emitter->boundingVolume()->corners().size();
+    indicesSize += 24;
+  }
+
   const qreal size = 0.4;
   QList<ParticlePlan> plans;
   ParticlePlan plan;
@@ -413,9 +420,9 @@ void GL3::draw(Scene::ParticleEmitter *emitter)
   plan.count = 0;
   plan.weights[0] = 0, plan.weights[1] = 0;
 
-  BufferElement *vertices = (BufferElement*) malloc(4 * emitter->particles().size() * sizeof(BufferElement));
+  BufferElement *vertices = (BufferElement*) malloc(verticesSize * sizeof(BufferElement));
   BufferElement *verticesPtr = vertices;
-  quint16 *indices = (quint16*) malloc(4 * emitter->particles().size() * sizeof(quint16));
+  quint16 *indices = (quint16*) malloc(indicesSize * sizeof(quint16));
   quint16 *indicesPtr = indices;
 
   BufferElement temp;
@@ -466,17 +473,46 @@ void GL3::draw(Scene::ParticleEmitter *emitter)
   // Add last plan
   plans << plan;
 
+  // Add Bounding volume (box)
+  if (Canvas::canvas()->drawBoundingVolumes()) {
+    // Vertices
+    BufferElement *temp = (BufferElement*) calloc(1, sizeof(BufferElement));
+    foreach (Vector3f corner, emitter->boundingVolume()->corners()) {
+      memcpy(temp->vertex, corner.data(), 3 * sizeof(GLfloat));
+      memcpy(verticesPtr, temp, sizeof(BufferElement));
+      verticesPtr++;
+    }
+    free(temp);
+    // Indices
+    QVector<quint16> idxs;
+    idxs << i + 0b000 << i + 0b001
+         << i + 0b001 << i + 0b011
+         << i + 0b011 << i + 0b010
+         << i + 0b010 << i + 0b000
+
+         << i + 0b100 << i + 0b101
+         << i + 0b101 << i + 0b111
+         << i + 0b111 << i + 0b110
+         << i + 0b110 << i + 0b100
+
+         << i + 0b000 << i + 0b100
+         << i + 0b001 << i + 0b101
+         << i + 0b011 << i + 0b111
+         << i + 0b010 << i + 0b110;
+    memcpy(indicesPtr, idxs.data(), idxs.size() * sizeof(quint16));
+  }
+
   // Bind VBO
   if (!emitter->m_verticesBufferId)
     glGenBuffers(1, &emitter->m_verticesBufferId);
   glBindBuffer(GL_ARRAY_BUFFER, emitter->m_verticesBufferId);
-  glBufferData(GL_ARRAY_BUFFER, 4 * emitter->particles().size() * sizeof(BufferElement), vertices, GL_STREAM_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, verticesSize * sizeof(BufferElement), vertices, GL_STREAM_DRAW);
   free(vertices);
 
   if (!emitter->m_indicesBufferId)
     glGenBuffers(1, &emitter->m_indicesBufferId);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, emitter->m_indicesBufferId);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, 4 * emitter->particles().size() * sizeof(quint16), indices, GL_STREAM_DRAW);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicesSize * sizeof(quint16), indices, GL_STREAM_DRAW);
   free(indices);
 
   Transform3f backup = m_transform;
@@ -518,11 +554,17 @@ void GL3::draw(Scene::ParticleEmitter *emitter)
 
     glDrawElements(GL_QUADS, plan.count, GL_UNSIGNED_SHORT, (GLushort*)0 + plan.index);
 
-    setMaterial(0l);
     delete material;
   }
 
   setTransformMatrix(backup);
+
+  // Draw Bounding volume
+  if (Canvas::canvas()->drawBoundingVolumes()) {
+    setMaterial(m_materials.value("BGE::BoundingVolume"));
+    glDrawElements(GL_LINES, 24, GL_UNSIGNED_SHORT, (GLushort*)0 + indicesSize - 24);
+  }
+  setMaterial(0l);
 
   // Unbind
   unbindAttribute("Vertex");
