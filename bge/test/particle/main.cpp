@@ -30,7 +30,7 @@ int main(int argc, char **argv)
   BGE::Canvas::canvas()->loadResource();
 
   BGE::Canvas::canvas()->addSceneObject(BGE::Canvas::canvas()->createCamera("Global Camera"));
-  BGE::Canvas::canvas()->camera("Global Camera")->move(0, 0, 300);
+  BGE::Canvas::canvas()->camera("Global Camera")->move(0, 0, 100);
   BGE::Canvas::canvas()->activateCamera("Global Camera");
 
   BGE::Canvas::canvas()->addSceneObject(BGE::Canvas::canvas()->createLight("Global light"));
