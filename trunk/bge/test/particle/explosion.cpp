@@ -25,8 +25,8 @@ Explosion::Explosion()
     particle.colorWeight = 0;
     particle.lifetime = 0;
     particle.position = Vector3f::Zero();
-    particle.velocity = Vector3f(qrand() % 20 - 10, qrand() % 60 - 30, qrand() % 20 - 10).normalized();
-    particle.velocity *= 20;
+    particle.velocity = Vector3f(qrand() % 60 - 30, qrand() % 60 - 30, qrand() % 60 - 30).normalized();
+    particle.velocity *= qrand() % 10 + 20;
     particle.initialVelocity = particle.velocity;
 
     emitParticle(particle);
@@ -34,8 +34,8 @@ Explosion::Explosion()
 
   BGE::Storage::Material *material = new BGE::Storage::Material("Particles");
   material->setEmission(QColor(255, 136, 0));
-  material->setAmbient(QColor(20, 20, 20));
-  material->setDiffuse(QColor(20, 20, 20));
+  material->setAmbient(QColor(40, 40, 40));
+  material->setDiffuse(QColor(40, 40, 40));
   addMaterial(material);
 
   setBoundingVolume(new BGE::Scene::BoundingVolume(Vector3f::Zero(), Vector3f(200, 200, 200)));
@@ -48,9 +48,4 @@ void Explosion::calculateParticle(BGE::Scene::Particle &particle, qint32 timeDif
   particle.velocity = particle.initialVelocity * (1.0 - (qreal) particle.lifetime / 3000.0);
   if (particle.alpha > 0.0)
     particle.alpha = 1.0 - ((qreal) particle.lifetime / 3000.0);
-  if (particle.colorWeight < 1.0) {
-    particle.colorWeight = ((qreal) particle.lifetime / 2500.0);
-    if (particle.colorWeight > 1.0)
-      particle.colorWeight = 1.0;
-  }
 }

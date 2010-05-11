@@ -33,7 +33,7 @@ Explosions::Explosions(QObject *parent)
 void Explosions::ignite()
 {
   Explosion *explosion = new Explosion;
-  explosion->move(qrand() % 500 - 250, qrand() % 500 - 250, qrand() % 100 - 50);
+  explosion->move(qrand() % 100 - 50, qrand() % 100 - 50, qrand() % 100 - 50);
   BGE::Canvas::canvas()->addSceneObject(explosion);
 
   m_timer->start(qrand() % 1000);
