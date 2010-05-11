@@ -322,6 +322,8 @@ void GL1::draw()
 
 void GL1::draw(Scene::ParticleEmitter *emitter)
 {
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   Storage::Material *particleMaterial = m_materials.value("Particles");
   foreach (Scene::Particle particle, emitter->particles()) {
     // Set material
@@ -358,6 +360,11 @@ void GL1::draw(Scene::ParticleEmitter *emitter)
     setMaterial(0l);
     delete material;
   }
+
+  if (Canvas::canvas()->drawBoundingVolumes())
+    draw(emitter->boundingVolume());
+
+  glDisable(GL_BLEND);
 }
 
 void GL1::init()
