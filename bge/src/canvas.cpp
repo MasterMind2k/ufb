@@ -150,9 +150,6 @@ void Canvas::paintGL()
 {
   m_timer->stop();
 
-  // Reset the scene
-  Driver::AbstractDriver::self()->clear();
-
   qint32 elapsed = m_time->restart();
   m_totalElapsed += elapsed;
   m_timeSinceSnap += elapsed;
@@ -224,6 +221,9 @@ void Canvas::paintGL()
       object->m_transformModified = false;
     }
   }
+
+  // Reset the scene
+  Driver::AbstractDriver::self()->clear();
 
   // Make the actual rendering
   m_renderer->renderScene();
