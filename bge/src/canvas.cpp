@@ -55,6 +55,7 @@ Canvas::Canvas()
   m_frames = 0;
   m_fps = 0;
   m_isFPSShown = false;
+  m_vsync = false;
   m_totalElapsed = 0;
   m_timeSinceSnap = 0;
 
@@ -363,8 +364,19 @@ void Canvas::registerStage(quint8 index, Rendering::Stage *stage)
 
 void Canvas::keyPressEvent(QKeyEvent* event)
 {
-  if (m_controller)
+  if (m_controller) {
     m_controller->keyPressed(event);
+  } else {
+    switch (event->key()) {
+      case Qt::Key_F:
+        setFPSShown(!isFPSShown());
+        break;
+
+      case Qt::Key_V:
+        toggleVSync(!isVSyncEnabled());
+        break;
+    }
+  }
 
   QWidget::keyPressEvent(event);
 }

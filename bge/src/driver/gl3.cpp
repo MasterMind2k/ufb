@@ -599,11 +599,6 @@ void GL3::init()
   m_renderer->unbind();
 
   glGenTextures(1, &m_renderTexture);
-
-  if (glSwapInterval) {
-    glSwapInterval(1);
-    qDebug() << "Setting vsync";
-  }
 }
 
 void GL3::clear()

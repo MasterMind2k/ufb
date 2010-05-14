@@ -12,6 +12,7 @@ set(driver_HDRS
   shader_p.h
   buffer_p.h
   fbo_p.h
+  utils_p.h
 )
 
 add_library(driver ${driver_SRCS} ${driver_HDRS})

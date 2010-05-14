@@ -224,6 +224,15 @@ class Canvas : public QGLWidget
       m_dynamicsWorld = dynamicsWorld;
     }
 
+    inline bool isVSyncEnabled() const
+    {
+      return m_vsync;
+    }
+    inline void toggleVSync(bool enable)
+    {
+      m_vsync = enable;
+    }
+
   private:
     /* Really private stuff */
     Scene::Object *m_scene;
@@ -244,6 +253,7 @@ class Canvas : public QGLWidget
 
     QHash<QString, Scene::Light*> m_lights;
 
+    bool m_vsync;
     bool m_isFPSShown;
     quint64 m_frames;
     qreal m_fps;
