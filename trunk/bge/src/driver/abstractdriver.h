@@ -78,6 +78,8 @@ class AbstractDriver
     virtual void replaceStage(quint8 index, Rendering::Stage *stage) = 0;
     virtual Rendering::Stage *stage(quint8 index) const = 0;
 
+    void toggleVSync(bool enable);
+
   protected:
     inline AbstractDriver() {}
 

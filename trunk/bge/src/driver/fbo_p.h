@@ -28,9 +28,6 @@
 #define glCheckFramebufferStatus _glCheckFramebufferStatus
 #define glDrawBuffers _glDrawBuffers
 
-// Added for vsync settings
-#define glSwapInterval _glSwapInterval
-
 typedef void (APIENTRY *glGenFramebuffers_t) (GLsizei n, const GLuint *);
 typedef void (APIENTRY *glDeleteFramebuffers_t) (GLsizei, const GLuint *);
 typedef void (APIENTRY *glBindFramebuffer_t) (GLenum target, GLuint framebuffer);
@@ -42,7 +39,6 @@ typedef void (APIENTRY *glFramebufferRenderbuffer_t) (GLenum, GLenum, GLenum, GL
 typedef void (APIENTRY *glFramebufferTexture2D_t) (GLenum, GLenum, GLenum, GLuint, GLint);
 typedef GLenum (APIENTRY *glCheckFramebufferStatus_t) (GLenum);
 typedef void (APIENTRY *glDrawBuffers_t) (GLsizei, const GLenum *);
-typedef int (APIENTRY *glSwapInterval_t) (GLint enable);
 
 /* FBOs */
 glGenFramebuffers_t _glGenFramebuffers = 0l;
@@ -56,7 +52,6 @@ glFramebufferRenderbuffer_t _glFramebufferRenderbuffer = 0l;
 glFramebufferTexture2D_t _glFramebufferTexture2D = 0l;
 glCheckFramebufferStatus_t _glCheckFramebufferStatus = 0l;
 glDrawBuffers_t _glDrawBuffers = 0l;
-glSwapInterval_t _glSwapInterval = 0l;
 
 bool hasFBOs = false;
 
@@ -66,10 +61,6 @@ void getFBOFunctions()
 {
   Canvas::canvas()->makeCurrent();
   const QGLContext* context = Canvas::canvas()->context();
-
-  _glSwapInterval = (glSwapInterval_t) context->getProcAddress("glXSwapIntervalSGI");
-  if (!_glSwapInterval)
-    _glSwapInterval = (glSwapInterval_t) context->getProcAddress("wglSwapInterval");
 
   _glGenFramebuffers = (glGenFramebuffers_t) context->getProcAddress("glGenFramebuffers");
   if (!_glGenFramebuffers)

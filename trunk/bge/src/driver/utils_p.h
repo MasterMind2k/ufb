@@ -10,39 +10,28 @@
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
  ***************************************************************************/
-#include "abstractdriver.h"
+#ifndef UTILS_P_H
+#define UTILS_P_H
 
-#include <QtCore/QCoreApplication>
+#include "canvas.h"
 
-#include <QtOpenGL/QGLFormat>
+/* Defines for utility functions */
+#define glSwapInterval _glSwapInterval
 
-#include "gl1.h"
-#include "gl3.h"
+typedef int (APIENTRY *glSwapInterval_t) (GLint enable);
 
-#include "utils_p.h"
+glSwapInterval_t _glSwapInterval = 0l;
 
 using namespace BGE;
-using namespace BGE::Driver;
 
-AbstractDriver* AbstractDriver::m_self = 0l;
-
-AbstractDriver* AbstractDriver::self()
+void getUtilFunctions()
 {
-  if (!m_self) {
-    bool useGL1 = QCoreApplication::instance()->arguments().contains("GL11");
-    if (QGLFormat::openGLVersionFlags() & QGLFormat::OpenGL_Version_3_0 && !useGL1) {
-      m_self = new GL3;
-    } else {
-      m_self = new GL1;
-      qWarning("BGE::Driver::AbstractDriver::self(): Running in compatibility mode (OpenGL 1.1)!");
-    }
-  }
+  Canvas::canvas()->makeCurrent();
+  const QGLContext* context = Canvas::canvas()->context();
 
-  return m_self;
+  _glSwapInterval = (glSwapInterval_t) context->getProcAddress("glXSwapIntervalSGI");
+  if (!_glSwapInterval)
+    _glSwapInterval = (glSwapInterval_t) context->getProcAddress("wglSwapInterval");
 }
 
-void AbstractDriver::toggleVSync(bool enable)
-{
-  if (glSwapInterval)
-    glSwapInterval(enable ? 1 : 0);
-}
+#endif
