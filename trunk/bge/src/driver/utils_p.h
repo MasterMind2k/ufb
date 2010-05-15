@@ -13,7 +13,7 @@
 #ifndef UTILS_P_H
 #define UTILS_P_H
 
-#include "canvas.h"
+#include <QtOpenGL/QGLContext>
 
 /* Defines for utility functions */
 #define glSwapInterval _glSwapInterval
@@ -22,12 +22,9 @@ typedef int (APIENTRY *glSwapInterval_t) (GLint enable);
 
 glSwapInterval_t _glSwapInterval = 0l;
 
-using namespace BGE;
-
 void getUtilFunctions()
 {
-  Canvas::canvas()->makeCurrent();
-  const QGLContext* context = Canvas::canvas()->context();
+  const QGLContext* context = QGLContext::currentContext();
 
   _glSwapInterval = (glSwapInterval_t) context->getProcAddress("glXSwapIntervalSGI");
   if (!_glSwapInterval)

@@ -228,10 +228,7 @@ class Canvas : public QGLWidget
     {
       return m_vsync;
     }
-    inline void toggleVSync(bool enable)
-    {
-      m_vsync = enable;
-    }
+    void toggleVSync(bool enable);
 
   private:
     /* Really private stuff */
