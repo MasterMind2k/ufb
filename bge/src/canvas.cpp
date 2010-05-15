@@ -362,6 +362,12 @@ void Canvas::registerStage(quint8 index, Rendering::Stage *stage)
   Driver::AbstractDriver::self()->registerStage(index, stage);
 }
 
+void Canvas::toggleVSync(bool enable)
+{
+  Driver::AbstractDriver::self()->toggleVSync(enable);
+  m_vsync = enable;
+}
+
 void Canvas::keyPressEvent(QKeyEvent* event)
 {
   if (m_controller) {
