@@ -44,8 +44,6 @@ AbstractDriver* AbstractDriver::self()
 
 void AbstractDriver::toggleVSync(bool enable)
 {
-  if (glSwapInterval) {
-    qDebug() << "Setting" << enable;
-    glSwapInterval(enable ? 1 : 0);
-  }
+  if (glSwapInterval)
+    glSwapInterval(enable ? 1 : 100);
 }
