@@ -35,6 +35,7 @@ class Partition
       m_parent = 0l;
       m_boundingVolume = 0l;
     }
+    Partition(const Vector3f &size);
     Partition(float width, float height, float depth);
     ~Partition();
 

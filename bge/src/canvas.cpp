@@ -34,6 +34,7 @@
 #include "scene/camera.h"
 #include "scene/light.h"
 #include "scene/partition.h"
+#include "scene/boundingvolume.h"
 
 #include "storage/storagemanager.h"
 
@@ -44,6 +45,7 @@
 #include "abstractcontroller.h"
 #include "abstractoverlay.h"
 #include "recorder.h"
+#include "gamestate.h"
 
 using namespace BGE;
 
@@ -366,6 +368,70 @@ void Canvas::toggleVSync(bool enable)
 {
   Driver::AbstractDriver::self()->toggleVSync(enable);
   m_vsync = enable;
+}
+
+void Canvas::pushGameState(GameState *state)
+{
+  // Unloads the previous state
+  if (gameState())
+    unloadState(gameState());
+
+  // Load the state
+  m_states.push(state);
+  loadState(state);
+}
+
+GameState *Canvas::popGameState()
+{
+  if (m_states.isEmpty())
+    return 0l;
+
+  // Unloads the top state
+  GameState *state = m_states.pop();
+  unloadState(state);
+
+  // Load the bottom game state
+  loadState(gameState());
+
+  return state;
+}
+
+void Canvas::loadState(GameState *state)
+{
+  if (!state)
+    return;
+
+  // Load state
+  state->load();
+
+  // Update the canvas
+  m_cameras = state->m_cameras;
+  m_activeCamera = state->m_activeCamera;
+  m_lights = state->m_lights;
+  m_controller = state->m_controller;
+  m_overlay = state->m_overlay;
+  m_scene = state->m_scene;
+
+  if (!state->m_partition)
+    state->m_partition = new Scene::Partition(m_partition->size()->size());
+  m_partition = state->m_partition;
+}
+
+void Canvas::unloadState(GameState *state)
+{
+  if (!state)
+    return;
+
+  // Unload state
+  state->unload();
+
+  // Updates the game state container
+  state->m_cameras = m_cameras;
+  state->m_activeCamera = m_activeCamera;
+  state->m_lights = m_lights;
+  state->m_controller = m_controller;
+  state->m_overlay = m_overlay;
+  state->m_partition = m_partition;
 }
 
 void Canvas::keyPressEvent(QKeyEvent* event)
