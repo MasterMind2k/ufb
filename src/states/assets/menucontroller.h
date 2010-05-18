@@ -10,27 +10,32 @@
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
  ***************************************************************************/
-#include <QtGui/QApplication>
+#ifndef STATES_ASSETS_MENUCONTROLLER_H
+#define STATES_ASSETS_MENUCONTROLLER_H
 
-#include "canvas.h"
+#include "abstractcontroller.h"
 
-#include "states/menu.h"
+namespace States {
+namespace Assets {
+class MenuOverlay;
 
-int main(int argc, char **argv)
+class MenuController : public BGE::AbstractController
 {
-  Q_INIT_RESOURCE(bge_resources);
+  public:
+    MenuController();
 
-  QApplication app(argc, argv);
+    inline void setOverlay(MenuOverlay *overlay)
+    {
+      m_overlay = overlay;
+    }
 
-  // Load data
-  BGE::Canvas::canvas()->loadResource();
+    void keyPressed(QKeyEvent *event);
 
-  BGE::Canvas::canvas()->pushGameState(new States::Menu);
+  private:
+    MenuOverlay *m_overlay;
+};
 
-  BGE::Canvas::canvas()->createCamera("Global camera");
-  BGE::Canvas::canvas()->activateCamera("Global camera");
-
-  BGE::Canvas::canvas()->show();
-
-  return app.exec();
 }
+}
+
+#endif
