@@ -108,13 +108,17 @@ Item* Loader3DS::load()
         quint16 facesNumber = *(quint16*) modelFile.read(2).data();
         size_t size = 4 * sizeof(quint16);
         quint16* vertexList = (quint16*) malloc(size);
+        QVector<quint16> temp;
+        temp.reserve(3);
+        QList<Face> faces;
         for (quint16 i = 0; i < facesNumber; i++) {
           modelFile.read((char*) vertexList, size);
-          QVector<quint16> temp;
+          temp.clear();
           temp << vertexList[0] << vertexList[1] << vertexList[2];
-          mesh->addFace(objectName, Mesh::Triangles, temp);
+          faces << Face(Mesh::Triangles, temp);
         }
         free(vertexList);
+        mesh->addFaces(objectName, faces);
 
         if (calculateNormals)
           mesh->calculateNormals(objectName);
