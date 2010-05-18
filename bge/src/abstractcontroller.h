@@ -13,6 +13,8 @@
 #ifndef __BGE_ABSTRACTCONTROLLER_H
 #define __BGE_ABSTRACTCONTROLLER_H
 
+#include "global.h"
+
 #include <QtGui/QKeyEvent>
 #include <QtGui/QMouseEvent>
 
