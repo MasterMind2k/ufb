@@ -1,0 +1,49 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource prefix="/asteroids/models">
+  <file alias="annefrank.3ds">resources/asteroids/models/annefrank.3ds</file>
+  <file alias="bacchus.3ds">resources/asteroids/models/bacchus.3ds</file>
+  <file alias="braille.3ds">resources/asteroids/models/braille.3ds</file>
+  <file alias="dactyl.3ds">resources/asteroids/models/dactyl.3ds</file>
+  <file alias="geographos.3ds">resources/asteroids/models/geographos.3ds</file>
+  <file alias="juno.3ds">resources/asteroids/models/juno.3ds</file>
+  <file alias="mathilde.3ds">resources/asteroids/models/mathilde.3ds</file>
+  <file alias="vesta.3ds">resources/asteroids/models/vesta.3ds</file>
+  <file alias="castalia.3ds">resources/asteroids/models/castalia.3ds</file>
+  <file alias="eros.3ds">resources/asteroids/models/eros.3ds</file>
+  <file alias="golevka.3ds">resources/asteroids/models/golevka.3ds</file>
+  <file alias="kleopatra.3ds">resources/asteroids/models/kleopatra.3ds</file>
+  <file alias="pallas.3ds">resources/asteroids/models/pallas.3ds</file>
+  <file alias="ceres.3ds">resources/asteroids/models/ceres.3ds</file>
+  <file alias="gaspra.3ds">resources/asteroids/models/gaspra.3ds</file>
+  <file alias="ida.3ds">resources/asteroids/models/ida.3ds</file>
+  <file alias="ky26.3ds">resources/asteroids/models/ky26.3ds</file>
+  <file alias="toutatis.3ds">resources/asteroids/models/toutatis.3ds</file>
+</qresource>
+<qresource prefix="asteroids/textures">
+  <file alias="annefrank.jpg">resources/asteroids/textures/annefrank.jpg</file>
+  <file alias="bacchus.jpg">resources/asteroids/textures/bacchus.jpg</file>
+  <file alias="braille.jpg">resources/asteroids/textures/braille.jpg</file>
+  <file alias="dactyl.jpg">resources/asteroids/textures/dactyl.jpg</file>
+  <file alias="geographos.jpg">resources/asteroids/textures/geographos.jpg</file>
+  <file alias="juno.jpg">resources/asteroids/textures/juno.jpg</file>
+  <file alias="mathilde.jpg">resources/asteroids/textures/mathilde.jpg</file>
+  <file alias="vesta.jpg">resources/asteroids/textures/vesta.jpg</file>
+  <file alias="castalia.jpg">resources/asteroids/textures/castalia.jpg</file>
+  <file alias="eros.jpg">resources/asteroids/textures/eros.jpg</file>
+  <file alias="golevka.jpg">resources/asteroids/textures/golevka.jpg</file>
+  <file alias="kleopatra.jpg">resources/asteroids/textures/kleopatra.jpg</file>
+  <file alias="pallas.jpg">resources/asteroids/textures/pallas.jpg</file>
+  <file alias="ceres.jpg">resources/asteroids/textures/ceres.jpg</file>
+  <file alias="gaspra.jpg">resources/asteroids/textures/gaspra.jpg</file>
+  <file alias="ida.jpg">resources/asteroids/textures/ida.jpg</file>
+  <file alias="ky26.jpg">resources/asteroids/textures/ky26.jpg</file>
+  <file alias="toutatis.jpg">resources/asteroids/textures/toutatis.jpg</file>
+</qresource>
+
+<qresource prefix="/fighters/models">
+  <file alias="fighter.3ds">resources/fighters/models/fighter.3ds</file>
+</qresource>
+<qresource prefix="/fighters/textures">
+  <file alias="fighter.jpg">resources/fighters/textures/fighter.jpg</file>
+</qresource>
+</RCC>
