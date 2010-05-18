@@ -30,7 +30,7 @@ class Partition;
 /**
  * @short Defines the state of the game.
  *
- * You should access and change game state's parameters only in the constructor.
+ * You should change overlay and controller only in the constructor.
  * Later on, the Canvas gets all the control over them.
  *
  * @warning When the game state is loaded, the parameters may get out of sync!
@@ -47,6 +47,15 @@ class GameState
   protected:
     virtual void load() = 0;
     virtual void unload() = 0;
+
+    inline void setOverlay(AbstractOverlay *overlay)
+    {
+      m_overlay = overlay;
+    }
+    inline void setController(AbstractController *controller)
+    {
+      m_controller = controller;
+    }
 
   private:
     Scene::Object *m_scene;

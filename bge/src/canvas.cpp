@@ -233,6 +233,7 @@ void Canvas::paintGL()
 
   // 2D painting
   QPainter painter(this);
+  painter.setRenderHint(QPainter::Antialiasing, true);
   if (m_overlay) {
     painter.save();
     m_overlay->paint(&painter, elapsed);
@@ -240,12 +241,14 @@ void Canvas::paintGL()
   }
 
   if (m_isFPSShown) {
+    painter.save();
     m_frames++;
     if (m_totalElapsed >= 1000)
       updateFPS();
 
     painter.setPen(Qt::white);
     painter.drawText(width() / 2, height() - 3, "FPS: " + QString::number(m_fps));
+    painter.restore();
   }
 
   painter.end();
