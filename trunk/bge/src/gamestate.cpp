@@ -22,4 +22,5 @@ GameState::GameState()
   m_overlay = 0l;
   m_controller = 0l;
   m_activeCamera = 0l;
+  m_partition = 0l;
 }
