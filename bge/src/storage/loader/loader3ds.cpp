@@ -148,11 +148,13 @@ Item* Loader3DS::load()
         quint16 verticesNumber = *(quint16*) modelFile.read(2).data();
         size_t size = 2* sizeof(float);
         float* raw = (float*) malloc(size);
+        QVector<Vector2f> textureMaps;
         for (quint16 i = 0; i < verticesNumber; i++) {
           modelFile.read((char*) raw, size);
-          mesh->addTextureMap(objectName, Vector2f(raw));
+          textureMaps << Vector2f(raw);
         }
         free(raw);
+        mesh->addTextureMaps(objectName, textureMaps);
 
         qDebug("BGE::Loader::Loader3DS::parse(): Parsed %d texture mappings for vertices.", verticesNumber);
         break;
