@@ -33,6 +33,8 @@ class MenuController : public BGE::AbstractController
 
   private:
     MenuOverlay *m_overlay;
+
+    void execute();
 };
 
 }

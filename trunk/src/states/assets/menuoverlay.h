@@ -39,6 +39,10 @@ class MenuOverlay : public BGE::AbstractOverlay
     MenuOverlay();
 
     void moveSelection(Directions direction);
+    inline Buttons selectedButton() const
+    {
+      return m_selectedButton;
+    }
 
   private:
     QRadialGradient m_buttonGradient;
