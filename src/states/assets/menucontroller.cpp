@@ -14,6 +14,8 @@
 
 #include "menuoverlay.h"
 
+#include "canvas.h"
+
 using namespace States;
 using namespace States::Assets;
 
@@ -31,7 +33,24 @@ void MenuController::keyPressed(QKeyEvent *event)
       m_overlay->moveSelection(MenuOverlay::Down);
       break;
 
+    case Qt::Key_Return:
+      execute();
+      break;
+
     default:
+      break;
+  }
+}
+
+void MenuController::execute()
+{
+  switch (m_overlay->selectedButton()) {
+    case MenuOverlay::Play:
+      // Not implemented
+      break;
+
+    case MenuOverlay::Quit:
+      BGE::Canvas::canvas()->close();
       break;
   }
 }
