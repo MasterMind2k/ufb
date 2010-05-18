@@ -23,7 +23,7 @@ int main(int argc, char **argv)
   QApplication app(argc, argv);
 
   // Load data
-  BGE::Canvas::canvas()->loadResource();
+  BGE::Canvas::canvas()->loadResource("./resources.rcc");
 
   BGE::Canvas::canvas()->pushGameState(new States::Menu);
 
