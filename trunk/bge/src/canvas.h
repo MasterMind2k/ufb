@@ -16,6 +16,7 @@
 #include <QtCore/QHash>
 #include <QtCore/QDir>
 #include <QtCore/QQueue>
+#include <QtCore/QStack>
 
 #include <QtOpenGL/QGLWidget>
 
@@ -26,6 +27,7 @@ namespace BGE {
 class AbstractController;
 class AbstractOverlay;
 class Recorder;
+class GameState;
 namespace Scene
 {
 class Object;
@@ -230,6 +232,27 @@ class Canvas : public QGLWidget
     }
     void toggleVSync(bool enable);
 
+    /**
+     * Pushes the GameState <i>state</i> to the stack. The Canvas <i>always</i> uses
+     * the top game state as it's state!
+     */
+    void pushGameState(GameState *state);
+    /**
+     * Pops the top game state and returns it.
+     */
+    GameState *popGameState();
+    /**
+     * Returns the top (active) game state.
+     *
+     * @return @c 0l There is no game state.
+     */
+    inline GameState *gameState() const
+    {
+      if (m_states.isEmpty())
+        return 0l;
+      return m_states.top();
+    }
+
   private:
     /* Really private stuff */
     Scene::Object *m_scene;
@@ -249,6 +272,7 @@ class Canvas : public QGLWidget
     Scene::Camera* m_activeCamera;
 
     QHash<QString, Scene::Light*> m_lights;
+    QStack<GameState*> m_states;
 
     bool m_vsync;
     bool m_isFPSShown;
@@ -262,6 +286,8 @@ class Canvas : public QGLWidget
     static Canvas* m_self;
 
     Canvas();
+    void unloadState(GameState *state);
+    void loadState(GameState *state);
 
     /* Reimplemented methods */
     void initializeGL();

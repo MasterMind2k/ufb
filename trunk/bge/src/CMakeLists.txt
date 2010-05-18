@@ -16,6 +16,7 @@ set(bge_SRCS
   recorder.cpp
   abstractoverlay.cpp
   motionstate.cpp
+  gamestate.cpp
 )
 
 set(bge_QHDRS

@@ -18,6 +18,13 @@
 using namespace BGE;
 using namespace BGE::Scene;
 
+Partition::Partition(const Vector3f &size)
+{
+  m_partitions.reserve(8);
+  m_parent = 0l;
+  m_boundingVolume = new BoundingVolume(Vector3f::Zero(), size);
+}
+
 Partition::Partition(float width, float height, float depth)
 {
   m_partitions.reserve(8);
