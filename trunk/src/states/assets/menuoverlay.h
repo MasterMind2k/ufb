@@ -10,27 +10,49 @@
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
  ***************************************************************************/
-#include <QtGui/QApplication>
+#ifndef STATES_ASSETS_MENUOVERLAY_H
+#define STATES_ASSETS_MENUOVERLAY_H
 
-#include "canvas.h"
+#include "abstractoverlay.h"
 
-#include "states/menu.h"
+#include <QtGui/QRadialGradient>
+#include <QtGui/QFont>
 
-int main(int argc, char **argv)
+class QPointF;
+
+namespace States {
+namespace Assets {
+
+class MenuOverlay : public BGE::AbstractOverlay
 {
-  Q_INIT_RESOURCE(bge_resources);
+  public:
+    enum Buttons {
+      Play,
+      Quit
+    };
 
-  QApplication app(argc, argv);
+    enum Directions {
+      Up,
+      Down
+    };
 
-  // Load data
-  BGE::Canvas::canvas()->loadResource();
+    MenuOverlay();
 
-  BGE::Canvas::canvas()->pushGameState(new States::Menu);
+    void moveSelection(Directions direction);
 
-  BGE::Canvas::canvas()->createCamera("Global camera");
-  BGE::Canvas::canvas()->activateCamera("Global camera");
+  private:
+    QRadialGradient m_buttonGradient;
+    QRadialGradient m_selectedButtonGradient;
+    QSizeF m_buttonSize;
+    QFont m_buttonTextFont;
+    Buttons m_selectedButton;
 
-  BGE::Canvas::canvas()->show();
+    void paint(QPainter *painter, qint32 elapsed);
+    void drawButton(Buttons button, const QRectF &geometry, QPainter *painter);
+    static QString buttonText(Buttons button);
+};
 
-  return app.exec();
 }
+}
+
+#endif

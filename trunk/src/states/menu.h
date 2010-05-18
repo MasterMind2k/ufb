@@ -10,27 +10,27 @@
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
  ***************************************************************************/
-#include <QtGui/QApplication>
+#ifndef STATES_MENU_H
+#define STATES_MENU_H
 
-#include "canvas.h"
+#include "gamestate.h"
 
-#include "states/menu.h"
-
-int main(int argc, char **argv)
-{
-  Q_INIT_RESOURCE(bge_resources);
-
-  QApplication app(argc, argv);
-
-  // Load data
-  BGE::Canvas::canvas()->loadResource();
-
-  BGE::Canvas::canvas()->pushGameState(new States::Menu);
-
-  BGE::Canvas::canvas()->createCamera("Global camera");
-  BGE::Canvas::canvas()->activateCamera("Global camera");
-
-  BGE::Canvas::canvas()->show();
-
-  return app.exec();
+namespace Widgets {
+class Menu;
 }
+
+namespace States {
+
+class Menu : public BGE::GameState
+{
+  public:
+    Menu();
+
+  private:
+    void load();
+    void unload();
+};
+
+}
+
+#endif
