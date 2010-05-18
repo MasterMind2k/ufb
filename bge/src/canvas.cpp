@@ -340,10 +340,10 @@ void Canvas::loadResource(const QString& fileName)
     return;
   }
 
-  if (!QResource::registerResource(fileName, "/bge_resources"))
+  if (!QResource::registerResource(fileName, "/bge_external"))
     qWarning("BGE::Canvas::loadResource: Cannot register '%s' resource!", fileName.toAscii().data());
   Storage::StorageManager::self()->load();
-  if (!QResource::unregisterResource(fileName, "/bge_resources"))
+  if (!QResource::unregisterResource(fileName, "/bge_external"))
     qWarning("BGE::Canvas::loadResource: Cannot unregister '%s' resource!", fileName.toAscii().data());
 }
 

@@ -45,6 +45,7 @@ void StorageManager::load()
 {
   QStack<QFileInfo> dirs;
   dirs += QDir(":/bge_resources").entryInfoList().toVector();
+  dirs += QDir(":/bge_external").entryInfoList().toVector();
 
   QStack<Item*> processedDirs;
   processedDirs.push(m_root);
