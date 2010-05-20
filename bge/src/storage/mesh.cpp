@@ -95,6 +95,17 @@ void Mesh::calculateNormals(const QString& name)
   m_normals.insert(name, normals);
 }
 
+void Mesh::rotate(const AngleAxisf &rotation)
+{
+  foreach (QString object, m_objects) {
+    QVector<Vector3f> vertices = m_vertices.value(object);
+    for (quint16 i = 0; i < vertices.size(); i++) {
+      vertices[i] = rotation * vertices.at(i);
+    }
+    m_vertices.insert(object, vertices);
+  }
+}
+
 void Mesh::addRectangle(const QString& objectName, const Vector3f& bottomLeft, const Vector3f& bottomRight, const Vector3f& topLeft, const Vector3f& topRight)
 {
   if (!m_objects.contains(objectName))

@@ -25,11 +25,3 @@ Menu::Menu()
   controller->setOverlay(overlay);
   setController(controller);
 }
-
-void Menu::load()
-{
-}
-
-void Menu::unload()
-{
-}

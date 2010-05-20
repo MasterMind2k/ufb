@@ -10,23 +10,18 @@
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
  ***************************************************************************/
-#ifndef STATES_MENU_H
-#define STATES_MENU_H
+#include "game.h"
 
-#include "gamestate.h"
+#include "objects/fighter.h"
 
-namespace Widgets {
-class Menu;
-}
+#include "assets/controller.h"
 
-namespace States {
+using namespace States;
 
-class Menu : public BGE::GameState
+Game::Game()
 {
-  public:
-    Menu();
-};
+  m_fighter = new Objects::Fighter;
 
+  Assets::Controller *controller = new Assets::Controller(m_fighter);
+  setController(controller);
 }
-
-#endif

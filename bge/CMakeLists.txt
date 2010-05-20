@@ -14,9 +14,9 @@ IF(NOT CMAKE_BUILD_TYPE)
 ENDIF(NOT CMAKE_BUILD_TYPE)
 
 # This is a ugly hack. Don't know how to fix this :(
-IF(CMAKE_BUILD_TYPE STREQUAL Debug)
-  add_definitions(-DEIGEN_DONT_ALIGN)
-ENDIF(CMAKE_BUILD_TYPE STREQUAL Debug)
+#IF(CMAKE_BUILD_TYPE STREQUAL Debug)
+#  add_definitions(-DEIGEN_DONT_ALIGN)
+#ENDIF(CMAKE_BUILD_TYPE STREQUAL Debug)
 
 add_subdirectory(src)
 add_subdirectory(test)

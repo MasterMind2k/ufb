@@ -10,23 +10,42 @@
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
  ***************************************************************************/
-#ifndef STATES_MENU_H
-#define STATES_MENU_H
+#include "controller.h"
 
-#include "gamestate.h"
+#include "BulletDynamics/Dynamics/btRigidBody.h"
 
-namespace Widgets {
-class Menu;
-}
+#include "canvas.h"
 
-namespace States {
+#include "objects/fighter.h"
 
-class Menu : public BGE::GameState
+using namespace States;
+using namespace States::Assets;
+
+Controller::Controller(Objects::Fighter *fighter)
+  : m_fighter(fighter)
 {
-  public:
-    Menu();
-};
-
 }
 
-#endif
+void Controller::keyPressed(QKeyEvent *event)
+{
+  switch (event->key()) {
+    case Qt::Key_Plus: {
+      m_fighter->setEnginePower(m_fighter->enginePower() + 5000);
+      break;
+    }
+
+    case Qt::Key_Minus: {
+      m_fighter->setEnginePower(m_fighter->enginePower() - 5000);
+      break;
+    }
+  }
+  m_fighter->body()->activate();
+}
+
+void Controller::mouseMoved(QMouseEvent *event)
+{
+  QSizeF size = BGE::Canvas::canvas()->size();
+  QPointF normalized((-(float) event->x() / size.width()) + 0.5, (-(float) event->y() / size.height()) + 0.5);
+  m_fighter->setAngularVelocity(Vector3f(normalized.y() * 2, 0, normalized.x() * 2));
+  m_fighter->body()->activate();
+}

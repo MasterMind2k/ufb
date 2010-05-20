@@ -10,21 +10,29 @@
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
  ***************************************************************************/
-#ifndef STATES_MENU_H
-#define STATES_MENU_H
+#ifndef OBJECTS_ASTEROID_H
+#define OBJECTS_ASTEROID_H
 
-#include "gamestate.h"
+#include "scene/object.h"
 
-namespace Widgets {
-class Menu;
-}
+class btRigidBody;
 
-namespace States {
+namespace Objects {
 
-class Menu : public BGE::GameState
+class Asteroid : public BGE::Scene::Object
 {
   public:
-    Menu();
+    Asteroid();
+
+    void initBody();
+
+    inline btRigidBody *body() const
+    {
+      return m_body;
+    }
+
+  private:
+    btRigidBody *m_body;
 };
 
 }

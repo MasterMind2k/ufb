@@ -13,10 +13,13 @@
 #ifndef __BGE_CANVAS_H
 #define __BGE_CANVAS_H
 
+#include "global.h"
+
 #include <QtCore/QHash>
 #include <QtCore/QDir>
 #include <QtCore/QQueue>
 #include <QtCore/QStack>
+#include <QtCore/QMutex>
 
 #include <QtOpenGL/QGLWidget>
 
@@ -53,6 +56,7 @@ class Canvas : public QGLWidget
 {
   Q_OBJECT
   public:
+    static Vector3f SceneSize;
     /**
      * Adds an SceneObject to the scene.
      *
@@ -198,6 +202,15 @@ class Canvas : public QGLWidget
       return m_isFPSShown;
     }
 
+    inline void grabMouse()
+    {
+      m_mouseGrabbed = true;
+    }
+    inline void ungrabMouse()
+    {
+      m_mouseGrabbed = false;
+    }
+
     /**
      * Loads the resource. The resource file has to be a Qt's binary resource file.
      *
@@ -264,6 +277,8 @@ class Canvas : public QGLWidget
     QTimer *m_timer;
     qint32 m_totalElapsed;
     QQueue<Scene::Object*> m_deletionQueue;
+    QMutex m_renderLocker;
+    bool m_mouseGrabbed;
 
     Recorder *m_recorder;
     quint32 m_timeSinceSnap;
@@ -293,10 +308,18 @@ class Canvas : public QGLWidget
     void initializeGL();
     void resizeGL(int w, int h);
     void paintGL();
+    void checkMouse(const QPoint &pos = QPoint());
 
     void keyPressEvent(QKeyEvent* event);
     void mouseMoveEvent(QMouseEvent* event);
     void mousePressEvent(QMouseEvent* event);
+
+    // To ensure the QGLWidgets gets the mouse events
+    inline void showEvent(QShowEvent *event)
+    {
+      QWidget::grabMouse();
+      QGLWidget::showEvent(event);
+    }
 
   private slots:
     void cleanup();
