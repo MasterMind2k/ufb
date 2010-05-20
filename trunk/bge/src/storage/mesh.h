@@ -183,6 +183,8 @@ class Mesh : public Item
       m_textureMaps.remove(name);
     }
 
+    void rotate(const AngleAxisf &rotation);
+
     /**
      * A conveniance method for creating rectangles.
      */

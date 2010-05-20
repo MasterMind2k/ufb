@@ -44,9 +44,16 @@ class GameState
   public:
     GameState();
 
+    /**
+     * Deletes the scene and partition.
+     *
+     * @warning Do not delete the gamestate if it is inside Canvas's game stack!
+     */
+    virtual ~GameState();
+
   protected:
-    virtual void load() = 0;
-    virtual void unload() = 0;
+    inline virtual void load() {}
+    inline virtual void unload() {}
 
     inline void setOverlay(AbstractOverlay *overlay)
     {

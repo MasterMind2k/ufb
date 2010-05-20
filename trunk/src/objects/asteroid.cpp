@@ -10,23 +10,32 @@
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
  ***************************************************************************/
-#ifndef STATES_MENU_H
-#define STATES_MENU_H
+#include "asteroid.h"
 
-#include "gamestate.h"
+#include "BulletDynamics/Dynamics/btRigidBody.h"
+#include "BulletCollision/CollisionShapes/btBoxShape.h"
 
-namespace Widgets {
-class Menu;
-}
+#include "motionstate.h"
 
-namespace States {
+#include "storage/storagemanager.h"
+#include "storage/mesh.h"
+#include "storage/texture.h"
 
-class Menu : public BGE::GameState
+#include "scene/boundingvolume.h"
+
+using namespace Objects;
+
+Asteroid::Asteroid()
 {
-  public:
-    Menu();
-};
+  setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/asteroids/models/mathilde"));
+  setTexture(BGE::Storage::StorageManager::self()->get<BGE::Storage::Texture*>("/asteroids/textures/mathilde"));
 
+  m_body = 0l;
 }
 
-#endif
+void Asteroid::initBody()
+{
+  btRigidBody::btRigidBodyConstructionInfo info(1000, new BGE::MotionState(this), new btBoxShape(btVector3(boundingVolume()->size().x(), boundingVolume()->size().y(), boundingVolume()->size().z())));
+  info.m_friction = 0;
+  m_body = new btRigidBody(info);
+}

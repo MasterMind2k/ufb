@@ -49,10 +49,13 @@
 
 using namespace BGE;
 
+Vector3f Canvas::SceneSize = Vector3f(1000, 1000, 1000);
+
 Canvas* Canvas::m_self = 0l;
 
 Canvas::Canvas()
-: QGLWidget()
+: QGLWidget(),
+  m_mouseGrabbed(false)
 {
   m_frames = 0;
   m_fps = 0;
@@ -93,7 +96,7 @@ Canvas::Canvas()
 
   m_controller = 0l;
   m_overlay = 0l;
-  m_partition = new Scene::Partition(1000, 1000, 1000);
+  m_partition = new Scene::Partition(SceneSize.x(), SceneSize.y(), SceneSize.z());
 
   setAutoFillBackground(false);
 
@@ -109,6 +112,8 @@ Canvas::Canvas()
   btDefaultCollisionConfiguration *collisionConfiguration = new btDefaultCollisionConfiguration;
   m_dynamicsWorld = new btDiscreteDynamicsWorld(new btCollisionDispatcher(collisionConfiguration), new btDbvtBroadphase, new btSequentialImpulseConstraintSolver, collisionConfiguration);
   m_dynamicsWorld->setGravity(btVector3(0, -10, 0));
+
+  setMouseTracking(true);
 
   connect(m_timer, SIGNAL(timeout()), SLOT(updateGL()));
   connect(QApplication::instance(), SIGNAL(aboutToQuit()), SLOT(cleanup()));
@@ -143,7 +148,7 @@ void Canvas::resizeGL(int w, int h)
   // Default perspective setup
   QMatrix4x4 projection;
   // Careful! Values are also used by v-f culling
-  projection.perspective(80, (qreal) w / (qreal) h, 0.1, 1000.0);
+  projection.perspective(80, (qreal) w / (qreal) h, 0.1, SceneSize.x());
   Matrix4d temp;
   memcpy(temp.data(), projection.data(), 16 * sizeof(qreal));
   Scene::Camera::m_projection.matrix() = temp.cast<float>();
@@ -151,6 +156,9 @@ void Canvas::resizeGL(int w, int h)
 
 void Canvas::paintGL()
 {
+  if (!m_renderLocker.tryLock(0))
+    return;
+
   m_timer->stop();
 
   qint32 elapsed = m_time->restart();
@@ -263,8 +271,32 @@ void Canvas::paintGL()
   while (!m_deletionQueue.isEmpty())
     delete m_deletionQueue.dequeue();
 
+  checkMouse();
+  m_renderLocker.unlock();
+
   // Set next rendering
   m_timer->start();
+}
+
+void Canvas::checkMouse(const QPoint &pos)
+{
+  if (!m_mouseGrabbed)
+    return;
+
+  QPoint position = pos.isNull() ? QCursor::pos() : pos;
+
+  QPoint topLeft = mapToGlobal(rect().topLeft()) + QPoint(10, 10);
+  QPoint bottomRight = mapToGlobal(rect().bottomRight())  - QPoint(10, 10);
+  if (position.x() > bottomRight.x())
+    position.setX(bottomRight.x());
+  else  if (position.x() < topLeft.x())
+    position.setX(topLeft.x());
+
+  if (position.y() > bottomRight.y())
+    position.setY(bottomRight.y());
+  else if (position.y() < topLeft.y())
+    position.setY(topLeft.y());
+  QCursor::setPos(position);
 }
 
 void Canvas::setOverlay(AbstractOverlay *overlay)
@@ -375,6 +407,7 @@ void Canvas::toggleVSync(bool enable)
 
 void Canvas::pushGameState(GameState *state)
 {
+  m_renderLocker.lock();
   // Unloads the previous state
   if (gameState())
     unloadState(gameState());
@@ -382,12 +415,15 @@ void Canvas::pushGameState(GameState *state)
   // Load the state
   m_states.push(state);
   loadState(state);
+  m_time->restart();
+  m_renderLocker.unlock();
 }
 
 GameState *Canvas::popGameState()
 {
   if (m_states.isEmpty())
     return 0l;
+  m_renderLocker.lock();
 
   // Unloads the top state
   GameState *state = m_states.pop();
@@ -396,6 +432,8 @@ GameState *Canvas::popGameState()
   // Load the bottom game state
   loadState(gameState());
 
+  m_time->restart();
+  m_renderLocker.unlock();
   return state;
 }
 
@@ -458,6 +496,8 @@ void Canvas::keyPressEvent(QKeyEvent* event)
 
 void Canvas::mouseMoveEvent(QMouseEvent* event)
 {
+  checkMouse(event->globalPos());
+
   if (m_controller)
     m_controller->mouseMoved(event);
   QWidget::mouseMoveEvent(event);

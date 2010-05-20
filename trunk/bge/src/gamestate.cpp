@@ -13,6 +13,7 @@
 #include "gamestate.h"
 
 #include "scene/object.h"
+#include "scene/partition.h"
 
 using namespace BGE;
 
@@ -23,4 +24,11 @@ GameState::GameState()
   m_controller = 0l;
   m_activeCamera = 0l;
   m_partition = 0l;
+}
+
+GameState::~GameState()
+{
+  delete m_scene;
+  if (m_partition)
+    delete m_partition;
 }
