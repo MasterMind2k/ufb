@@ -36,7 +36,7 @@ void HUD::paint(QPainter *painter, qint32 elapsed)
   painter->setBrush(Qt::NoBrush);
 
   Vector2f center(BGE::Canvas::canvas()->width() / 2.0, BGE::Canvas::canvas()->height() / 2.0);
-  Vector2f left(center.x() / 2.0, center.y());
+  Vector2f left(center.x() / (float) 2.0, center.y());
   float width = 2.0 * BGE::Canvas::canvas()->width() / 4.0;
   Vector2f right(left.x() + width, left.y());
 
