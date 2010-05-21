@@ -29,7 +29,6 @@ Fighter::Fighter()
 {
   setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/fighters/models/fighter"));
   setTexture(BGE::Storage::StorageManager::self()->get<BGE::Storage::Texture*>("/fighters/textures/fighter"));
-  mesh()->rotate(AngleAxisf(-M_PI / 2, Vector3f::UnitX()));
 
   m_body = 0l;
 
