@@ -36,6 +36,8 @@ class Fighter : public BGE::Scene::Object
       m_enginePower = enginePower;
       if (m_enginePower > MaxPower)
         m_enginePower = MaxPower;
+      else if (m_enginePower < 0)
+        m_enginePower = 0;
     }
     inline qreal enginePower() const
     {

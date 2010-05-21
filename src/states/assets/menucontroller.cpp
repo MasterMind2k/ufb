@@ -79,7 +79,9 @@ void MenuController::execute()
       BGE::Canvas::canvas()->activateCamera("Global camera");
 
       asteroid->body()->setGravity(btVector3(0, 0, 0));
+      asteroid->body()->applyGravity();
       game->fighter()->body()->setGravity(btVector3(0, 0, 0));
+      game->fighter()->body()->applyGravity();
       break;
     }
 

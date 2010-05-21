@@ -17,6 +17,9 @@
 
 #include "canvas.h"
 
+#include "storage/storagemanager.h"
+#include "storage/mesh.h"
+
 #include "states/menu.h"
 
 int main(int argc, char **argv)
@@ -30,6 +33,9 @@ int main(int argc, char **argv)
 
   // Load data
   BGE::Canvas::canvas()->loadResource("./resources.rcc");
+
+  // Fix fighter model :)
+  BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/fighters/models/fighter")->rotate(AngleAxisf(-M_PI / 2, Vector3f::UnitX()));
 
   BGE::Canvas::canvas()->pushGameState(new States::Menu);
 
