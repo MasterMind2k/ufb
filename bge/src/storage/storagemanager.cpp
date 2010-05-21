@@ -75,7 +75,7 @@ void StorageManager::load()
         // Load obj
         qDebug("BGE::Storage::StorageManager::load(): Loading model '%s'", absoluteFilePath.toUtf8().data());
         loader = new Loader::ObjLoader(absoluteFilePath);
-      } else if (filename.endsWith(".png", Qt::CaseInsensitive) || filename.endsWith(".jpg", Qt::CaseInsensitive)) {
+      } else if (filename.endsWith(".png", Qt::CaseInsensitive) || filename.endsWith(".jpg", Qt::CaseInsensitive) || filename.endsWith(".bmp", Qt::CaseInsensitive)) {
         // Load texture
         qDebug("BGE::Storage::StorageManager::load(): Loading texture '%s'", absoluteFilePath.toUtf8().data());
         loader = new Loader::TextureLoader(absoluteFilePath);
