@@ -62,7 +62,7 @@ void MenuController::execute()
       asteroid->move(0, 0, -700);
 
       Game *game = new Game();
-      game->fighter()->move(0, 0, 800);
+      game->fighter()->move(0, 0, 0);
       game->fighter()->initBody();
       asteroid->initBody();
       BGE::Canvas::canvas()->pushGameState(game);
@@ -71,7 +71,7 @@ void MenuController::execute()
       BGE::Canvas::canvas()->addSceneObject(BGE::Canvas::canvas()->createLight("Global light"));
       BGE::Canvas::canvas()->light("Global light")->setPositional(false);
       BGE::Canvas::canvas()->light("Global light")->setPosition(0, 1, 1);
-      BGE::Canvas::canvas()->camera("Global camera")->move(0, 100, 200);
+      BGE::Canvas::canvas()->camera("Global camera")->move(0, 80, 200);
       BGE::Canvas::canvas()->addSceneObject(game->fighter());
       BGE::Canvas::canvas()->addSceneObject(asteroid);
       BGE::Canvas::canvas()->dynamicsWorld()->addRigidBody(game->fighter()->body());

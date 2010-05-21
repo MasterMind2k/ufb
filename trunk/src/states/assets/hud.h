@@ -10,19 +10,30 @@
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
  ***************************************************************************/
-#include "game.h"
+#ifndef STATES_ASSETS_HUD_H
+#define STATES_ASSETS_HUD_H
 
-#include "objects/fighter.h"
+#include "abstractoverlay.h"
 
-#include "assets/controller.h"
-#include "assets/hud.h"
-
-using namespace States;
-
-Game::Game()
-{
-  m_fighter = new Objects::Fighter;
-
-  setController(new Assets::Controller(m_fighter));
-  setOverlay(new Assets::HUD(m_fighter));
+namespace Objects {
+class Fighter;
 }
+
+namespace States {
+namespace Assets {
+
+class HUD : public BGE::AbstractOverlay
+{
+  public:
+  HUD(Objects::Fighter *fighter);
+
+  private:
+    Objects::Fighter *m_fighter;
+
+    void paint(QPainter *painter, qint32 elapsed);
+};
+
+}
+}
+
+#endif

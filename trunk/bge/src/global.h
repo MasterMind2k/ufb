@@ -31,6 +31,7 @@ using Eigen::Quaternionf;
 using Eigen::AngleAxisf;
 using Eigen::Scaling3f;
 using Eigen::Hyperplane;
+using Eigen::Rotation2Df;
 
 typedef Hyperplane<float, 3> Plane;
 

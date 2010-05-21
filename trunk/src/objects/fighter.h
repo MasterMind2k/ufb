@@ -34,6 +34,8 @@ class Fighter : public BGE::Scene::Object
     inline void setEnginePower(qreal enginePower)
     {
       m_enginePower = enginePower;
+      if (m_enginePower > MaxPower)
+        m_enginePower = MaxPower;
     }
     inline qreal enginePower() const
     {
@@ -53,6 +55,8 @@ class Fighter : public BGE::Scene::Object
     {
       return m_angularVelocity;
     }
+
+    static const qreal MaxPower = 1000000;
 
   private:
     btRigidBody *m_body;
