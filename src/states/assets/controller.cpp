@@ -30,12 +30,12 @@ void Controller::keyPressed(QKeyEvent *event)
 {
   switch (event->key()) {
     case Qt::Key_Plus: {
-      m_fighter->setEnginePower(m_fighter->enginePower() + 5000);
+      m_fighter->setEnginePower(m_fighter->enginePower() + 50000);
       break;
     }
 
     case Qt::Key_Minus: {
-      m_fighter->setEnginePower(m_fighter->enginePower() - 5000);
+      m_fighter->setEnginePower(m_fighter->enginePower() - 50000);
       break;
     }
   }

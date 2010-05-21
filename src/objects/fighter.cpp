@@ -40,8 +40,8 @@ Fighter::Fighter()
 void Fighter::initBody()
 {
   btRigidBody::btRigidBodyConstructionInfo info(1000, new BGE::MotionState(this), new btBoxShape(btVector3(boundingVolume()->size().x(), boundingVolume()->size().y(), boundingVolume()->size().z())));
-  info.m_friction = 5;
   m_body = new btRigidBody(info);
+  m_body->setDamping(0.5, 0);
 }
 
 void Fighter::calculateTransforms(qint32 timeDiff)
