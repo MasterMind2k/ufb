@@ -20,6 +20,8 @@
 #include "storage/storagemanager.h"
 #include "storage/mesh.h"
 
+#include "scene/light.h"
+
 #include "states/menu.h"
 
 int main(int argc, char **argv)
@@ -33,6 +35,9 @@ int main(int argc, char **argv)
 
   // Load data
   BGE::Canvas::canvas()->loadResource("./resources.rcc");
+
+  // Itensify ambient light
+  BGE::Scene::Light::setGlobalAmbient(QColor(120, 120, 120));
 
   // Fix fighter model :)
   BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/fighters/models/fighter")->rotate(AngleAxisf(-M_PI / 2, Vector3f::UnitX()));
