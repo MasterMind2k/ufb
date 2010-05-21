@@ -371,6 +371,15 @@ class Object
       return m_isRenderable;
     }
 
+    /**
+     * If you call this method, you wil disable culling of this object. Useful for
+     * skyboxes.
+     */
+    inline void disableCulling()
+    {
+      m_isCulled = false;
+    }
+
   protected:
     /**
      * This method gets called _before_ transform matrices get updated. Reimplement
@@ -409,6 +418,7 @@ class Object
     Object *m_parent;
     bool m_transformModified;
     bool m_isRenderable;
+    bool m_isCulled;
 
     Storage::Mesh* m_mesh;
     QHash<QString, Storage::Material*> m_materials;

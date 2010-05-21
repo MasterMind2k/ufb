@@ -27,7 +27,8 @@ using namespace BGE;
 using namespace BGE::Scene;
 
 Object::Object()
-  : m_isRenderable(false)
+  : m_isRenderable(false),
+    m_isCulled(true)
 {
   // Set the default transforms
   m_transform.setIdentity();

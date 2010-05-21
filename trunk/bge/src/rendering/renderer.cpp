@@ -103,4 +103,9 @@ void Renderer::drawScene()
       Driver::AbstractDriver::self()->draw(static_cast<Scene::ParticleEmitter*> (object));
     }
   }
+
+  if (currentMesh)
+    currentMesh->unbind();
+  if (currentTexture)
+    currentTexture->unbind();
 }

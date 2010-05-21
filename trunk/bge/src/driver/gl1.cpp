@@ -261,6 +261,9 @@ void GL1::setLight(Scene::Light *light)
 {
   m_lights << light;
   m_lightTransforms << m_transform;
+
+  QColor ambient = Scene::Light::globalAmbient();
+  glLightModelfv(GL_LIGHT_MODEL_AMBIENT, Vector4f(ambient.redF(), ambient.greenF(), ambient.blueF(), ambient.alphaF()).data());
 }
 
 void GL1::resetLighting()
