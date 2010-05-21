@@ -46,12 +46,13 @@ void HUD::paint(QPainter *painter, qint32 elapsed)
   Vector2f base(left.x(), left.y());
   Vector2f widthDirection(1, 0);
 
-  Vector3f normal(1, 0, 0);
-  normal = m_fighter->globalOrientation() * normal;
-  Vector3f cross = normal != Vector3f(1, 0, 0) ? normal.cross(Vector3f(1, 0.0f, 0.0f)).normalized() : Vector3f(0, 1, 1).normalized();
-
   // Z rotation
-  float angle = acos((cross.y() < 0 || cross.z() < 0 ? -1 : 1) * normal.dot(Vector3f(1.0f, 0.0f, 0.0f)));
+  float angle = -atan2(2 * (m_fighter->globalOrientation().x() * m_fighter->globalOrientation().y()
+                            + m_fighter->globalOrientation().w() * m_fighter->globalOrientation().z()),
+                            m_fighter->globalOrientation().w() * m_fighter->globalOrientation().w()
+                            + m_fighter->globalOrientation().x() * m_fighter->globalOrientation().x()
+                            - m_fighter->globalOrientation().y() * m_fighter->globalOrientation().y()
+                            - m_fighter->globalOrientation().z() * m_fighter->globalOrientation().z());
   Rotation2Df rotate(angle);
 
   left = rotate * (left - center) + center;
@@ -59,10 +60,13 @@ void HUD::paint(QPainter *painter, qint32 elapsed)
   painter->drawLine(QPointF(left.x(), left.y()), QPointF(right.x(), right.y()));
 
   // X rotation
-  normal = Quaternionf(BGE::Canvas::canvas()->activeCamera()->cameraTransform().rotation()) * Vector3f(0, 0, 1);
-  cross = normal != Vector3f(0, 0, 1) ? normal.cross(Vector3f(0, 0.0f, 1.0f)) : Vector3f(1, 1, 0);
-  angle = acos(normal.dot(Vector3f(0, 0, 1)));
-  angle = angle / M_PI;
+  angle = atan2(2 * (m_fighter->globalOrientation().y() * m_fighter->globalOrientation().z()
+                     + m_fighter->globalOrientation().w() * m_fighter->globalOrientation().x()),
+                     m_fighter->globalOrientation().w() * m_fighter->globalOrientation().w()
+                     - m_fighter->globalOrientation().x() * m_fighter->globalOrientation().x()
+                     - m_fighter->globalOrientation().y() * m_fighter->globalOrientation().y()
+                     + m_fighter->globalOrientation().z() * m_fighter->globalOrientation().z());
+  angle = qAbs(angle / M_PI);
   tip.y() = center.y() + angle * tip.y() - tip.y() / 2;
 
   tip = rotate * (tip - center) + center;
