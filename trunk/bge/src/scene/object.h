@@ -66,11 +66,7 @@ class Object
     /**
      * Scales the object using the coeficients vector.
      */
-    inline void scale(const Scaling3f& scale)
-    {
-      m_scale = m_scale * scale;
-      m_transformModified = true;
-    }
+    void scale(const Scaling3f& scale);
     /**
      * \overload
      */
@@ -84,6 +80,10 @@ class Object
     inline void scale(float s)
     {
       scale(Scaling3f(s, s, s));
+    }
+    inline Vector3f scaled() const
+    {
+      return m_scale * Vector3f(1.0, 1.0, 1.0);
     }
 
     /**

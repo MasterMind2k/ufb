@@ -67,6 +67,18 @@ void Object::move(const Vector3f& direction)
   m_transformModified = true;
 }
 
+void Object::scale(const Scaling3f &scale)
+{
+  m_scale = m_scale * scale;
+  m_transformModified = true;
+
+  if (m_boundingVolume) {
+    Vector3f size = m_boundingVolume->size();
+    size = m_scale * size;
+    m_boundingVolume->setSize(size);
+  }
+}
+
 void Object::rotate(const AngleAxisf& rotation)
 {
   m_orientation = (m_orientation * rotation).normalized();

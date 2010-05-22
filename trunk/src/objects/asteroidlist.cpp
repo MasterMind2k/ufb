@@ -17,6 +17,7 @@
 #include "asteroid.h"
 
 #include "scene/camera.h"
+#include "scene/boundingvolume.h"
 
 using namespace Objects;
 
@@ -48,9 +49,9 @@ void AsteroidList::setPosition(Asteroid *asteroid, const Vector3f &position)
 
   if (!m_nearestAsteroid) {
     m_nearestAsteroid = asteroid;
-    m_distance = (BGE::Canvas::canvas()->activeCamera()->globalPosition() - asteroid->globalPosition()).norm();
+    m_distance = (BGE::Canvas::canvas()->activeCamera()->globalPosition() - asteroid->globalPosition()).norm() - asteroid->boundingVolume()->radius();
   } else {
-    float distance = (BGE::Canvas::canvas()->activeCamera()->globalPosition() - asteroid->globalPosition()).norm();
+    float distance = (BGE::Canvas::canvas()->activeCamera()->globalPosition() - asteroid->globalPosition()).norm() - asteroid->boundingVolume()->radius();
     if (distance < m_distance) {
       m_nearestAsteroid = asteroid;
       m_distance = distance;
