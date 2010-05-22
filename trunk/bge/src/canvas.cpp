@@ -148,7 +148,7 @@ void Canvas::resizeGL(int w, int h)
   // Default perspective setup
   QMatrix4x4 projection;
   // Careful! Values are also used by v-f culling
-  projection.perspective(80, (qreal) w / (qreal) h, 0.1, SceneSize.x());
+  projection.perspective(80, (qreal) w / (qreal) h, 0.1, 2 * SceneSize.x());
   Matrix4d temp;
   memcpy(temp.data(), projection.data(), 16 * sizeof(qreal));
   Scene::Camera::m_projection.matrix() = temp.cast<float>();
@@ -195,7 +195,7 @@ void Canvas::paintGL()
               objectQueue.append(object->children());
 
               // Put object to the rendering queue
-              if (object->isRenderable())
+              if (object->isRenderable() && object->m_isCulled)
                 m_renderer->enqueueObject(object);
             }
           }
@@ -214,7 +214,7 @@ void Canvas::paintGL()
               objectQueue.append(object->children());
 
               // Put object to the rendering queue
-              if (object->isRenderable())
+              if (object->isRenderable() && object->m_isCulled)
                 m_renderer->enqueueObject(object);
             }
             queue.append(partition->partitions().toList());
@@ -230,6 +230,9 @@ void Canvas::paintGL()
     while (!objectQueue.isEmpty()) {
       Scene::Object *object = objectQueue.dequeue();
       object->m_transformModified = false;
+      objectQueue.append(object->children());
+      if (object->isRenderable() && !object->m_isCulled)
+        m_renderer->enqueueObject(object);
     }
   }
 
