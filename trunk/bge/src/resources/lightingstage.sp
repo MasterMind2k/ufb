@@ -149,7 +149,10 @@ void main(void)
 {
   vec4 temp = texture2D(Positions, ex_TexCoord.st);
   vec3 position = temp.xyz;
+  if (length(position) == 0.0)
+    discard;
   vec3 normal = texture2D(Normals, ex_TexCoord.st).xyz;
+  float lighting = texture2D(Normals, ex_TexCoord.st).w;
   vec4 colorMap = texture2D(ColorMap, ex_TexCoord.st);
 
   /* Material */
@@ -162,14 +165,18 @@ void main(void)
   vec4 color = Material.emission;
 
   if (color.r + color.g + color.b == 0.0) {
-    if (UsedLights > 0)
-      color += light1(position, normal, Material);
-    if (UsedLights > 1)
-      color += light2(position, normal, Material);
-    if (UsedLights > 2)
-      color += light3(position, normal, Material);
-    if (UsedLights > 3)
-      color += light4(position, normal, Material);
+    if (lighting > 0.0) {
+      if (UsedLights > 0)
+        color += light1(position, normal, Material);
+      if (UsedLights > 1)
+        color += light2(position, normal, Material);
+      if (UsedLights > 2)
+        color += light3(position, normal, Material);
+      if (UsedLights > 3)
+        color += light4(position, normal, Material);
+    } else {
+      color = vec4(1.0);
+    }
   }
   if (colorMap.r + colorMap.g + colorMap.g > 0.0)
     color *= colorMap;

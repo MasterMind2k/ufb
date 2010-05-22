@@ -78,13 +78,27 @@ class AbstractDriver
     virtual void replaceStage(quint8 index, Rendering::Stage *stage) = 0;
     virtual Rendering::Stage *stage(quint8 index) const = 0;
 
+    inline void disableLighting()
+    {
+      m_hasLighting = false;
+    }
+    inline void enableLighting()
+    {
+      m_hasLighting = true;
+    }
+    inline bool hasLighting() const
+    {
+      return m_hasLighting;
+    }
+
     void toggleVSync(bool enable);
 
   protected:
-    inline AbstractDriver() {}
+    inline AbstractDriver() :m_hasLighting(true) {}
 
   private:
     static AbstractDriver* m_self;
+    bool m_hasLighting;
 };
 
 }
