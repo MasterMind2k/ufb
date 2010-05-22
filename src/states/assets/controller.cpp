@@ -29,6 +29,12 @@ Controller::Controller(Objects::Fighter *fighter)
 void Controller::keyPressed(QKeyEvent *event)
 {
   switch (event->key()) {
+    case Qt::Key_R : {
+      if (event->modifiers() & Qt::CTRL)
+        BGE::Canvas::canvas()->setFPSShown(!BGE::Canvas::canvas()->isFPSShown());
+      break;
+    }
+
     case Qt::Key_Plus: {
       m_fighter->setEnginePower(m_fighter->enginePower() + 50000);
       break;

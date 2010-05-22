@@ -41,6 +41,12 @@ MenuController::MenuController()
 void MenuController::keyPressed(QKeyEvent *event)
 {
   switch (event->key()) {
+    case Qt::Key_R : {
+      if (event->modifiers() & Qt::CTRL)
+        BGE::Canvas::canvas()->setFPSShown(!BGE::Canvas::canvas()->isFPSShown());
+      break;
+    }
+
     case Qt::Key_Up:
       m_overlay->moveSelection(MenuOverlay::Up);
       break;
