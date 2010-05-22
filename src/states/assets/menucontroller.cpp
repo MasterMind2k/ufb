@@ -95,7 +95,6 @@ void MenuController::execute()
       skybox->disableCulling();
       skybox->setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/skybox/model"));
       skybox->setTexture(BGE::Storage::StorageManager::self()->get<BGE::Storage::Texture*>("/skybox/Galaxy_FT"));
-      skybox->addMaterial(BGE::Storage::StorageManager::self()->get<BGE::Storage::Material*>("/skybox/material"));
       skybox->move(0, 0, -BGE::Canvas::SceneSize.z());
       BGE::Canvas::canvas()->addSceneObject(skybox);
       // Back
@@ -103,7 +102,6 @@ void MenuController::execute()
       skybox->disableCulling();
       skybox->setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/skybox/model"));
       skybox->setTexture(BGE::Storage::StorageManager::self()->get<BGE::Storage::Texture*>("/skybox/Galaxy_BK"));
-      skybox->addMaterial(BGE::Storage::StorageManager::self()->get<BGE::Storage::Material*>("/skybox/material"));
       skybox->rotateY(180);
       skybox->move(0, 0, BGE::Canvas::SceneSize.z());
       BGE::Canvas::canvas()->addSceneObject(skybox);
@@ -112,7 +110,6 @@ void MenuController::execute()
       skybox->disableCulling();
       skybox->setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/skybox/model"));
       skybox->setTexture(BGE::Storage::StorageManager::self()->get<BGE::Storage::Texture*>("/skybox/Galaxy_LT"));
-      skybox->addMaterial(BGE::Storage::StorageManager::self()->get<BGE::Storage::Material*>("/skybox/material"));
       skybox->rotateY(90);
       skybox->move(-BGE::Canvas::SceneSize.x(), 0, 0);
       BGE::Canvas::canvas()->addSceneObject(skybox);
@@ -121,7 +118,6 @@ void MenuController::execute()
       skybox->disableCulling();
       skybox->setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/skybox/model"));
       skybox->setTexture(BGE::Storage::StorageManager::self()->get<BGE::Storage::Texture*>("/skybox/Galaxy_RT"));
-      skybox->addMaterial(BGE::Storage::StorageManager::self()->get<BGE::Storage::Material*>("/skybox/material"));
       skybox->rotateY(-90);
       skybox->move(BGE::Canvas::SceneSize.x(), 0, 0);
       BGE::Canvas::canvas()->addSceneObject(skybox);
@@ -130,7 +126,6 @@ void MenuController::execute()
       skybox->disableCulling();
       skybox->setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/skybox/model"));
       skybox->setTexture(BGE::Storage::StorageManager::self()->get<BGE::Storage::Texture*>("/skybox/Galaxy_UP"));
-      skybox->addMaterial(BGE::Storage::StorageManager::self()->get<BGE::Storage::Material*>("/skybox/material"));
       skybox->rotateX(90);
       skybox->move(0, BGE::Canvas::SceneSize.y(), 0);
       BGE::Canvas::canvas()->addSceneObject(skybox);
@@ -139,7 +134,6 @@ void MenuController::execute()
       skybox->disableCulling();
       skybox->setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/skybox/model"));
       skybox->setTexture(BGE::Storage::StorageManager::self()->get<BGE::Storage::Texture*>("/skybox/Galaxy_DN"));
-      skybox->addMaterial(BGE::Storage::StorageManager::self()->get<BGE::Storage::Material*>("/skybox/material"));
       skybox->rotateX(-90);
       skybox->move(0, -BGE::Canvas::SceneSize.y(), 0);
       BGE::Canvas::canvas()->addSceneObject(skybox);
