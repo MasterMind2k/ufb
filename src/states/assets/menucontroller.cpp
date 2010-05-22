@@ -148,10 +148,12 @@ void MenuController::execute()
 
 void MenuController::populateAsteroids()
 {
+  int max = BGE::Canvas::canvas()->SceneSize.x();
+  int min = BGE::Canvas::canvas()->SceneSize.x() / 2;
   qsrand(time(0l));
-  for (quint16 i = 0; i < 50; i++) {
+  for (quint16 i = 0; i < 10; i++) {
     Objects::Asteroid *asteroid = new Objects::Asteroid;
-    asteroid->move(qrand() % (int) BGE::Canvas::canvas()->SceneSize.x(), qrand() % (int) BGE::Canvas::canvas()->SceneSize.y(), qrand() % (int) BGE::Canvas::canvas()->SceneSize.z());
+    asteroid->move(qrand() % max - min, qrand() % max - min, qrand() % max - min);
     BGE::Canvas::canvas()->addSceneObject(asteroid);
 
     asteroid->initBody();

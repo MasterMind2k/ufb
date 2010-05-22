@@ -105,18 +105,54 @@ void HUD::paint(QPainter *painter, qint32 elapsed)
   foreach (Objects::Asteroid *asteroid, Objects::AsteroidList::self()->asteroids()) {
     Vector3f pos = Objects::AsteroidList::self()->transformedPositions().value(asteroid);
     if (pos.z() < -1 || pos.z() > 1)
-      continue;
+      break;
 
     if (pos.x() < -1 || pos.x() > 1)
-      continue;
+      break;
     if (pos.y() < -1 || pos.y() > 1)
-      continue;
+      break;
 
     pos.x() = size.width() * ((pos.x() + 1.0) / 2.0);
     pos.y() = size.height() - size.height() * ((pos.y() + 1.0) / 2.0);
     painter->drawPoint(pos.x(), pos.y());
 
     float distance = (BGE::Canvas::canvas()->activeCamera()->globalPosition() - asteroid->globalPosition()).norm();
-    painter->drawText(pos.x(), pos.y(), "Distance: " + QString::number(distance));
+    painter->drawText(pos.x() + 5, pos.y() + 5, "Distance: " + QString::number(distance));
+  }
+
+  // Direction to nearest asteroid
+  Objects::Asteroid *nearest = Objects::AsteroidList::self()->nearestAsteroid();
+  if (nearest) {
+    Vector3f pos = Objects::AsteroidList::self()->transformedPositions().value(nearest);
+    pos.x() = size.width() * ((pos.x() + 1.0) / 2.0);
+    pos.y() = size.height() - size.height() * ((pos.y() + 1.0) / 2.0);
+
+    bool x = true;
+    bool y = true;
+    if (pos.x() > size.width())
+      pos.x() = size.width();
+    else if (pos.x() < 0)
+      pos.x() = 0;
+    else
+      x = false;
+
+    if (pos.y() > size.height())
+      pos.y() = size.height();
+    else if (pos.y() < 0)
+      pos.y() = 0;
+    else if ((BGE::Canvas::canvas()->activeCamera()->cameraTransform() * nearest->globalPosition()).z() > 0) {
+      if (pos.y() < size.height() / 2.0)
+        pos.y() = 0;
+      else
+        pos.y() = size.height();
+    } else
+      y = false;
+
+    if (x || y) {
+      painter->drawPoint(pos.x() + 5, pos.y() + 5);
+      painter->drawPoint(pos.x() - 5, pos.y() + 5);
+      painter->drawPoint(pos.x() + 5, pos.y() - 5);
+      painter->drawPoint(pos.x() - 5, pos.y() - 5);
+    }
   }
 }

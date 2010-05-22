@@ -16,6 +16,8 @@
 
 #include "asteroid.h"
 
+#include "scene/camera.h"
+
 using namespace Objects;
 
 AsteroidList *AsteroidList::m_self = 0l;
@@ -32,11 +34,27 @@ bool lessThen(Asteroid *a1, Asteroid *a2)
   if (position.y() < -1 || position.y() > 1)
     return false;
 
-  return AsteroidList::self()->transformedPositions().value(a2) > position;
+  return true;
 }
 
 AsteroidList::AsteroidList()
 {
+  m_nearestAsteroid = 0l;
+}
+
+void AsteroidList::setPosition(Asteroid *asteroid, const Vector3f &position)
+{
+  m_transformedPositions.insert(asteroid, position);
+
+  if (!m_nearestAsteroid) {
+    m_nearestAsteroid = asteroid;
+  } else {
+    float distance = (BGE::Canvas::canvas()->activeCamera()->globalPosition() - asteroid->globalPosition()).norm();
+    if (distance < m_distance) {
+      m_nearestAsteroid = asteroid;
+      m_distance = distance;
+    }
+  }
 }
 
 void AsteroidList::sort()
