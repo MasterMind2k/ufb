@@ -19,10 +19,33 @@
 
 #include "storage/storagemanager.h"
 #include "storage/mesh.h"
+#include "storage/texture.h"
+#include "storage/material.h"
 
 #include "scene/light.h"
+#include "scene/camera.h"
 
 #include "states/menu.h"
+
+void createSkyboxQuad()
+{
+  BGE::Storage::Mesh *skybox = new BGE::Storage::Mesh("model");
+
+  skybox->createObject("quad");
+  float maxSize = BGE::Canvas::SceneSize.x();
+  skybox->addRectangle("quad", Vector3f(-maxSize, -maxSize, 0), Vector3f(maxSize, -maxSize, 0), Vector3f(-maxSize, maxSize, 0), Vector3f(maxSize, maxSize, 0));
+  skybox->addTextureMaps("quad", QVector<Vector2f>() << Vector2f(0, 0) << Vector2f(1, 0) << Vector2f(0, 1) << Vector2f(1, 1));
+
+  skybox->addNormals("quad", QVector<Vector3f>() << Vector3f(0, 0, -1) << Vector3f(0, 0, -1) << Vector3f(0, 0, -1) << Vector3f(0, 0, -1));
+
+  skybox->addFaceMaterial("quad", 0, "material");
+
+  BGE::Storage::StorageManager::self()->set(skybox, "/skybox/");
+
+  // Add material
+  BGE::Storage::Material *material = new BGE::Storage::Material("material", Qt::white, Qt::black, Qt::black, Qt::black, 0);
+  BGE::Storage::StorageManager::self()->set(material, "/skybox/");
+}
 
 int main(int argc, char **argv)
 {
@@ -36,6 +59,9 @@ int main(int argc, char **argv)
   // Load data
   BGE::Canvas::canvas()->loadResource("./resources.rcc");
 
+  // Create sky box quad
+  createSkyboxQuad();
+
   // Itensify ambient light
   BGE::Scene::Light::setGlobalAmbient(QColor(120, 120, 120));
 
@@ -44,8 +70,68 @@ int main(int argc, char **argv)
 
   BGE::Canvas::canvas()->pushGameState(new States::Menu);
 
-  BGE::Canvas::canvas()->createCamera("Global camera");
+  // Make the skybox for menu
+  // Front
+  BGE::Scene::Object *skybox = new BGE::Scene::Object;
+  skybox->disableCulling();
+  skybox->setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/skybox/model"));
+  skybox->setTexture(BGE::Storage::StorageManager::self()->get<BGE::Storage::Texture*>("/skybox/Galaxy_FT"));
+  skybox->addMaterial(BGE::Storage::StorageManager::self()->get<BGE::Storage::Material*>("/skybox/material"));
+  skybox->move(0, 0, -BGE::Canvas::SceneSize.z());
+  BGE::Canvas::canvas()->addSceneObject(skybox);
+  // Back
+  skybox = new BGE::Scene::Object;
+  skybox->disableCulling();
+  skybox->setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/skybox/model"));
+  skybox->setTexture(BGE::Storage::StorageManager::self()->get<BGE::Storage::Texture*>("/skybox/Galaxy_BK"));
+  skybox->addMaterial(BGE::Storage::StorageManager::self()->get<BGE::Storage::Material*>("/skybox/material"));
+  skybox->rotateY(180);
+  skybox->move(0, 0, BGE::Canvas::SceneSize.z());
+  BGE::Canvas::canvas()->addSceneObject(skybox);
+  // Left
+  skybox = new BGE::Scene::Object;
+  skybox->disableCulling();
+  skybox->setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/skybox/model"));
+  skybox->setTexture(BGE::Storage::StorageManager::self()->get<BGE::Storage::Texture*>("/skybox/Galaxy_LT"));
+  skybox->addMaterial(BGE::Storage::StorageManager::self()->get<BGE::Storage::Material*>("/skybox/material"));
+  skybox->rotateY(90);
+  skybox->move(-BGE::Canvas::SceneSize.x(), 0, 0);
+  BGE::Canvas::canvas()->addSceneObject(skybox);
+  // Right
+  skybox = new BGE::Scene::Object;
+  skybox->disableCulling();
+  skybox->setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/skybox/model"));
+  skybox->setTexture(BGE::Storage::StorageManager::self()->get<BGE::Storage::Texture*>("/skybox/Galaxy_RT"));
+  skybox->addMaterial(BGE::Storage::StorageManager::self()->get<BGE::Storage::Material*>("/skybox/material"));
+  skybox->rotateY(-90);
+  skybox->move(BGE::Canvas::SceneSize.x(), 0, 0);
+  BGE::Canvas::canvas()->addSceneObject(skybox);
+  // Top
+  skybox = new BGE::Scene::Object;
+  skybox->disableCulling();
+  skybox->setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/skybox/model"));
+  skybox->setTexture(BGE::Storage::StorageManager::self()->get<BGE::Storage::Texture*>("/skybox/Galaxy_UP"));
+  skybox->addMaterial(BGE::Storage::StorageManager::self()->get<BGE::Storage::Material*>("/skybox/material"));
+  skybox->rotateX(90);
+  skybox->move(0, BGE::Canvas::SceneSize.y(), 0);
+  BGE::Canvas::canvas()->addSceneObject(skybox);
+  // Bottom
+  skybox = new BGE::Scene::Object;
+  skybox->disableCulling();
+  skybox->setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/skybox/model"));
+  skybox->setTexture(BGE::Storage::StorageManager::self()->get<BGE::Storage::Texture*>("/skybox/Galaxy_DN"));
+  skybox->addMaterial(BGE::Storage::StorageManager::self()->get<BGE::Storage::Material*>("/skybox/material"));
+  skybox->rotateX(-90);
+  skybox->move(0, -BGE::Canvas::SceneSize.y(), 0);
+  BGE::Canvas::canvas()->addSceneObject(skybox);
+
+  BGE::Canvas::canvas()->addSceneObject(BGE::Canvas::canvas()->createCamera("Global camera"));
+  BGE::Canvas::canvas()->camera("Global camera")->move(0, 0, 0);
   BGE::Canvas::canvas()->activateCamera("Global camera");
+
+  BGE::Canvas::canvas()->createLight("Global light")->setPosition(0, 0, -1);
+  BGE::Canvas::canvas()->light("Global light")->setPositional(false);
+  BGE::Canvas::canvas()->addSceneObject(BGE::Canvas::canvas()->light("Global light"));
 
   BGE::Canvas::canvas()->show();
 

@@ -46,4 +46,13 @@
 <qresource prefix="/fighters/textures">
   <file alias="fighter.jpg">resources/fighters/textures/fighter.jpg</file>
 </qresource>
+
+<qresource prefix="/skybox/">
+  <file alias="Galaxy_BK.bmp">resources/skybox/Galaxy_BK.bmp</file>
+  <file alias="Galaxy_DN.bmp">resources/skybox/Galaxy_DN.bmp</file>
+  <file alias="Galaxy_FT.bmp">resources/skybox/Galaxy_FT.bmp</file>
+  <file alias="Galaxy_LT.bmp">resources/skybox/Galaxy_LT.bmp</file>
+  <file alias="Galaxy_RT.bmp">resources/skybox/Galaxy_RT.bmp</file>
+  <file alias="Galaxy_UP.bmp">resources/skybox/Galaxy_UP.bmp</file>
+</qresource>
 </RCC>
