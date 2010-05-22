@@ -33,8 +33,10 @@ using namespace Objects;
 
 Asteroid::Asteroid()
 {
-  setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/asteroids/models/mathilde"));
-  setTexture(BGE::Storage::StorageManager::self()->get<BGE::Storage::Texture*>("/asteroids/textures/mathilde"));
+  QList<BGE::Storage::Item*> meshes = BGE::Storage::StorageManager::self()->get("/asteroids/models")->items();
+  setMesh(static_cast<BGE::Storage::Mesh*> (meshes.at(qrand() % meshes.size())));
+
+  setTexture(BGE::Storage::StorageManager::self()->get<BGE::Storage::Texture*>("/asteroids/textures/" + mesh()->name()));
 
   m_body = 0l;
 
@@ -50,5 +52,5 @@ void Asteroid::initBody()
 
 void Asteroid::postTransformCalculations(qint32 timeDiff)
 {
-  AsteroidList::self()->setPosition(this, BGE::Canvas::canvas()->activeCamera()->cameraTransform() * globalPosition());
+  AsteroidList::self()->setPosition(this, BGE::Scene::Camera::projection() * BGE::Canvas::canvas()->activeCamera()->cameraTransform() * globalPosition());
 }

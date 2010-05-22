@@ -23,14 +23,13 @@ AsteroidList *AsteroidList::m_self = 0l;
 bool lessThen(Asteroid *a1, Asteroid *a2)
 {
   Vector3f position = AsteroidList::self()->transformedPositions().value(a1);
-  if (position.z() > 0)
+  if (position.z() < -1 || position.z() > 1)
     return false;
 
-  QSize size = BGE::Canvas::canvas()->size();
-  if (position.x() < 0 || position.x() > size.width())
+  if (position.x() < -1 || position.x() > 1)
     return false;
 
-  if (position.y() < 0 || position.y() > size.height())
+  if (position.y() < -1 || position.y() > 1)
     return false;
 
   return AsteroidList::self()->transformedPositions().value(a2) > position;
