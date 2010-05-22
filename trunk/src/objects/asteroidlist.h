@@ -32,10 +32,7 @@ class AsteroidList
       return m_self;
     }
 
-    inline void setPosition(Asteroid *asteroid, const Vector3f &position)
-    {
-      m_transformedPositions.insert(asteroid, position);
-    }
+    void setPosition(Asteroid *asteroid, const Vector3f &position);
 
     inline void addAsteroid(Asteroid *asteroid)
     {
@@ -58,9 +55,16 @@ class AsteroidList
       return m_transformedPositions;
     }
 
+    inline Asteroid *nearestAsteroid() const
+    {
+      return m_nearestAsteroid;
+    }
+
   private:
     QList<Asteroid*> m_asteroids;
     QHash<Asteroid*, Vector3f> m_transformedPositions;
+    Asteroid *m_nearestAsteroid;
+    float m_distance;
 
     static AsteroidList *m_self;
 };
