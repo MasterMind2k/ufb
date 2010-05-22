@@ -18,10 +18,10 @@
 
 #include "objects/fighter.h"
 
-// Odstrani
 #include "BulletDynamics/Dynamics/btRigidBody.h"
 
 #include "scene/camera.h"
+#include "scene/boundingvolume.h"
 
 #include "objects/asteroidlist.h"
 #include "objects/asteroid.h"
@@ -116,7 +116,7 @@ void HUD::paint(QPainter *painter, qint32 elapsed)
     pos.y() = size.height() - size.height() * ((pos.y() + 1.0) / 2.0);
     painter->drawPoint(pos.x(), pos.y());
 
-    float distance = (BGE::Canvas::canvas()->activeCamera()->globalPosition() - asteroid->globalPosition()).norm();
+    float distance = (BGE::Canvas::canvas()->activeCamera()->globalPosition() - asteroid->globalPosition()).norm() - asteroid->boundingVolume()->radius();
     painter->drawText(pos.x() + 5, pos.y() + 5, "Distance: " + QString::number(distance));
   }
 

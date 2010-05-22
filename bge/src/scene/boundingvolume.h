@@ -49,11 +49,8 @@ class BoundingVolume
       m_corners.reserve(8);
       m_transformedCorners.reserve(8);
       m_center = center;
-      m_size = size;
       m_transform.setIdentity();
-      m_isCacheValid = false;
-      calculateCorners();
-      calculateRadius();
+      setSize(size);
     }
 
     inline void setTransform(const Transform3f &transform)
@@ -69,6 +66,13 @@ class BoundingVolume
     inline const Vector3f &size() const
     {
       return m_size;
+    }
+    inline void setSize(const Vector3f &size)
+    {
+      m_size = size;
+      m_isCacheValid = false;
+      calculateCorners();
+      calculateRadius();
     }
 
     inline const float radius() const
