@@ -15,6 +15,12 @@
 #include "BulletDynamics/Dynamics/btRigidBody.h"
 #include "BulletCollision/CollisionShapes/btBoxShape.h"
 
+#include "canvas.h"
+
+#include "scene/camera.h"
+
+#include "asteroidlist.h"
+
 #include "motionstate.h"
 
 #include "storage/storagemanager.h"
@@ -31,6 +37,8 @@ Asteroid::Asteroid()
   setTexture(BGE::Storage::StorageManager::self()->get<BGE::Storage::Texture*>("/asteroids/textures/mathilde"));
 
   m_body = 0l;
+
+  AsteroidList::self()->addAsteroid(this);
 }
 
 void Asteroid::initBody()
@@ -38,4 +46,9 @@ void Asteroid::initBody()
   btRigidBody::btRigidBodyConstructionInfo info(1000, new BGE::MotionState(this), new btBoxShape(btVector3(boundingVolume()->size().x(), boundingVolume()->size().y(), boundingVolume()->size().z())));
   info.m_friction = 0;
   m_body = new btRigidBody(info);
+}
+
+void Asteroid::postTransformCalculations(qint32 timeDiff)
+{
+  AsteroidList::self()->setPosition(this, BGE::Canvas::canvas()->activeCamera()->cameraTransform() * globalPosition());
 }

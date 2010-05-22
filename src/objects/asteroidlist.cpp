@@ -10,33 +10,37 @@
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
  ***************************************************************************/
-#ifndef OBJECTS_ASTEROID_H
-#define OBJECTS_ASTEROID_H
+#include "asteroidlist.h"
 
-#include "scene/object.h"
+#include "canvas.h"
 
-class btRigidBody;
+#include "asteroid.h"
 
-namespace Objects {
+using namespace Objects;
 
-class Asteroid : public BGE::Scene::Object
+AsteroidList *AsteroidList::m_self = 0l;
+
+bool lessThen(Asteroid *a1, Asteroid *a2)
 {
-  public:
-    Asteroid();
+  Vector3f position = AsteroidList::self()->transformedPositions().value(a1);
+  if (position.z() > 0)
+    return false;
 
-    void initBody();
+  QSize size = BGE::Canvas::canvas()->size();
+  if (position.x() < 0 || position.x() > size.width())
+    return false;
 
-    inline btRigidBody *body() const
-    {
-      return m_body;
-    }
+  if (position.y() < 0 || position.y() > size.height())
+    return false;
 
-  private:
-    btRigidBody *m_body;
-
-    void postTransformCalculations(qint32 timeDiff);
-};
-
+  return AsteroidList::self()->transformedPositions().value(a2) > position;
 }
 
-#endif
+AsteroidList::AsteroidList()
+{
+}
+
+void AsteroidList::sort()
+{
+  qSort(m_asteroids.begin(), m_asteroids.end(), lessThen);
+}

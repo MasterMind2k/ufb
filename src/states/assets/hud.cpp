@@ -23,6 +23,9 @@
 
 #include "scene/camera.h"
 
+#include "objects/asteroidlist.h"
+#include "objects/asteroid.h"
+
 using namespace States;
 using namespace Assets;
 
@@ -34,6 +37,7 @@ HUD::HUD(Objects::Fighter *fighter)
 
 void HUD::paint(QPainter *painter, qint32 elapsed)
 {
+  QSizeF size = BGE::Canvas::canvas()->size();
   painter->setPen(Qt::green);
   painter->setBrush(Qt::NoBrush);
 
@@ -95,4 +99,24 @@ void HUD::paint(QPainter *painter, qint32 elapsed)
   rect.setHeight(m_fighter->enginePower() / Objects::Fighter::MaxPower * 150);
   rect.moveTo(rect.left(), 160 - rect.height());
   painter->drawRect(rect);
+
+  // Paint distances
+  Objects::AsteroidList::self()->sort();
+  foreach (Objects::Asteroid *asteroid, Objects::AsteroidList::self()->asteroids()) {
+    Vector3f pos = BGE::Scene::Camera::projection() * Objects::AsteroidList::self()->transformedPositions().value(asteroid);
+    if (pos.z() < -1 || pos.z() > 1)
+      break;
+
+    if (pos.x() < -1 || pos.x() > 1)
+      break;
+    if (pos.y() < -1 || pos.y() > 1)
+      break;
+
+    pos.x() = size.width() * ((pos.x() + 1.0) / 2.0);
+    pos.y() = size.height() - size.height() * ((pos.y() + 1.0) / 2.0);
+    painter->drawPoint(pos.x(), pos.y());
+
+    float distance = (BGE::Canvas::canvas()->activeCamera()->globalPosition() - asteroid->globalPosition()).norm();
+    painter->drawText(pos.x(), pos.y(), "Distance: " + QString::number(distance));
+  }
 }
