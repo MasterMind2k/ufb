@@ -25,7 +25,7 @@ namespace Assets {
 class HUD : public BGE::AbstractOverlay
 {
   public:
-  HUD(Objects::Fighter *fighter);
+    HUD(Objects::Fighter *fighter);
 
   private:
     Objects::Fighter *m_fighter;

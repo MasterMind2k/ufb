@@ -149,10 +149,38 @@ void HUD::paint(QPainter *painter, qint32 elapsed)
       y = false;
 
     if (x || y) {
-      painter->drawPoint(pos.x() + 5, pos.y() + 5);
-      painter->drawPoint(pos.x() - 5, pos.y() + 5);
-      painter->drawPoint(pos.x() + 5, pos.y() - 5);
-      painter->drawPoint(pos.x() - 5, pos.y() - 5);
+      qreal angle = 0;
+      if (x && y) {
+        if (pos.x() > 0 && pos.y() > 0)
+          angle = 3.0 * M_PI / 4.0;
+        else if (pos.x() > 0 && pos.y() == 0)
+          angle = M_PI / 4.0;
+        else if (pos.x() == 0 && pos.y() > 0)
+          angle = -3.0 * M_PI / 4.0;
+        else
+          angle = -M_PI / 4.0;
+      } else if (!x) {
+        if (pos.y() > 0)
+          angle = M_PI;
+      } else if (!y) {
+        if (pos.x() > 0)
+          angle = M_PI / 2.0;
+        else
+          angle = -M_PI / 2.0;
+      }
+      Vector2f tip(0, 0), left(-25, 25), right(25, 25);
+      Rotation2Df rot(angle);
+      tip = rot * tip;
+      left = rot * left;
+      right = rot * right;
+
+      QPolygon arrow;
+      arrow << QPoint(tip.x(), tip.y());
+      arrow << QPoint(left.x(), left.y());
+      arrow << QPoint(right.x(), right.y());
+      arrow.translate(pos.x(), pos.y());
+
+      painter->drawPolygon(arrow);
     }
   }
 }

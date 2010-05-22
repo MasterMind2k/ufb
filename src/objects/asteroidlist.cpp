@@ -48,6 +48,7 @@ void AsteroidList::setPosition(Asteroid *asteroid, const Vector3f &position)
 
   if (!m_nearestAsteroid) {
     m_nearestAsteroid = asteroid;
+    m_distance = (BGE::Canvas::canvas()->activeCamera()->globalPosition() - asteroid->globalPosition()).norm();
   } else {
     float distance = (BGE::Canvas::canvas()->activeCamera()->globalPosition() - asteroid->globalPosition()).norm();
     if (distance < m_distance) {

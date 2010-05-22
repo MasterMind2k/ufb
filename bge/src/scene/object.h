@@ -385,6 +385,11 @@ class Object
       return m_isCulled;
     }
 
+    inline const Partition *partition() const
+    {
+      return m_partition;
+    }
+
   protected:
     /**
      * This method gets called _before_ transform matrices get updated. Reimplement
