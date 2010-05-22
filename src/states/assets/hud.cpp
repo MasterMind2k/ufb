@@ -103,14 +103,14 @@ void HUD::paint(QPainter *painter, qint32 elapsed)
   // Paint distances
   Objects::AsteroidList::self()->sort();
   foreach (Objects::Asteroid *asteroid, Objects::AsteroidList::self()->asteroids()) {
-    Vector3f pos = BGE::Scene::Camera::projection() * Objects::AsteroidList::self()->transformedPositions().value(asteroid);
+    Vector3f pos = Objects::AsteroidList::self()->transformedPositions().value(asteroid);
     if (pos.z() < -1 || pos.z() > 1)
-      break;
+      continue;
 
     if (pos.x() < -1 || pos.x() > 1)
-      break;
+      continue;
     if (pos.y() < -1 || pos.y() > 1)
-      break;
+      continue;
 
     pos.x() = size.width() * ((pos.x() + 1.0) / 2.0);
     pos.y() = size.height() - size.height() * ((pos.y() + 1.0) / 2.0);

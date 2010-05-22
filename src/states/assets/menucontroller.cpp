@@ -68,16 +68,12 @@ void MenuController::execute()
 {
   switch (m_overlay->selectedButton()) {
     case MenuOverlay::Play: {
-      // Spawn the game
-      Objects::Asteroid *asteroid = new Objects::Asteroid;
-      asteroid->move(0, 0, 700);
-
       Game *game = new Game();
       game->fighter()->move(0, 0, 0);
       game->fighter()->rotateY(180);
       game->fighter()->initBody();
-      asteroid->initBody();
       BGE::Canvas::canvas()->pushGameState(game);
+      populateAsteroids();
       game->fighter()->addChild(BGE::Canvas::canvas()->createCamera("Global camera"));
       //BGE::Canvas::canvas()->addSceneObject(BGE::Canvas::canvas()->createCamera("Global camera"));
       BGE::Canvas::canvas()->addSceneObject(BGE::Canvas::canvas()->createLight("Global light"));
@@ -85,13 +81,9 @@ void MenuController::execute()
       BGE::Canvas::canvas()->light("Global light")->setPosition(0, 0, -1);
       BGE::Canvas::canvas()->camera("Global camera")->move(0, 30, -100);
       BGE::Canvas::canvas()->addSceneObject(game->fighter());
-      BGE::Canvas::canvas()->addSceneObject(asteroid);
       BGE::Canvas::canvas()->dynamicsWorld()->addRigidBody(game->fighter()->body());
-      BGE::Canvas::canvas()->dynamicsWorld()->addRigidBody(asteroid->body());
       BGE::Canvas::canvas()->activateCamera("Global camera");
 
-      asteroid->body()->setGravity(btVector3(0, 0, 0));
-      asteroid->body()->applyGravity();
       game->fighter()->body()->setGravity(btVector3(0, 0, 0));
       game->fighter()->body()->applyGravity();
 
@@ -151,5 +143,20 @@ void MenuController::execute()
       BGE::Canvas::canvas()->close();
       break;
     }
+  }
+}
+
+void MenuController::populateAsteroids()
+{
+  qsrand(time(0l));
+  for (quint16 i = 0; i < 50; i++) {
+    Objects::Asteroid *asteroid = new Objects::Asteroid;
+    asteroid->move(qrand() % (int) BGE::Canvas::canvas()->SceneSize.x(), qrand() % (int) BGE::Canvas::canvas()->SceneSize.y(), qrand() % (int) BGE::Canvas::canvas()->SceneSize.z());
+    BGE::Canvas::canvas()->addSceneObject(asteroid);
+
+    asteroid->initBody();
+    BGE::Canvas::canvas()->dynamicsWorld()->addRigidBody(asteroid->body());
+    asteroid->body()->setGravity(btVector3(0, 0, 0));
+    asteroid->body()->applyGravity();
   }
 }
