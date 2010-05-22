@@ -296,6 +296,9 @@ void GL1::draw()
   bool isFirstPass = true;
   bool isBlending = false;
 
+  if (!hasLighting())
+    glDisable(GL_LIGHTING);
+
   while (m_renderedLights < m_lights.size()) {
     if (!isFirstPass)
       loadLights();
@@ -305,6 +308,9 @@ void GL1::draw()
     if (!isFirstPass)
       unloadLights();
 
+    if (!hasLighting())
+      break;
+
     if (isFirstPass && !isBlending) {
       glDepthFunc(GL_LEQUAL);
       glEnable(GL_BLEND);
@@ -313,6 +319,9 @@ void GL1::draw()
       isBlending = true;
     }
   }
+
+  if (!hasLighting())
+    glEnable(GL_LIGHTING);
 
   if (m_hasTexture)
     glDisable(GL_TEXTURE_2D);

@@ -31,12 +31,13 @@ struct MaterialStruct {
   float shininess;
 };
 uniform MaterialStruct Material;
+uniform float HasLighting;
 
 
 void main(void)
 {
   gl_FragData[0] = vec4(position.xyz, Material.shininess);
-  gl_FragData[1] = vec4(normalize(normal.xyz), 0.0);
+  gl_FragData[1] = vec4(normalize(normal.xyz), HasLighting);
   gl_FragData[2] = texture2D(Texture, ex_TexCoord.st);
   gl_FragData[3] = Material.ambient;
   gl_FragData[4] = Material.diffuse;

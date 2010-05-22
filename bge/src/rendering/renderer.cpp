@@ -76,6 +76,12 @@ void Renderer::drawScene()
     Transform3f worldTransform = Canvas::canvas()->activeCamera()->cameraTransform() * object->globalTransform();
     Driver::AbstractDriver::self()->setTransformMatrix(worldTransform);
 
+    // Toggle lighting
+    if (object->isCulled())
+      Driver::AbstractDriver::self()->enableLighting();
+    else
+      Driver::AbstractDriver::self()->disableLighting();
+
     if (object->mesh()) {
       Driver::AbstractDriver::self()->bind(object->materials());
 

@@ -374,10 +374,15 @@ class Object
     /**
      * If you call this method, you wil disable culling of this object. Useful for
      * skyboxes.
+     * It also disables lighting.
      */
     inline void disableCulling()
     {
       m_isCulled = false;
+    }
+    inline bool isCulled() const
+    {
+      return m_isCulled;
     }
 
   protected:

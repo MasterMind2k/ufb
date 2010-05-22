@@ -196,7 +196,7 @@ GL3::GL3()
   m_boundingMaterial = new Storage::Material("BGE::BoundingVolume", QColor(0, 0, 0), QColor(0, 0, 0), QColor(0, 0, 0), QColor(255, 255, 255), 0);
 
   m_globalUniforms << "Positions" // With added specular power
-                   << "Normals"
+                   << "Normals" // With lighting toggle
                    << "ColorMap"
                    << "Ambient"
                    << "Diffuse"
@@ -391,6 +391,8 @@ void GL3::draw()
 {
   if (!m_boundShader)
     qFatal("BGE::Driver::GL3::draw(): Shader not bound!");
+
+  bindUniformAttribute("HasLighting", hasLighting() ? 1.0f : 0.0f);
 
   Storage::Material* currentMaterial = 0l;
   setMaterial(currentMaterial);

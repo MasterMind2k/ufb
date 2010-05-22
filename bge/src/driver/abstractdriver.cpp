@@ -28,8 +28,8 @@ AbstractDriver* AbstractDriver::m_self = 0l;
 
 AbstractDriver* AbstractDriver::self()
 {
-  getUtilFunctions();
   if (!m_self) {
+    getUtilFunctions();
     bool useGL1 = QCoreApplication::instance()->arguments().contains("GL11");
     if (QGLFormat::openGLVersionFlags() & QGLFormat::OpenGL_Version_3_0 && !useGL1) {
       m_self = new GL3;
