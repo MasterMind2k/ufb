@@ -59,7 +59,7 @@ vec4 positionalLight(in vec3 ecPos, in vec3 n, in MaterialStruct Material, in Li
   dist = length(aux);
   lightDir = normalize(aux);
 
-  color = Material.ambient * GlobalAmbient;
+  color = vec4(0.0);
 
   NdotL = max(dot(n, lightDir), 0.0);
 
@@ -97,7 +97,7 @@ vec4 directionalLight(in vec3 ecPos, in vec3 n, in MaterialStruct Material, in L
   eye = vec3(0, 0, 1);
 
   /* Ambient */
-  color = GlobalAmbient * Material.ambient + Material.ambient * Light.ambient;
+  color = Material.ambient * Light.ambient;
   
   NdotL = max(dot(n, lightDir), 0.0);
 
@@ -166,6 +166,7 @@ void main(void)
 
   if (color.r + color.g + color.b == 0.0) {
     if (lighting > 0.0) {
+      color = GlobalAmbient * Material.ambient;
       if (UsedLights > 0)
         color += light1(position, normal, Material);
       if (UsedLights > 1)
