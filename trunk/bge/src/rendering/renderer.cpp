@@ -91,13 +91,13 @@ void Renderer::drawScene()
     }
 
     if (currentTexture != object->texture()) {
-    if (currentTexture)
-      currentTexture->unbind();
+      if (currentTexture)
+        currentTexture->unbind();
 
-    if (object->texture())
-      object->texture()->bind();
-    currentTexture = object->texture();
-  }
+      if (object->texture())
+        object->texture()->bind();
+      currentTexture = object->texture();
+    }
 
     if (object->mesh()) {
       Driver::AbstractDriver::self()->setTransformMatrix(worldTransform * object->globalTransform());

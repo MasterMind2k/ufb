@@ -27,6 +27,11 @@ class Light : public BGE::Scene::Object
   public:
     Light(const QString& name = QString());
 
+    inline const QString &name() const
+    {
+      return m_name;
+    }
+
     inline void setAmbientColor(const QColor& ambientColor)
     {
       m_ambient = ambientColor;

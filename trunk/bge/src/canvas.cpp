@@ -367,14 +367,14 @@ bool Canvas::removeCamera(const QString& name)
 
 Scene::Light* Canvas::createLight(const QString& name)
 {
-  if (m_lights.contains(name))
+  if (!name.isEmpty() && m_lights.contains(name))
     return 0l;
 
   Scene::Light* light = new Scene::Light(name);
   if (!light)
     return 0l;
 
-  m_lights.insert(name, light);
+  m_lights.insert(light->name(), light);
   return light;
 }
 
@@ -384,7 +384,6 @@ bool Canvas::removeLight(const QString &name)
   if (!light)
     return false;
 
-  delete light;
   m_lights.remove(name);
 
   return true;

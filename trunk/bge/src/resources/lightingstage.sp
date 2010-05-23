@@ -15,8 +15,6 @@ in vec2 ex_TexCoord;
 
 uniform sampler2D Positions, Normals, ColorMap, Ambient, Diffuse, Specular, Emission;
 
-/*out vec4 out_Color;*/
-
 struct LightStruct {
   vec4 position;
   /* Colors */
@@ -41,10 +39,7 @@ struct MaterialStruct {
   float shininess;
 };
 
-uniform LightStruct Lights0;
-uniform LightStruct Lights1;
-uniform LightStruct Lights2;
-uniform LightStruct Lights3;
+uniform LightStruct Light;
 uniform int UsedLights;
 uniform vec4 GlobalAmbient;
 
@@ -115,34 +110,10 @@ vec4 directionalLight(in vec3 ecPos, in vec3 n, in MaterialStruct Material, in L
 
 vec4 light1(in vec3 ecPos, in vec3 n, in MaterialStruct Material)
 {
-  if (Lights0.position.w == 1.0)
-    return positionalLight(ecPos, n, Material, Lights0);
+  if (Light.position.w == 1.0)
+    return positionalLight(ecPos, n, Material, Light);
   else
-    return directionalLight(ecPos, n, Material, Lights0);
-}
-
-vec4 light2(in vec3 ecPos, in vec3 n, in MaterialStruct Material)
-{
-  if (Lights1.position.w == 1.0)
-    return positionalLight(ecPos, n, Material, Lights1);
-  else
-    return directionalLight(ecPos, n, Material, Lights1);
-}
-
-vec4 light3(in vec3 ecPos, in vec3 n, in MaterialStruct Material)
-{
-  if (Lights2.position.w == 1.0)
-    return positionalLight(ecPos, n, Material, Lights2);
-  else
-    return directionalLight(ecPos, n, Material, Lights2);
-}
-
-vec4 light4(in vec3 ecPos, in vec3 n, in MaterialStruct Material)
-{
-  if (Lights3.position.w == 1.0)
-    return positionalLight(ecPos, n, Material, Lights3);
-  else
-    return directionalLight(ecPos, n, Material, Lights3);
+    return directionalLight(ecPos, n, Material, Light);
 }
 
 void main(void)
@@ -164,24 +135,19 @@ void main(void)
   Material.emission = texture2D(Emission, ex_TexCoord.st);
   vec4 color = Material.emission;
 
+  bool lightingOnly = GlobalAmbient.r + GlobalAmbient.g + GlobalAmbient.b == 0.0;
+
   if (color.r + color.g + color.b == 0.0) {
     if (lighting > 0.0) {
       color = GlobalAmbient * Material.ambient;
       if (UsedLights > 0)
         color += light1(position, normal, Material);
-      if (UsedLights > 1)
-        color += light2(position, normal, Material);
-      if (UsedLights > 2)
-        color += light3(position, normal, Material);
-      if (UsedLights > 3)
-        color += light4(position, normal, Material);
-    } else {
+    } else if (!lightingOnly) {
       color = vec4(1.0);
     }
   }
   if (colorMap.r + colorMap.g + colorMap.g > 0.0)
     color *= colorMap;
-  /*out_Color = color;*/
   gl_FragData[0] = color;
 }
 

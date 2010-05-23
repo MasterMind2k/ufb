@@ -25,6 +25,7 @@ class Explosion : public BGE::Scene::ParticleEmitter
       Small
     };
     Explosion(const Vector3f &position, Sizes size);
+    ~Explosion();
 
   private:
     void calculateParticle(BGE::Scene::Particle &particle, qint32 timeDiff);
