@@ -20,6 +20,8 @@
 #include "storage/mesh.h"
 #include "storage/material.h"
 
+#include "explosion.h"
+
 using namespace Objects;
 
 qreal Bullet::Velocity = 10000;
@@ -44,4 +46,16 @@ void Bullet::postTransformCalculations(qint32 timeDiff)
     BGE::Canvas::canvas()->dynamicsWorld()->removeRigidBody(body());
     BGE::Canvas::canvas()->deleteSceneObject(this);
   }
+}
+
+void Bullet::collision(BGE::Scene::Object *object)
+{
+  // Explode
+  parent()->addChild(new Explosion(globalPosition(), Explosion::Small));
+
+  // Die :)
+  setRenderable(false);
+  parent()->removeChild(this);
+  BGE::Canvas::canvas()->dynamicsWorld()->removeRigidBody(body());
+  BGE::Canvas::canvas()->deleteSceneObject(this);
 }

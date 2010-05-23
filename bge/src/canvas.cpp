@@ -166,7 +166,34 @@ void Canvas::paintGL()
 
   // Calculate all the transforms (recursive)
   if (elapsed > 0) {
-    m_dynamicsWorld->stepSimulation((qreal) elapsed / 1000.0);
+    m_dynamicsWorld->stepSimulation((qreal) elapsed / 1000.0, 7);
+
+    // Get collisions
+    int manifolds = m_dynamicsWorld->getDispatcher()->getNumManifolds();
+    for (quint32 i = 0; i < manifolds; i++) {
+      btPersistentManifold *manifold = m_dynamicsWorld->getDispatcher()->getManifoldByIndexInternal(i);
+      btCollisionObject *objectA = static_cast<btCollisionObject*> (manifold->getBody0());
+      btCollisionObject *objectB = static_cast<btCollisionObject*> (manifold->getBody1());
+      if (!objectA || !objectB)
+        continue;
+
+      int numContacts = manifold->getNumContacts();
+      for (qint32 j = 0; j < numContacts; j++) {
+        btManifoldPoint &pt = manifold->getContactPoint(j);
+        //if (pt.getDistance() < 0.0) {
+          // Dispatch trigger
+          Scene::Object *firstObject = static_cast <Scene::Object*> (objectA->getUserPointer());
+          Scene::Object *secondObject = static_cast<Scene::Object*> (objectB->getUserPointer());
+          if (!firstObject || !secondObject)
+            continue;
+
+          firstObject->collision(secondObject);
+          secondObject->collision(firstObject);
+          break;
+        //}
+      }
+    }
+
     m_scene->prepareTransforms(elapsed);
 
     // Calculate list of visible objects

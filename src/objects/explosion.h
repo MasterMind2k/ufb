@@ -10,36 +10,25 @@
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
  ***************************************************************************/
-#ifndef OBJECTS_ASTEROID_H
-#define OBJECTS_ASTEROID_H
+#ifndef OBJECTS_EXPLOSION_H
+#define OBJECTS_EXPLOSION_H
 
-#include "object.h"
+#include "scene/particleemitter.h"
 
 namespace Objects {
 
-class Asteroid : public Object
+class Explosion : public BGE::Scene::ParticleEmitter
 {
   public:
     enum Sizes {
-      Large, /* 2000 */
-      Medium, /* 1500 */
-      Small /* 1000 */
+      Large,
+      Small
     };
-
-    Asteroid(Sizes size);
-
-    qreal radius() const;
-
-    inline Sizes size() const
-    {
-      return m_size;
-    }
+    Explosion(const Vector3f &position, Sizes size);
 
   private:
-    Sizes m_size;
-
-    void postTransformCalculations(qint32 timeDiff);
-    void collision(BGE::Scene::Object *object);
+    void calculateParticle(BGE::Scene::Particle &particle, qint32 timeDiff);
+    qreal m_lifetime;
 };
 
 }

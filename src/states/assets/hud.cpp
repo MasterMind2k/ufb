@@ -117,7 +117,7 @@ void HUD::paint(QPainter *painter, qint32 elapsed)
     painter->drawText(pos.x() + 5, pos.y() + 5, "Asteroid: " + QString::number(distance));
 
     // Is it in weapon's range?
-    if (distance < (m_fighter->velocity() + m_fighter->globalOrientation() * Vector3f(0, 0, -Objects::Bullet::Velocity)).norm() * Objects::Bullet::MaxLifetime / 1000.0 * 0.4) {
+    if (distance < (m_fighter->velocity() + m_fighter->globalOrientation() * Vector3f(0, 0, -Objects::Bullet::Velocity)).norm() * Objects::Bullet::MaxLifetime / 1000.0) {
       // Left top corner
       painter->drawLine(pos.x() - 15, pos.y() - 15, pos.x() - 10, pos.y() - 15);
       painter->drawLine(pos.x() - 15, pos.y() - 15, pos.x() - 15, pos.y() - 10);

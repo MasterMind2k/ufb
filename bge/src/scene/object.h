@@ -415,6 +415,8 @@ class Object
       m_boundingVolume = boundingVolume;
     }
 
+    virtual inline void collision(Object *object) {}
+
   private:
     Transform3f m_transform;
     Transform3f m_globalTransform;

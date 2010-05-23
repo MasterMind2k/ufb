@@ -60,3 +60,6 @@ void Asteroid::postTransformCalculations(qint32 timeDiff)
 {
   AsteroidList::self()->setPosition(this, BGE::Scene::Camera::projection() * BGE::Canvas::canvas()->activeCamera()->cameraTransform() * globalPosition());
 }
+
+void Asteroid::collision(BGE::Scene::Object *object)
+{}
