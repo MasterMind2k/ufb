@@ -313,6 +313,7 @@ class Canvas : public QGLWidget
     void keyPressEvent(QKeyEvent* event);
     void mouseMoveEvent(QMouseEvent* event);
     void mousePressEvent(QMouseEvent* event);
+    void mouseReleaseEvent(QMouseEvent *event);
 
     // To ensure the QGLWidgets gets the mouse events
     inline void showEvent(QShowEvent *event)

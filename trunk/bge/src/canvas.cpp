@@ -513,6 +513,13 @@ void Canvas::mousePressEvent(QMouseEvent* event)
   QWidget::mousePressEvent(event);
 }
 
+void Canvas::mouseReleaseEvent(QMouseEvent *event)
+{
+  if (m_controller)
+    m_controller->mouseButtonReleased(event);
+  QWidget::mousePressEvent(event);
+}
+
 void Canvas::cleanup()
 {
   m_timer->setSingleShot(true);
