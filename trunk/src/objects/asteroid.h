@@ -20,9 +20,24 @@ namespace Objects {
 class Asteroid : public Object
 {
   public:
-    Asteroid();
+    enum Sizes {
+      Large, /* 2000 */
+      Medium, /* 1500 */
+      Small /* 1000 */
+    };
+
+    Asteroid(Sizes size);
+
+    qreal radius() const;
+
+    inline Sizes size() const
+    {
+      return m_size;
+    }
 
   private:
+    Sizes m_size;
+
     void postTransformCalculations(qint32 timeDiff);
 };
 
