@@ -52,6 +52,8 @@ void Object::initBody()
   BGE::Canvas::canvas()->dynamicsWorld()->addRigidBody(m_body);
   m_body->setGravity(btVector3(0, 0, 0));
   m_body->applyGravity();
+
+  m_body->setUserPointer(this);
 }
 
 Vector3f Object::velocity() const

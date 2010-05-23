@@ -415,7 +415,7 @@ void GL3::draw(Scene::ParticleEmitter *emitter)
     indicesSize += 24;
   }
 
-  const qreal size = 0.4;
+  const qreal size = 1;
   QList<ParticlePlan> plans;
   ParticlePlan plan;
   plan.index = 0;
@@ -538,20 +538,16 @@ void GL3::draw(Scene::ParticleEmitter *emitter)
                                                         particleMaterial->shininess());
     material->setAmbient(QColor(material->ambient().red() * plan.weights[0],
                          material->ambient().green() * plan.weights[0],
-                         material->ambient().blue() * plan.weights[0],
-                         material->ambient().alpha() * plan.weights[1]));
+                         material->ambient().blue() * plan.weights[0]));
     material->setDiffuse(QColor(material->diffuse().red() * plan.weights[0],
                          material->diffuse().green() * plan.weights[0],
-                         material->diffuse().blue() * plan.weights[0],
-                         material->diffuse().alpha() * plan.weights[1]));
+                         material->diffuse().blue() * plan.weights[0]));
     material->setSpecular(QColor(material->specular().red() * plan.weights[0],
                           material->specular().green() * plan.weights[0],
-                          material->specular().blue() * plan.weights[0],
-                          material->specular().alpha() * plan.weights[1]));
+                          material->specular().blue() * plan.weights[0]));
     material->setEmission(QColor(material->emission().red() * emissionWeight,
                           material->emission().green() * emissionWeight,
-                          material->emission().blue() * emissionWeight,
-                          material->emission().alpha() * plan.weights[1]));
+                          material->emission().blue() * emissionWeight));
     setMaterial(material);
 
     glDrawElements(GL_QUADS, plan.count, GL_UNSIGNED_SHORT, (GLushort*)0 + plan.index);

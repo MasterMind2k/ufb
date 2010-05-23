@@ -29,6 +29,7 @@ class Bullet : public Objects::Object
     quint16 m_lifetime;
 
     void postTransformCalculations(qint32 timeDiff);
+    void collision(BGE::Scene::Object *object);
 };
 
 }

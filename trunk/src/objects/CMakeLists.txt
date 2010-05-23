@@ -3,6 +3,7 @@ set(objects_SRCS
   fighter.cpp
   asteroid.cpp
   bullet.cpp
+  explosion.cpp
   asteroidlist.cpp
 )
 
