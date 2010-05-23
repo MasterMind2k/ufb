@@ -13,23 +13,14 @@
 #ifndef OBJECTS_FIGHTER_H
 #define OBJECTS_FIGHTER_H
 
-#include "scene/object.h"
-
-class btRigidBody;
+#include "object.h"
 
 namespace Objects {
 
-class Fighter : public BGE::Scene::Object
+class Fighter : public Object
 {
   public:
     Fighter();
-
-    void initBody();
-
-    inline btRigidBody *body() const
-    {
-      return m_body;
-    }
 
     inline void setEnginePower(qreal enginePower)
     {
@@ -58,10 +49,11 @@ class Fighter : public BGE::Scene::Object
       return m_angularVelocity;
     }
 
+    void initBody();
+
     static const qreal MaxPower = 1000000;
 
   private:
-    btRigidBody *m_body;
     qreal m_enginePower;
     Vector3f m_angularVelocity;
 

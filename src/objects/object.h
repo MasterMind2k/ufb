@@ -10,20 +10,29 @@
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
  ***************************************************************************/
-#ifndef OBJECTS_ASTEROID_H
-#define OBJECTS_ASTEROID_H
+#ifndef OBJECTS_OBJECT_H
+#define OBJECTS_OBJECT_H
 
-#include "object.h"
+#include "scene/object.h"
+
+class btRigidBody;
 
 namespace Objects {
 
-class Asteroid : public Object
+class Object : public BGE::Scene::Object
 {
   public:
-    Asteroid();
+    Object();
+
+    virtual void initBody();
+
+    inline btRigidBody *body() const
+    {
+      return m_body;
+    }
 
   private:
-    void postTransformCalculations(qint32 timeDiff);
+    btRigidBody *m_body;
 };
 
 }
