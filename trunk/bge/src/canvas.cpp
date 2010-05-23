@@ -122,7 +122,6 @@ Canvas::Canvas()
 void Canvas::addSceneObject(Scene::Object* object)
 {
   m_scene->addChild(object);
-  m_partition->addObject(object);
 }
 
 Canvas* Canvas::canvas()
