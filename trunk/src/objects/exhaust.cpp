@@ -35,7 +35,7 @@ Exhaust::Exhaust(Fighter *fighter)
   addMaterial(material);
 
   setBoundingVolume(new BGE::Scene::BoundingVolume(Vector3f(10, 10, 100), Vector3f(100, 100, 200)));
-  m_previousTransform.setIdentity();
+  m_previousPosition.setZero();
 
   // Add light
   BGE::Scene::Light *light = BGE::Canvas::canvas()->createLight(QString("Exhaust light_%0").arg((int) this));
@@ -71,12 +71,11 @@ void Exhaust::spawnParticles(qint32 timeDiff)
 {
   qreal usage = m_fighter->enginePower() / Fighter::MaxPower;
 
-  Vector3f previousPosition = m_previousTransform * Vector3f(0, 0, 0);
   Vector3f currentPosition = globalTransform() * Vector3f(0, 0, 0);
 
   quint16 particles = 300 * usage;
   if (!particles) {
-    m_previousTransform = globalTransform();
+    m_previousPosition = currentPosition;
     static_cast<BGE::Scene::Light*> (child(0))->setQuadraticAttenuation(1.0);
     return;
   }
@@ -91,7 +90,7 @@ void Exhaust::spawnParticles(qint32 timeDiff)
     particle.lifetime = 0;
 
     // Interpolating points
-    particle.position = currentPosition - i * n * (currentPosition - previousPosition);
+    particle.position = currentPosition - i * n * (currentPosition - m_previousPosition);
 
     particle.velocity = Vector3f(qrand() % 10 - 5, qrand() % 10 - 5, 10).normalized() * (qrand() % 50 + 50);
 
@@ -101,5 +100,5 @@ void Exhaust::spawnParticles(qint32 timeDiff)
     emitParticle(particle);
   }
 
-  m_previousTransform = globalTransform();
+  m_previousPosition = currentPosition;
 }
