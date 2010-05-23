@@ -31,13 +31,6 @@ void Mesh::addVertices(const QString& name, const VectorList& vertices)
   QVector<Vector3f> temp = m_vertices.value(name);
   temp += vertices.toVector();
 
-  QVector<float> points;
-  foreach (Vector3f vertex, vertices)
-    points << vertex.x() << vertex.y() << vertex.z();
-
-  m_rawVertices = (float*) realloc(m_rawVertices, (m_numVertices * 3 + points.size()) * sizeof(float));
-  m_numVertices += vertices.size();
-
   m_vertices.insert(name, temp);
 }
 
@@ -160,6 +153,8 @@ Scene::BoundingVolume *Mesh::calculateBoundingVolume()
   Vector3f min, max;
   float radius = 0;
 
+  QVector<float> rawVertices;
+
   for (QList<QVector<Vector3f> >::const_iterator i = vertices.constBegin(); i != vertices.constEnd(); i++) {
     foreach (Vector3f vertex, *i) {
       radius = qMax(vertex.norm(), radius);
@@ -169,8 +164,14 @@ Scene::BoundingVolume *Mesh::calculateBoundingVolume()
       max.y() = qMax(vertex.y(), max.y());
       min.z() = qMin(vertex.z(), min.z());
       max.z() = qMax(vertex.z(), max.z());
+
+      rawVertices << vertex.x() << vertex.y() << vertex.z();
+      m_numVertices++;
     }
   }
+
+  m_rawVertices = (float*) malloc(rawVertices.size() * sizeof(float));
+  memcpy(m_rawVertices, rawVertices.data(),rawVertices.size() * sizeof(float));
 
   m_boundingVolume = new Scene::BoundingVolume(radius, min, max);
   return new Scene::BoundingVolume(m_boundingVolume->radius(), m_boundingVolume->min(), m_boundingVolume->max());

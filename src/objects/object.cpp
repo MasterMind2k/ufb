@@ -44,6 +44,7 @@ Object::~Object()
 void Object::initBody()
 {
   btConvexHullShape *boundingVolume = new btConvexHullShape(mesh()->vertices(), mesh()->numVertices(), 3 * sizeof(float));
+
   Vector3f scaled = this->scaled();
   boundingVolume->setLocalScaling(btVector3(scaled.x(), scaled.y(), scaled.z()));
 
