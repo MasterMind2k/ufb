@@ -43,6 +43,10 @@ class AbstractController
      * This method gets called wen user presses a mouse button.
      */
     virtual void mouseButtonPressed(QMouseEvent* event) {}
+    /**
+     * This method gets called wen user releases a mouse button.
+     */
+    virtual void mouseButtonReleased(QMouseEvent* event) {}
 };
 
 }

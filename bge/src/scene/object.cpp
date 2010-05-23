@@ -93,6 +93,8 @@ void Object::addChild(Object *child)
   child->setParent(this);
   if (m_partition)
     m_partition->addObject(child);
+  else if (this == BGE::Canvas::canvas()->scene())
+    BGE::Canvas::canvas()->partition()->addObject(child);
 }
 
 void Object::setMesh(Storage::Mesh *mesh)
