@@ -14,7 +14,10 @@
 
 using namespace Objects;
 
+#include "canvas.h"
+
 #include "scene/boundingvolume.h"
+#include "scene/light.h"
 
 #include "storage/material.h"
 
@@ -34,7 +37,6 @@ Explosion::Explosion(const Vector3f &position, Sizes size)
       particles = 500;
       break;
   }
-
 
   setBoundingVolume(new BGE::Scene::BoundingVolume(Vector3f::Zero(), Vector3f(a, a, a)));
 
@@ -58,10 +60,26 @@ Explosion::Explosion(const Vector3f &position, Sizes size)
   addMaterial(material);
 
   move(position);
+
+  // Add light
+  BGE::Scene::Light *light = BGE::Canvas::canvas()->createLight(QString("Explosive light_%0").arg((int) this));
+  light->setAmbientColor(QColor(180, 96, 0));
+  light->setDiffuseColor(QColor(255, 136, 0));
+  light->setSpecularColor(Qt::white);
+  light->setQuadraticAttenuation(0.2);
+  addChild(light);
+}
+
+Explosion::~Explosion()
+{
+  BGE::Canvas::canvas()->removeLight(static_cast<BGE::Scene::Light*> (child(0))->name());
 }
 
 void Explosion::calculateParticle(BGE::Scene::Particle &particle, qint32 timeDiff)
 {
+  // Increase light
+  static_cast<BGE::Scene::Light*> (child(0))->setQuadraticAttenuation(0.000001 / particle.alpha);
+
   particle.lifetime += timeDiff;
   particle.position += particle.velocity * timeDiff / 1000.0;
   particle.velocity = particle.initialVelocity * (1.0 - (qreal) particle.lifetime / m_lifetime);

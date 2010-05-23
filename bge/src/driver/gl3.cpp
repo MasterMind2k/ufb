@@ -760,7 +760,7 @@ void GL3::pass(Rendering::Stage *stage)
   if (!m_stages.contains(stage))
     m_renderer->activateTextures();
 
-  for (quint8 i = 0; i < loop; i += m_maxLights) {
+  for (quint8 i = 0; i < loop; i++) {
     if (stage->m_needLights)
       loadLights();
 
@@ -771,7 +771,7 @@ void GL3::pass(Rendering::Stage *stage)
       glEnable(GL_BLEND);
       glDisable(GL_DEPTH_TEST);
       if (stage->m_needLights)
-        bindUniformAttribute("GlobalAmbient", Vector4f(0, 0, 0, 1));
+        bindUniformAttribute("GlobalAmbient", Vector4f(0, 0, 0, 0));
     }
   }
 
@@ -1187,27 +1187,17 @@ char** GL3::prepareShaderSource(const QString &source, qint32 &count, qint32 **l
 
 void GL3::loadLights()
 {
-  quint8 offset = m_renderedLights;
-  if (offset)
-    offset--;
-  qint32 size = m_lights.size();
-  quint8 usedLights = 0;
-  for (quint32 i = 0; i < m_maxLights; i++) {
-    if (i + offset >= size)
-      break;
-    Light light = m_lights.at(i + offset);
-    bindUniformAttribute(QString("Lights%0.position").arg(i), light.position);
-    bindUniformAttribute(QString("Lights%0.ambient").arg(i), light.ambient);
-    bindUniformAttribute(QString("Lights%0.diffuse").arg(i), light.diffuse);
-    bindUniformAttribute(QString("Lights%0.specular").arg(i), light.specular);
-    bindUniformAttribute(QString("Lights%0.constant").arg(i), light.constant);
-    bindUniformAttribute(QString("Lights%0.linear").arg(i), light.linear);
-    bindUniformAttribute(QString("Lights%0.quadratic").arg(i), light.quadratic);
-    bindUniformAttribute(QString("Lights%0.spot_cutoff").arg(i), light.spot_cutoff);
-    bindUniformAttribute(QString("Lights%0.spot_exponent").arg(i), light.spot_exponent);
-    bindUniformAttribute(QString("Lights%0.spot_direction").arg(i), light.spot_direction);
-    m_renderedLights++;
-    usedLights++;
-  }
-  bindUniformAttribute("UsedLights", usedLights);
+  quint8 i = m_renderedLights++;
+  Light light = m_lights.at(i);
+  bindUniformAttribute(QString("Light.position"), light.position);
+  bindUniformAttribute(QString("Light.ambient"), light.ambient);
+  bindUniformAttribute(QString("Light.diffuse"), light.diffuse);
+  bindUniformAttribute(QString("Light.specular"), light.specular);
+  bindUniformAttribute(QString("Light.constant"), light.constant);
+  bindUniformAttribute(QString("Light.linear"), light.linear);
+  bindUniformAttribute(QString("Light.quadratic"), light.quadratic);
+  bindUniformAttribute(QString("Light.spot_cutoff"), light.spot_cutoff);
+  bindUniformAttribute(QString("Light.spot_exponent"), light.spot_exponent);
+  bindUniformAttribute(QString("Light.spot_direction"), light.spot_direction);
+  bindUniformAttribute("UsedLights", 1);
 }
