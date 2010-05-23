@@ -27,14 +27,17 @@
 using namespace States;
 using namespace Assets;
 
-HUD::HUD(Objects::Fighter *fighter)
+HUD::HUD()
   : BGE::AbstractOverlay(),
-    m_fighter(fighter)
+    m_fighter(0l)
 {
 }
 
 void HUD::paint(QPainter *painter, qint32 elapsed)
 {
+  if (!m_fighter)
+    return;
+
   QSizeF size = BGE::Canvas::canvas()->size();
   painter->setPen(QColor(0, 255, 0, 150));
   painter->setBrush(Qt::NoBrush);

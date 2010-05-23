@@ -536,18 +536,12 @@ void GL3::draw(Scene::ParticleEmitter *emitter)
                                                         particleMaterial->specular(),
                                                         particleMaterial->emission(),
                                                         particleMaterial->shininess());
-    material->setAmbient(QColor(material->ambient().red() * plan.weights[0],
-                         material->ambient().green() * plan.weights[0],
-                         material->ambient().blue() * plan.weights[0]));
-    material->setDiffuse(QColor(material->diffuse().red() * plan.weights[0],
-                         material->diffuse().green() * plan.weights[0],
-                         material->diffuse().blue() * plan.weights[0]));
-    material->setSpecular(QColor(material->specular().red() * plan.weights[0],
-                          material->specular().green() * plan.weights[0],
-                          material->specular().blue() * plan.weights[0]));
-    material->setEmission(QColor(material->emission().red() * emissionWeight,
-                          material->emission().green() * emissionWeight,
-                          material->emission().blue() * emissionWeight));
+    material->setDiffuse(QColor(0, 0, 0));
+    material->setSpecular(QColor(0, 0, 0));
+    material->setEmission(QColor(material->emission().red() * emissionWeight + material->ambient().red() * plan.weights[0],
+                                 material->emission().green() * emissionWeight + material->ambient().green() * plan.weights[0],
+                                 material->emission().blue() * emissionWeight + material->ambient().blue() * plan.weights[0]));
+    material->setAmbient(QColor(0, 0, 0));
     setMaterial(material);
 
     glDrawElements(GL_QUADS, plan.count, GL_UNSIGNED_SHORT, (GLushort*)0 + plan.index);
