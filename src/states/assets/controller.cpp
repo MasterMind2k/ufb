@@ -51,6 +51,24 @@ void Controller::keyPressed(QKeyEvent *event)
       m_fighter->setEnginePower(m_fighter->enginePower() - 50000);
       break;
     }
+
+    // Camera controls
+    case Qt::Key_1: {
+      BGE::Canvas::canvas()->activateCamera("First person camera");
+      break;
+    }
+    case Qt::Key_2: {
+      BGE::Canvas::canvas()->activateCamera("Third person camera");
+      break;
+    }
+    case Qt::Key_3: {
+      BGE::Canvas::canvas()->activateCamera("Front camera");
+      break;
+    }
+    case Qt::Key_4: {
+      BGE::Canvas::canvas()->activateCamera("Side camera");
+      break;
+    }
   }
   m_fighter->body()->activate();
 }

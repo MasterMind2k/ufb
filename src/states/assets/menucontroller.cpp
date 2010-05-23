@@ -74,16 +74,31 @@ void MenuController::execute()
       game->fighter()->initBody();
       BGE::Canvas::canvas()->pushGameState(game);
       populateAsteroids();
-      game->fighter()->addChild(BGE::Canvas::canvas()->createCamera("Global camera"));
+
+      // Setup cameras
+      game->fighter()->addChild(BGE::Canvas::canvas()->createCamera("First person camera"));
+      BGE::Canvas::canvas()->camera("First person camera")->move(0, 0, -225);
+      game->fighter()->addChild(BGE::Canvas::canvas()->createCamera("Third person camera"));
+      BGE::Canvas::canvas()->camera("Third person camera")->move(0, 200, 400);
+      BGE::Canvas::canvas()->camera("Third person camera")->rotateX(-15);
+      game->fighter()->addChild(BGE::Canvas::canvas()->createCamera("Front camera"));
+      BGE::Canvas::canvas()->camera("Front camera")->move(0, -50, -500);
+      BGE::Canvas::canvas()->camera("Front camera")->rotateY(180);
+      BGE::Canvas::canvas()->camera("Front camera")->rotateX(15);
+      game->fighter()->addChild(BGE::Canvas::canvas()->createCamera("Side camera"));
+      BGE::Canvas::canvas()->camera("Side camera")->move(600, 0, 0);
+      BGE::Canvas::canvas()->camera("Side camera")->rotateY(90);
+
+      // Default camera
+      BGE::Canvas::canvas()->activateCamera("First person camera");
+
       //BGE::Canvas::canvas()->addSceneObject(BGE::Canvas::canvas()->createCamera("Global camera"));
       BGE::Canvas::canvas()->addSceneObject(BGE::Canvas::canvas()->createLight("Global light"));
       BGE::Canvas::canvas()->light("Global light")->setPositional(false);
       BGE::Canvas::canvas()->light("Global light")->setPosition(0, 0, -1);
-      BGE::Canvas::canvas()->camera("Global camera")->move(0, 0, -225);
       //BGE::Canvas::canvas()->camera("Global camera")->move(0, 600, 0);
       //BGE::Canvas::canvas()->camera("Global camera")->rotateX(-90);
       BGE::Canvas::canvas()->addSceneObject(game->fighter());
-      BGE::Canvas::canvas()->activateCamera("Global camera");
 
       game->fighter()->body()->setGravity(btVector3(0, 0, 0));
       game->fighter()->body()->applyGravity();
