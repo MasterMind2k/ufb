@@ -16,6 +16,7 @@
 #include "abstractcontroller.h"
 
 #include <QtCore/QObject>
+#include <QtCore/QTime>
 
 class QTimer;
 
@@ -40,6 +41,7 @@ class Controller : public QObject, public BGE::AbstractController
   private:
     Objects::Fighter *m_fighter;
     QTimer *m_timer;
+    QTime m_previousShot;
 
   private slots:
     void fire();
