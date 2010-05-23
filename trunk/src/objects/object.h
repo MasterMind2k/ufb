@@ -15,6 +15,8 @@
 
 #include "scene/object.h"
 
+#include "BulletCollision/NarrowPhaseCollision/btVoronoiSimplexSolver.h"
+
 class btRigidBody;
 
 namespace Objects {
@@ -31,10 +33,12 @@ class Object : public BGE::Scene::Object
       return m_body;
     }
 
-    Vector3f velocity();
+    Vector3f velocity() const;
+    qreal distance(Object *object) const;
 
   private:
     btRigidBody *m_body;
+    static btVoronoiSimplexSolver m_solver;
 };
 
 }
