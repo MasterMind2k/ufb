@@ -80,6 +80,8 @@ void MenuController::execute()
       BGE::Canvas::canvas()->light("Global light")->setPositional(false);
       BGE::Canvas::canvas()->light("Global light")->setPosition(0, 0, -1);
       BGE::Canvas::canvas()->camera("Global camera")->move(0, 0, -225);
+      //BGE::Canvas::canvas()->camera("Global camera")->move(0, 600, 0);
+      //BGE::Canvas::canvas()->camera("Global camera")->rotateX(-90);
       BGE::Canvas::canvas()->addSceneObject(game->fighter());
       BGE::Canvas::canvas()->activateCamera("Global camera");
 
