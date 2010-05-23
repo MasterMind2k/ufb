@@ -23,9 +23,9 @@
 using namespace States;
 using namespace States::Assets;
 
-Controller::Controller(Objects::Fighter *fighter)
+Controller::Controller()
   : QObject(),
-    m_fighter(fighter)
+    m_fighter(0l)
 {
   m_timer = new QTimer(this);
   m_timer->setInterval(500);
@@ -35,6 +35,9 @@ Controller::Controller(Objects::Fighter *fighter)
 
 void Controller::keyPressed(QKeyEvent *event)
 {
+  if (!m_fighter)
+    return;
+
   switch (event->key()) {
     case Qt::Key_R : {
       if (event->modifiers() & Qt::CTRL)
@@ -75,6 +78,9 @@ void Controller::keyPressed(QKeyEvent *event)
 
 void Controller::mouseMoved(QMouseEvent *event)
 {
+  if (!m_fighter)
+    return;
+
   QSizeF size = BGE::Canvas::canvas()->size();
   QPointF normalized((-(float) event->x() / size.width()) + 0.5, (-(float) event->y() / size.height()) + 0.5);
   m_fighter->setAngularVelocity(Vector3f(normalized.y() * 2, 0, normalized.x() * 2));
@@ -83,6 +89,9 @@ void Controller::mouseMoved(QMouseEvent *event)
 
 void Controller::mouseButtonPressed(QMouseEvent *event)
 {
+  if (!m_fighter)
+    return;
+
   switch (event->button()) {
     case Qt::LeftButton:
       if (m_previousShot.elapsed() > m_timer->interval())
@@ -94,6 +103,9 @@ void Controller::mouseButtonPressed(QMouseEvent *event)
 
 void Controller::mouseButtonReleased(QMouseEvent *event)
 {
+  if (!m_fighter)
+    return;
+
   switch (event->button()) {
     case Qt::LeftButton:
       m_timer->stop();
@@ -103,6 +115,9 @@ void Controller::mouseButtonReleased(QMouseEvent *event)
 
 void Controller::fire()
 {
+  if (!m_fighter)
+    return;
+
   m_fighter->fire();
   m_previousShot.restart();
 }

@@ -10,35 +10,29 @@
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
  ***************************************************************************/
-#ifndef STATES_ASSETS_HUD_H
-#define STATES_ASSETS_HUD_H
+#ifndef OBJECTS_EXHAUST_H
+#define OBJECTS_EXHAUST_H
 
-#include "abstractoverlay.h"
+#include "scene/particleemitter.h"
 
 namespace Objects {
 class Fighter;
-}
 
-namespace States {
-namespace Assets {
-
-class HUD : public BGE::AbstractOverlay
+class Exhaust : public BGE::Scene::ParticleEmitter
 {
   public:
-    HUD();
-
-    inline void setFighter(Objects::Fighter *fighter)
-    {
-      m_fighter = fighter;
-    }
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+    Exhaust(Fighter *fighter);
+    ~Exhaust();
 
   private:
-    Objects::Fighter *m_fighter;
+    Fighter *m_fighter;
+    Transform3f m_previousTransform;
 
-    void paint(QPainter *painter, qint32 elapsed);
+    void calculateParticle(BGE::Scene::Particle &particle, qint32 timeDiff);
+    void spawnParticles(qint32 timeDiff);
 };
 
-}
 }
 
 #endif

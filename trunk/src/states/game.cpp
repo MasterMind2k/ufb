@@ -21,8 +21,14 @@ using namespace States;
 
 Game::Game()
 {
-  m_fighter = new Objects::Fighter;
+  m_controller = new Assets::Controller;
+  setController(m_controller);
+  m_hud = new Assets::HUD;
+  setOverlay(m_hud);
+}
 
-  setController(new Assets::Controller(m_fighter));
-  setOverlay(new Assets::HUD(m_fighter));
+void Game::setFighter(Objects::Fighter *fighter)
+{
+  m_controller->setFighter(fighter);
+  m_hud->setFighter(fighter);
 }

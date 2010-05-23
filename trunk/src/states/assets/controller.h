@@ -31,7 +31,12 @@ class Controller : public QObject, public BGE::AbstractController
 {
   Q_OBJECT
   public:
-    Controller(Objects::Fighter *fighter);
+    Controller();
+
+    inline void setFighter(Objects::Fighter *fighter)
+    {
+      m_fighter = fighter;
+    }
 
     void keyPressed(QKeyEvent *event);
     void mouseMoved(QMouseEvent *event);

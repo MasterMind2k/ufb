@@ -69,23 +69,25 @@ void MenuController::execute()
   switch (m_overlay->selectedButton()) {
     case MenuOverlay::Play: {
       Game *game = new Game();
-      game->fighter()->move(0, 0, 0);
-      game->fighter()->rotateY(180);
-      game->fighter()->initBody();
       BGE::Canvas::canvas()->pushGameState(game);
+      Objects::Fighter *fighter = new Objects::Fighter;
+      game->setFighter(fighter);
+      fighter->rotateY(180);
+      fighter->initBody();
+      BGE::Canvas::canvas()->addSceneObject(fighter);
       populateAsteroids();
 
       // Setup cameras
-      game->fighter()->addChild(BGE::Canvas::canvas()->createCamera("First person camera"));
+      fighter->addChild(BGE::Canvas::canvas()->createCamera("First person camera"));
       BGE::Canvas::canvas()->camera("First person camera")->move(0, 0, -225);
-      game->fighter()->addChild(BGE::Canvas::canvas()->createCamera("Third person camera"));
+      fighter->addChild(BGE::Canvas::canvas()->createCamera("Third person camera"));
       BGE::Canvas::canvas()->camera("Third person camera")->move(0, 200, 400);
       BGE::Canvas::canvas()->camera("Third person camera")->rotateX(-15);
-      game->fighter()->addChild(BGE::Canvas::canvas()->createCamera("Front camera"));
+      fighter->addChild(BGE::Canvas::canvas()->createCamera("Front camera"));
       BGE::Canvas::canvas()->camera("Front camera")->move(0, -50, -500);
       BGE::Canvas::canvas()->camera("Front camera")->rotateY(180);
       BGE::Canvas::canvas()->camera("Front camera")->rotateX(15);
-      game->fighter()->addChild(BGE::Canvas::canvas()->createCamera("Side camera"));
+      fighter->addChild(BGE::Canvas::canvas()->createCamera("Side camera"));
       BGE::Canvas::canvas()->camera("Side camera")->move(600, 0, 0);
       BGE::Canvas::canvas()->camera("Side camera")->rotateY(90);
 
@@ -98,10 +100,6 @@ void MenuController::execute()
       BGE::Canvas::canvas()->light("Global light")->setPosition(0, 0, -1);
       //BGE::Canvas::canvas()->camera("Global camera")->move(0, 600, 0);
       //BGE::Canvas::canvas()->camera("Global camera")->rotateX(-90);
-      BGE::Canvas::canvas()->addSceneObject(game->fighter());
-
-      game->fighter()->body()->setGravity(btVector3(0, 0, 0));
-      game->fighter()->body()->applyGravity();
 
       // Create skybox for game
       // Front

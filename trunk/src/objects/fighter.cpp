@@ -19,6 +19,7 @@
 #include "storage/texture.h"
 
 #include "bullet.h"
+#include "exhaust.h"
 
 using namespace Objects;
 
@@ -31,6 +32,12 @@ Fighter::Fighter()
   m_enginePower = 0;
   m_angularVelocity = Vector3f::Zero();
   setMass(1000);
+
+  // Add our exhaust :)
+  addChild(new Exhaust(this));
+  child(0)->move(18, 50, 240);
+  addChild(new Exhaust(this));
+  child(1)->move(-18, 50, 240);
 }
 
 void Fighter::initBody()

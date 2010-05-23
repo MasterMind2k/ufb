@@ -20,19 +20,22 @@ class Fighter;
 }
 
 namespace States {
+namespace Assets {
+class Controller;
+class HUD;
+}
 
 class Game : public BGE::GameState
 {
   public:
     Game();
 
-    inline Objects::Fighter *fighter() const
-    {
-      return m_fighter;
-    }
+    void setFighter(Objects::Fighter *fighter);
 
   private:
-    Objects::Fighter *m_fighter;
+    /* Only for setting fighter */
+    Assets::Controller *m_controller;
+    Assets::HUD *m_hud;
 };
 
 }
