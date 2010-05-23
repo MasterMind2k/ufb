@@ -31,6 +31,13 @@ void Mesh::addVertices(const QString& name, const VectorList& vertices)
   QVector<Vector3f> temp = m_vertices.value(name);
   temp += vertices.toVector();
 
+  QVector<float> points;
+  foreach (Vector3f vertex, vertices)
+    points << vertex.x() << vertex.y() << vertex.z();
+
+  m_rawVertices = (float*) realloc(m_rawVertices, (m_numVertices * 3 + points.size()) * sizeof(float));
+  m_numVertices += vertices.size();
+
   m_vertices.insert(name, temp);
 }
 

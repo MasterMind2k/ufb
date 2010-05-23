@@ -49,9 +49,13 @@ class Mesh : public Item
       Triangles
     };
 
-    inline Mesh(const QString& name) : Item(name)
+    inline Mesh(const QString& name) : Item(name), m_rawVertices(0l), m_numVertices(0)
     {
       m_boundingVolume = 0l;
+    }
+    inline ~Mesh()
+    {
+      free(m_rawVertices);
     }
 
     /**
@@ -71,6 +75,14 @@ class Mesh : public Item
     inline QVector<Vector3f> vertices(const QString& name) const
     {
       return m_vertices.value(name);
+    }
+    inline const float* vertices() const
+    {
+      return m_rawVertices;
+    }
+    inline quint16 numVertices() const
+    {
+      return m_numVertices;
     }
 
     /**
@@ -201,6 +213,8 @@ class Mesh : public Item
     QSet<QString> m_objects;
     /* Vertices */
     QHash<QString, QVector<Vector3f> > m_vertices;
+    float *m_rawVertices;
+    quint16 m_numVertices;
     /* Faces */
     QHash<QString, QList<QPair<Primitives, QVector<quint16> > > > m_faces;
     /* Materials */
