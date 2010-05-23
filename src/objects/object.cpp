@@ -14,6 +14,11 @@
 
 #include "BulletDynamics/Dynamics/btRigidBody.h"
 #include "BulletCollision/CollisionShapes/btConvexHullShape.h"
+#include "BulletCollision/NarrowPhaseCollision/btDiscreteCollisionDetectorInterface.h"
+#include "BulletCollision/NarrowPhaseCollision/btGjkPairDetector.h"
+#include "BulletCollision/NarrowPhaseCollision/btPointCollector.h"
+
+#include "canvas.h"
 
 #include "storage/storagemanager.h"
 #include "storage/mesh.h"
@@ -21,6 +26,8 @@
 #include "motionstate.h"
 
 using namespace Objects;
+
+btVoronoiSimplexSolver Object::m_solver;
 
 Object::Object()
   : m_body(0)
@@ -37,8 +44,25 @@ void Object::initBody()
   m_body = new btRigidBody(info);
 }
 
-Vector3f Object::velocity()
+Vector3f Object::velocity() const
 {
   btVector3 velocity = m_body->getLinearVelocity();
   return Vector3f(velocity.x(), velocity.y(), velocity.z());
+}
+
+qreal Object::distance(Object *object) const
+{
+  btGjkPairDetector raycast(static_cast<btConvexShape*> (body()->getCollisionShape()), static_cast<btConvexShape*> (object->body()->getCollisionShape()), &m_solver, 0l);
+
+  btPointCollector output;
+  btDiscreteCollisionDetectorInterface::ClosestPointInput input;
+  input.m_transformA = body()->getWorldTransform();
+  input.m_transformB = object->body()->getWorldTransform();
+
+  raycast.getClosestPoints(input, output, 0l);
+  if (output.m_hasResult) {
+    return output.m_distance < 0 ? 0 : output.m_distance;
+  } else {
+    return BGE::Canvas::SceneSize.norm();
+  }
 }
