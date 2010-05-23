@@ -28,7 +28,7 @@ Controller::Controller(Objects::Fighter *fighter)
     m_fighter(fighter)
 {
   m_timer = new QTimer(this);
-  m_timer->setInterval(100);
+  m_timer->setInterval(500);
   connect(m_timer, SIGNAL(timeout()), SLOT(fire()));
 }
 

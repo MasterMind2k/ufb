@@ -16,15 +16,17 @@
 
 #include "storage/material.h"
 
-Explosion::Explosion()
+Explosion::Explosion(const Vector3f &position)
   : BGE::Scene::ParticleEmitter()
 {
+  setBoundingVolume(new BGE::Scene::BoundingVolume(Vector3f::Zero(), Vector3f(200, 200, 200)));
+
   for (quint16 i = 0; i < 1000; i++) {
     BGE::Scene::Particle particle;
     particle.alpha = 1;
     particle.colorWeight = 0;
     particle.lifetime = 0;
-    particle.position = Vector3f::Zero();
+    particle.position = position;
     particle.velocity = Vector3f(qrand() % 60 - 30, qrand() % 60 - 30, qrand() % 60 - 30).normalized();
     particle.velocity *= qrand() % 10 + 20;
     particle.initialVelocity = particle.velocity;
@@ -38,7 +40,7 @@ Explosion::Explosion()
   material->setDiffuse(QColor(40, 40, 40));
   addMaterial(material);
 
-  setBoundingVolume(new BGE::Scene::BoundingVolume(Vector3f::Zero(), Vector3f(200, 200, 200)));
+  move(position);
 }
 
 void Explosion::calculateParticle(BGE::Scene::Particle &particle, qint32 timeDiff)

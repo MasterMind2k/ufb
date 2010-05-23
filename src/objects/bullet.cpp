@@ -30,7 +30,7 @@ Bullet::Bullet()
   BGE::Storage::Material *material = BGE::Storage::StorageManager::self()->get<BGE::Storage::Material*>("/projectiles/bullet/Material");
   material->setEmission(material->diffuse());
   loadMaterialsFromMesh();
-  scale(100);
+  scale(50);
 
   m_lifetime = 0;
 }
