@@ -10,37 +10,29 @@
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
  ***************************************************************************/
-#include "fighter.h"
+#include "object.h"
 
 #include "BulletDynamics/Dynamics/btRigidBody.h"
+#include "BulletCollision/CollisionShapes/btConvexHullShape.h"
 
 #include "storage/storagemanager.h"
 #include "storage/mesh.h"
-#include "storage/texture.h"
+
+#include "motionstate.h"
 
 using namespace Objects;
 
-Fighter::Fighter()
+Object::Object()
+  : m_body(0)
 {
-  setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/fighters/models/fighter"));
-  setTexture(BGE::Storage::StorageManager::self()->get<BGE::Storage::Texture*>("/fighters/textures/fighter"));
-
-  m_enginePower = 0;
-  m_angularVelocity = Vector3f::Zero();
 }
 
-void Fighter::initBody()
+void Object::initBody()
 {
-  Object::initBody();
-  body()->setDamping(0.5, 0);
-}
+  btConvexHullShape *boundingVolume = new btConvexHullShape(mesh()->vertices(), mesh()->numVertices(), 3 * sizeof(float));
+  Vector3f scaled = this->scaled();
+  boundingVolume->setLocalScaling(btVector3(scaled.x(), scaled.y(), scaled.z()));
 
-void Fighter::calculateTransforms(qint32 timeDiff)
-{
-  Q_UNUSED(timeDiff);
-
-  Vector3f enginePower = globalOrientation() * Vector3f(0, 0, -m_enginePower);
-  body()->applyCentralForce(btVector3(enginePower.x(), enginePower.y(), enginePower.z()));
-  Vector3f angularVelocity = globalOrientation() * m_angularVelocity;
-  body()->setAngularVelocity(btVector3(angularVelocity.x(), angularVelocity.y(), angularVelocity.z()));
+  btRigidBody::btRigidBodyConstructionInfo info(1000, new BGE::MotionState(this), boundingVolume);
+  m_body = new btRigidBody(info);
 }
