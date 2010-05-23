@@ -79,7 +79,7 @@ void MenuController::execute()
       BGE::Canvas::canvas()->addSceneObject(BGE::Canvas::canvas()->createLight("Global light"));
       BGE::Canvas::canvas()->light("Global light")->setPositional(false);
       BGE::Canvas::canvas()->light("Global light")->setPosition(0, 0, -1);
-      BGE::Canvas::canvas()->camera("Global camera")->move(0, 0, -227);
+      BGE::Canvas::canvas()->camera("Global camera")->move(0, 0, -225);
       BGE::Canvas::canvas()->addSceneObject(game->fighter());
       BGE::Canvas::canvas()->dynamicsWorld()->addRigidBody(game->fighter()->body());
       BGE::Canvas::canvas()->activateCamera("Global camera");

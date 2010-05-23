@@ -36,3 +36,9 @@ void Object::initBody()
   btRigidBody::btRigidBodyConstructionInfo info(1000, new BGE::MotionState(this), boundingVolume);
   m_body = new btRigidBody(info);
 }
+
+Vector3f Object::velocity()
+{
+  btVector3 velocity = m_body->getLinearVelocity();
+  return Vector3f(velocity.x(), velocity.y(), velocity.z());
+}

@@ -18,8 +18,6 @@
 
 #include "objects/fighter.h"
 
-#include "BulletDynamics/Dynamics/btRigidBody.h"
-
 #include "scene/camera.h"
 #include "scene/boundingvolume.h"
 
@@ -87,8 +85,7 @@ void HUD::paint(QPainter *painter, qint32 elapsed)
   rect.translate(BGE::Canvas::canvas()->width() - 60, 10);
   painter->drawRect(rect);
 
-  // Tested, and gor max velocity 1435
-  rect.setHeight(m_fighter->body()->getLinearVelocity().length() / 1435 * 150);
+  rect.setHeight(m_fighter->velocity().norm() / Objects::Fighter::MaxVelocity * 150);
   rect.moveTo(rect.left(), 160 - rect.height());
   painter->save();
   painter->setPen(Qt::NoPen);
