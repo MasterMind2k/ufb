@@ -51,6 +51,8 @@ class Fighter : public Object
 
     void initBody();
 
+    void fire();
+
     static const qreal MaxPower = 1000000;
     static const qreal MaxVelocity = 1435;
 

@@ -12,6 +12,7 @@
  ***************************************************************************/
 #include "object.h"
 
+#include "BulletDynamics/Dynamics/btDynamicsWorld.h"
 #include "BulletDynamics/Dynamics/btRigidBody.h"
 #include "BulletCollision/CollisionShapes/btConvexHullShape.h"
 #include "BulletCollision/NarrowPhaseCollision/btDiscreteCollisionDetectorInterface.h"
@@ -30,8 +31,14 @@ using namespace Objects;
 btVoronoiSimplexSolver Object::m_solver;
 
 Object::Object()
-  : m_body(0)
+  : m_body(0),
+    m_mass(1.0)
 {
+}
+
+Object::~Object()
+{
+  delete m_body;
 }
 
 void Object::initBody()
@@ -40,8 +47,11 @@ void Object::initBody()
   Vector3f scaled = this->scaled();
   boundingVolume->setLocalScaling(btVector3(scaled.x(), scaled.y(), scaled.z()));
 
-  btRigidBody::btRigidBodyConstructionInfo info(1000, new BGE::MotionState(this), boundingVolume);
+  btRigidBody::btRigidBodyConstructionInfo info(m_mass, new BGE::MotionState(this), boundingVolume);
   m_body = new btRigidBody(info);
+  BGE::Canvas::canvas()->dynamicsWorld()->addRigidBody(m_body);
+  m_body->setGravity(btVector3(0, 0, 0));
+  m_body->applyGravity();
 }
 
 Vector3f Object::velocity() const

@@ -12,6 +12,8 @@
  ***************************************************************************/
 #include "controller.h"
 
+#include <QtCore/QTimer>
+
 #include "BulletDynamics/Dynamics/btRigidBody.h"
 
 #include "canvas.h"
@@ -22,8 +24,12 @@ using namespace States;
 using namespace States::Assets;
 
 Controller::Controller(Objects::Fighter *fighter)
-  : m_fighter(fighter)
+  : QObject(),
+    m_fighter(fighter)
 {
+  m_timer = new QTimer(this);
+  m_timer->setInterval(100);
+  connect(m_timer, SIGNAL(timeout()), SLOT(fire()));
 }
 
 void Controller::keyPressed(QKeyEvent *event)
@@ -54,4 +60,28 @@ void Controller::mouseMoved(QMouseEvent *event)
   QPointF normalized((-(float) event->x() / size.width()) + 0.5, (-(float) event->y() / size.height()) + 0.5);
   m_fighter->setAngularVelocity(Vector3f(normalized.y() * 2, 0, normalized.x() * 2));
   m_fighter->body()->activate();
+}
+
+void Controller::mouseButtonPressed(QMouseEvent *event)
+{
+  switch (event->button()) {
+    case Qt::LeftButton:
+      fire();
+      m_timer->start();
+      break;
+  }
+}
+
+void Controller::mouseButtonReleased(QMouseEvent *event)
+{
+  switch (event->button()) {
+    case Qt::LeftButton:
+      m_timer->stop();
+      break;
+  }
+}
+
+void Controller::fire()
+{
+  m_fighter->fire();
 }

@@ -10,46 +10,25 @@
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
  ***************************************************************************/
-#ifndef OBJECTS_OBJECT_H
-#define OBJECTS_OBJECT_H
+#ifndef OBJECTS_BULLET_H
+#define OBJECTS_BULLET_H
 
-#include "scene/object.h"
-
-#include "BulletCollision/NarrowPhaseCollision/btVoronoiSimplexSolver.h"
-
-class btRigidBody;
+#include "object.h"
 
 namespace Objects {
 
-class Object : public BGE::Scene::Object
+class Bullet : public Objects::Object
 {
   public:
-    Object();
-    virtual ~Object();
+    Bullet();
 
-    virtual void initBody();
-
-    inline btRigidBody *body() const
-    {
-      return m_body;
-    }
-
-    Vector3f velocity() const;
-    qreal distance(Object *object) const;
-
-    inline void setMass(qreal mass)
-    {
-      m_mass = mass;
-    }
-    inline qreal mass() const
-    {
-      return m_mass;
-    }
+    static const quint16 MaxLifetime = 3000;
+    static qreal Velocity;
 
   private:
-    btRigidBody *m_body;
-    qreal m_mass;
-    static btVoronoiSimplexSolver m_solver;
+    quint16 m_lifetime;
+
+    void postTransformCalculations(qint32 timeDiff);
 };
 
 }

@@ -114,7 +114,7 @@ int main(int argc, char **argv)
   BGE::Canvas::canvas()->addSceneObject(skybox);
 
   BGE::Canvas::canvas()->addSceneObject(BGE::Canvas::canvas()->createCamera("Global camera"));
-  BGE::Canvas::canvas()->camera("Global camera")->move(0, 0, 0);
+  BGE::Canvas::canvas()->camera("Global camera")->move(0, 0, 600);
   BGE::Canvas::canvas()->activateCamera("Global camera");
 
   BGE::Canvas::canvas()->createLight("Global light")->setPosition(0, 0, -1);

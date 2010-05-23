@@ -47,6 +47,10 @@
   <file alias="fighter.jpg">resources/fighters/textures/fighter.jpg</file>
 </qresource>
 
+<qresource prefix="/projectiles">
+  <file alias="bullet.3ds">resources/projectiles/bullet.3ds</file>
+</qresource>
+
 <qresource prefix="/skybox/">
   <file alias="Galaxy_BK.bmp">resources/skybox/Galaxy_BK.bmp</file>
   <file alias="Galaxy_DN.bmp">resources/skybox/Galaxy_DN.bmp</file>
