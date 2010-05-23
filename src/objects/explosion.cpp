@@ -78,7 +78,7 @@ Explosion::~Explosion()
 void Explosion::calculateParticle(BGE::Scene::Particle &particle, qint32 timeDiff)
 {
   // Increase light
-  static_cast<BGE::Scene::Light*> (child(0))->setQuadraticAttenuation(0.000001 / particle.alpha);
+  static_cast<BGE::Scene::Light*> (child(0))->setQuadraticAttenuation(0.00001 * (1 - particle.alpha / 5.0) * (1 - particle.alpha / 5.0) + 0.000001);
 
   particle.lifetime += timeDiff;
   particle.position += particle.velocity * timeDiff / 1000.0;
