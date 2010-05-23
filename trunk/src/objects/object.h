@@ -31,6 +31,8 @@ class Object : public BGE::Scene::Object
       return m_body;
     }
 
+    Vector3f velocity();
+
   private:
     btRigidBody *m_body;
 };

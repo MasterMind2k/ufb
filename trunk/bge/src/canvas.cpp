@@ -148,7 +148,7 @@ void Canvas::resizeGL(int w, int h)
   // Default perspective setup
   QMatrix4x4 projection;
   // Careful! Values are also used by v-f culling
-  projection.perspective(80, (qreal) w / (qreal) h, 0.1, 2 * SceneSize.x());
+  projection.perspective(80, (qreal) w / (qreal) h, 20, SceneSize.norm());
   Matrix4d temp;
   memcpy(temp.data(), projection.data(), 16 * sizeof(qreal));
   Scene::Camera::m_projection.matrix() = temp.cast<float>();
