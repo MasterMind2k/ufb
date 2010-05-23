@@ -14,11 +14,14 @@
 
 #include "canvas.h"
 
+#include "partition.h"
+
 using namespace BGE;
 using namespace BGE::Scene;
 
 void ParticleEmitter::postTransformCalculations(qint32 timeDiff)
 {
+  m_lifetime += timeDiff;
   if (m_autoremove && m_particles.isEmpty()) {
     setRenderable(false);
     // Remove itself
@@ -37,4 +40,7 @@ void ParticleEmitter::postTransformCalculations(qint32 timeDiff)
   // Remove invisible particles
   for (qint32 i = removeList.size() - 1; i >= 0; i--)
     m_particles.removeAt(i);
+
+  // Spawn new particles
+  spawnParticles(timeDiff);
 }

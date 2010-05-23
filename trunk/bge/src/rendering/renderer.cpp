@@ -73,8 +73,7 @@ void Renderer::drawScene()
     Scene::Object* object = m_renderQueue.dequeue();
 
     // Calculate world transform
-    Transform3f worldTransform = Canvas::canvas()->activeCamera()->cameraTransform() * object->globalTransform();
-    Driver::AbstractDriver::self()->setTransformMatrix(worldTransform);
+    Transform3f worldTransform = Canvas::canvas()->activeCamera()->cameraTransform();
 
     // Toggle lighting
     if (object->isCulled())
@@ -83,6 +82,7 @@ void Renderer::drawScene()
       Driver::AbstractDriver::self()->disableLighting();
 
     if (object->mesh()) {
+      Driver::AbstractDriver::self()->setTransformMatrix(worldTransform * object->globalTransform());
       Driver::AbstractDriver::self()->bind(object->materials());
 
       if (currentMesh != object->mesh()) {
@@ -104,6 +104,7 @@ void Renderer::drawScene()
 
       Driver::AbstractDriver::self()->draw();
     } else {
+      Driver::AbstractDriver::self()->setTransformMatrix(worldTransform);
       Driver::AbstractDriver::self()->bind(object->materials());
 
       Driver::AbstractDriver::self()->draw(static_cast<Scene::ParticleEmitter*> (object));

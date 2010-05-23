@@ -19,7 +19,7 @@ class Explosion : public BGE::Scene::ParticleEmitter
 {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-    Explosion();
+    Explosion(const Vector3f &position);
 
   protected:
     void calculateParticle(BGE::Scene::Particle &particle, qint32 timeDiff);

@@ -43,6 +43,7 @@ void createSkyboxQuad()
 
 int main(int argc, char **argv)
 {
+  qsrand(time(0l));
   Q_INIT_RESOURCE(bge_resources);
 
   QApplication app(argc, argv);
@@ -61,6 +62,7 @@ int main(int argc, char **argv)
 
   // Fix fighter model :)
   BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/fighters/models/fighter")->rotate(AngleAxisf(-M_PI / 2, Vector3f::UnitX()));
+  BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/projectiles/bullet")->rotate(AngleAxisf(-M_PI / 2, Vector3f::UnitX()));
 
   BGE::Canvas::canvas()->pushGameState(new States::Menu);
 
