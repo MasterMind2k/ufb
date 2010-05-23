@@ -15,6 +15,10 @@
 
 #include "abstractcontroller.h"
 
+#include <QtCore/QObject>
+
+class QTimer;
+
 namespace Objects {
 class Fighter;
 }
@@ -22,16 +26,23 @@ class Fighter;
 namespace States {
 namespace Assets {
 
-class Controller : public BGE::AbstractController
+class Controller : public QObject, public BGE::AbstractController
 {
+  Q_OBJECT
   public:
     Controller(Objects::Fighter *fighter);
 
     void keyPressed(QKeyEvent *event);
     void mouseMoved(QMouseEvent *event);
+    void mouseButtonPressed(QMouseEvent *event);
+    void mouseButtonReleased(QMouseEvent *event);
 
   private:
     Objects::Fighter *m_fighter;
+    QTimer *m_timer;
+
+  private slots:
+    void fire();
 };
 
 }

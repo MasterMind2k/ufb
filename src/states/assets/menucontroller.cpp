@@ -81,7 +81,6 @@ void MenuController::execute()
       BGE::Canvas::canvas()->light("Global light")->setPosition(0, 0, -1);
       BGE::Canvas::canvas()->camera("Global camera")->move(0, 0, -225);
       BGE::Canvas::canvas()->addSceneObject(game->fighter());
-      BGE::Canvas::canvas()->dynamicsWorld()->addRigidBody(game->fighter()->body());
       BGE::Canvas::canvas()->activateCamera("Global camera");
 
       game->fighter()->body()->setGravity(btVector3(0, 0, 0));
@@ -157,8 +156,5 @@ void MenuController::populateAsteroids()
     BGE::Canvas::canvas()->addSceneObject(asteroid);
 
     asteroid->initBody();
-    BGE::Canvas::canvas()->dynamicsWorld()->addRigidBody(asteroid->body());
-    asteroid->body()->setGravity(btVector3(0, 0, 0));
-    asteroid->body()->applyGravity();
   }
 }

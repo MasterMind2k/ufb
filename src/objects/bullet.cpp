@@ -10,53 +10,38 @@
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
  ***************************************************************************/
-#include "asteroid.h"
+#include "bullet.h"
+
+#include "BulletDynamics/Dynamics/btDynamicsWorld.h"
 
 #include "canvas.h"
 
-#include "scene/camera.h"
-#include "scene/boundingvolume.h"
-
 #include "storage/storagemanager.h"
 #include "storage/mesh.h"
-#include "storage/texture.h"
-
-#include "asteroidlist.h"
+#include "storage/material.h"
 
 using namespace Objects;
 
-Asteroid::Asteroid(Sizes size)
-  : m_size(size)
+qreal Bullet::Velocity = 10000;
+
+Bullet::Bullet()
 {
-  QList<BGE::Storage::Item*> meshes = BGE::Storage::StorageManager::self()->get("/asteroids/models")->items();
-  setMesh(static_cast<BGE::Storage::Mesh*> (meshes.at(qrand() % meshes.size())));
+  setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/projectiles/bullet"));
+  BGE::Storage::Material *material = BGE::Storage::StorageManager::self()->get<BGE::Storage::Material*>("/projectiles/bullet/Material");
+  material->setEmission(material->diffuse());
   loadMaterialsFromMesh();
+  scale(100);
 
-  // Scale it to the designated size
-  scale(radius() / boundingVolume()->radius());
-
-  setTexture(BGE::Storage::StorageManager::self()->get<BGE::Storage::Texture*>("/asteroids/textures/" + mesh()->name()));
-
-  AsteroidList::self()->addAsteroid(this);
-
-  setMass(2000);
+  m_lifetime = 0;
 }
 
-qreal Asteroid::radius() const
+void Bullet::postTransformCalculations(qint32 timeDiff)
 {
-  switch (m_size) {
-    case Large:
-      return 2000;
-
-    case Medium:
-      return 1000;
-
-    case Small:
-      return 500;
+  m_lifetime += timeDiff;
+  if (m_lifetime > MaxLifetime) {
+    setRenderable(false);
+    parent()->removeChild(this);
+    BGE::Canvas::canvas()->dynamicsWorld()->removeRigidBody(body());
+    BGE::Canvas::canvas()->deleteSceneObject(this);
   }
-}
-
-void Asteroid::postTransformCalculations(qint32 timeDiff)
-{
-  AsteroidList::self()->setPosition(this, BGE::Scene::Camera::projection() * BGE::Canvas::canvas()->activeCamera()->cameraTransform() * globalPosition());
 }

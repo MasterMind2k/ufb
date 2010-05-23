@@ -1,4 +1,3 @@
-
 add_subdirectory(assets)
 
 set(states_SRCS

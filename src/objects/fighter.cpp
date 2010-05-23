@@ -18,21 +18,52 @@
 #include "storage/mesh.h"
 #include "storage/texture.h"
 
+#include "bullet.h"
+
 using namespace Objects;
 
 Fighter::Fighter()
 {
   setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/fighters/models/fighter"));
+  loadMaterialsFromMesh();
   setTexture(BGE::Storage::StorageManager::self()->get<BGE::Storage::Texture*>("/fighters/textures/fighter"));
 
   m_enginePower = 0;
   m_angularVelocity = Vector3f::Zero();
+  setMass(1000);
 }
 
 void Fighter::initBody()
 {
   Object::initBody();
   body()->setDamping(0.5, 0);
+}
+
+void Fighter::fire()
+{
+  // Right bullet
+  Bullet *bullet = new Bullet;
+  bullet->setOrientation(globalOrientation());
+  bullet->move(globalPosition() + globalOrientation() * Vector3f(150, -10, 0));
+
+  parent()->addChild(bullet);
+  bullet->initBody();
+
+  Vector3f velocity(0, 0, -Bullet::Velocity);
+  velocity = globalOrientation() * velocity + this->velocity();
+  bullet->body()->setLinearVelocity(btVector3(velocity.x(), velocity.y(), velocity.z()));
+  bullet->body()->activate();
+
+  // Left bullet
+  bullet = new Bullet;
+  bullet->setOrientation(globalOrientation());
+  bullet->move(globalPosition() + globalOrientation() * Vector3f(-150, -10, 0));
+
+  parent()->addChild(bullet);
+  bullet->initBody();
+
+  bullet->body()->setLinearVelocity(btVector3(velocity.x(), velocity.y(), velocity.z()));
+  bullet->body()->activate();
 }
 
 void Fighter::calculateTransforms(qint32 timeDiff)

@@ -16,11 +16,11 @@
 
 #include "canvas.h"
 
-#include "objects/fighter.h"
-
 #include "scene/camera.h"
 #include "scene/boundingvolume.h"
 
+#include "objects/fighter.h"
+#include "objects/bullet.h"
 #include "objects/asteroidlist.h"
 #include "objects/asteroid.h"
 
@@ -115,6 +115,22 @@ void HUD::paint(QPainter *painter, qint32 elapsed)
 
     float distance = asteroid->distance(m_fighter);
     painter->drawText(pos.x() + 5, pos.y() + 5, "Asteroid: " + QString::number(distance));
+
+    // Is it in weapon's range?
+    if (distance < (m_fighter->velocity() + m_fighter->globalOrientation() * Vector3f(0, 0, -Objects::Bullet::Velocity)).norm() * Objects::Bullet::MaxLifetime / 1000.0 * 0.4) {
+      // Left top corner
+      painter->drawLine(pos.x() - 15, pos.y() - 15, pos.x() - 10, pos.y() - 15);
+      painter->drawLine(pos.x() - 15, pos.y() - 15, pos.x() - 15, pos.y() - 10);
+      // Left bottom corner
+      painter->drawLine(pos.x() - 15, pos.y() + 15, pos.x() - 10, pos.y() + 15);
+      painter->drawLine(pos.x() - 15, pos.y() + 15, pos.x() - 15, pos.y() + 10);
+      // Right top corner
+      painter->drawLine(pos.x() + 15, pos.y() - 15, pos.x() + 10, pos.y() - 15);
+      painter->drawLine(pos.x() + 15, pos.y() - 15, pos.x() + 15, pos.y() - 10);
+      // Right bottom corner
+      painter->drawLine(pos.x() + 15, pos.y() + 15, pos.x() + 10, pos.y() + 15);
+      painter->drawLine(pos.x() + 15, pos.y() + 15, pos.x() + 15, pos.y() + 10);
+    }
   }
 
   // Direction to nearest asteroid
