@@ -179,18 +179,14 @@ void Canvas::paintGL()
 
       int numContacts = manifold->getNumContacts();
       for (qint32 j = 0; j < numContacts; j++) {
-        btManifoldPoint &pt = manifold->getContactPoint(j);
-        //if (pt.getDistance() < 0.0) {
-          // Dispatch trigger
-          Scene::Object *firstObject = static_cast <Scene::Object*> (objectA->getUserPointer());
-          Scene::Object *secondObject = static_cast<Scene::Object*> (objectB->getUserPointer());
-          if (!firstObject || !secondObject)
-            continue;
+        Scene::Object *firstObject = static_cast <Scene::Object*> (objectA->getUserPointer());
+        Scene::Object *secondObject = static_cast<Scene::Object*> (objectB->getUserPointer());
+        if (!firstObject || !secondObject)
+          continue;
 
-          firstObject->collision(secondObject);
-          secondObject->collision(firstObject);
-          break;
-        //}
+        firstObject->collision(secondObject);
+        secondObject->collision(firstObject);
+        break;
       }
     }
 

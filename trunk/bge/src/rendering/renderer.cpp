@@ -81,26 +81,27 @@ void Renderer::drawScene()
     else
       Driver::AbstractDriver::self()->disableLighting();
 
+    if (currentMesh != object->mesh()) {
+      if (currentMesh)
+        currentMesh->unbind();
+
+      if (object->mesh())
+        object->mesh()->bind();
+      currentMesh = object->mesh();
+    }
+
+    if (currentTexture != object->texture()) {
+    if (currentTexture)
+      currentTexture->unbind();
+
+    if (object->texture())
+      object->texture()->bind();
+    currentTexture = object->texture();
+  }
+
     if (object->mesh()) {
       Driver::AbstractDriver::self()->setTransformMatrix(worldTransform * object->globalTransform());
       Driver::AbstractDriver::self()->bind(object->materials());
-
-      if (currentMesh != object->mesh()) {
-        if (currentMesh)
-          currentMesh->unbind();
-
-        object->mesh()->bind();
-        currentMesh = object->mesh();
-      }
-
-      if (currentTexture != object->texture()) {
-        if (currentTexture)
-          currentTexture->unbind();
-
-        if (object->texture())
-          object->texture()->bind();
-        currentTexture = object->texture();
-      }
 
       Driver::AbstractDriver::self()->draw();
     } else {
