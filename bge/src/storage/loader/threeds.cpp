@@ -29,7 +29,7 @@ Item* ThreeDS::load()
 {
   QFile modelFile(filename());
   if (!modelFile.open(QFile::ReadOnly)) {
-    qWarning("BGE::Storage::Loader::Loader3DS::load(): Cannot open model '%s'.", filename().toUtf8().data());
+    qWarning("BGE::Storage::Loader::ThreeDS::load(): Cannot open model '%s'.", filename().toUtf8().data());
     return 0l;
   }
 
@@ -77,7 +77,7 @@ Item* ThreeDS::load()
       case 0x4000: {
         objectName = readString(modelFile);
 
-        qDebug("BGE::Storage::Loader::Loader3DS::parse(): Parsing object '%s'", objectName.toUtf8().data());
+        qDebug("BGE::Storage::Loader::ThreeDS::parse(): Parsing object '%s'", objectName.toUtf8().data());
         break;
       }
 
@@ -97,7 +97,7 @@ Item* ThreeDS::load()
           mesh->calculateNormals(objectName);
         free(coordinates);
 
-        qDebug("BGE::Storage::Loader::Loader3DS::parse(): Parsed %d vertices.", verticesNumber);
+        qDebug("BGE::Storage::Loader::ThreeDS::parse(): Parsed %d vertices.", verticesNumber);
         break;
       }
 
@@ -123,7 +123,7 @@ Item* ThreeDS::load()
         if (calculateNormals)
           mesh->calculateNormals(objectName);
 
-        qDebug("BGE::Storage::Loader::Loader3DS::parse(): Parsed %d faces.", facesNumber);
+        qDebug("BGE::Storage::Loader::ThreeDS::parse(): Parsed %d faces.", facesNumber);
         break;
       }
 
@@ -139,7 +139,7 @@ Item* ThreeDS::load()
         }
         faceMaterials.insert(objectName, mat);
 
-        qDebug("BGE::Storage::Loader::Loader3DS::parse(): Parsed %d material mappings for faces.", facesNum);
+        qDebug("BGE::Storage::Loader::ThreeDS::parse(): Parsed %d material mappings for faces.", facesNum);
         break;
       }
 
@@ -156,7 +156,7 @@ Item* ThreeDS::load()
         free(raw);
         mesh->addTextureMaps(objectName, textureMaps);
 
-        qDebug("BGE::Storage::Loader::Loader3DS::parse(): Parsed %d texture mappings for vertices.", verticesNumber);
+        qDebug("BGE::Storage::Loader::ThreeDS::parse(): Parsed %d texture mappings for vertices.", verticesNumber);
         break;
       }
 
@@ -167,7 +167,7 @@ Item* ThreeDS::load()
         mesh->addItem(material);
         materials.insert(materialName, material);
 
-        qDebug("BGE::Storage::Storage::Loader:Loader3DS::parse(): Parsing material '%s'.", materialName.toUtf8().data());
+        qDebug("BGE::Storage::Loader::ThreeDS::parse(): Parsing material '%s'.", materialName.toUtf8().data());
         break;
       }
 
@@ -175,7 +175,7 @@ Item* ThreeDS::load()
       case 0xA010: {
         materialState = Ambient;
 
-        qDebug("BGE::Storage::Loader::Loader3DS::parse(): Parsing material '%s' ambient color.", materialName.toUtf8().data());
+        qDebug("BGE::Storage::Loader::ThreeDS::parse(): Parsing material '%s' ambient color.", materialName.toUtf8().data());
         break;
       }
 
@@ -183,7 +183,7 @@ Item* ThreeDS::load()
       case 0xA020 : {
         materialState = Diffuse;
 
-        qDebug("BGE::Storage::Loader::Loader3DS::parse(): Parsing material '%s' diffuse color.", materialName.toUtf8().data());
+        qDebug("BGE::Storage::Loader::ThreeDS::parse(): Parsing material '%s' diffuse color.", materialName.toUtf8().data());
         break;
       }
 
@@ -191,7 +191,7 @@ Item* ThreeDS::load()
       case 0xA030 : {
         materialState = Specular;
 
-        qDebug("BGE::Storage::Loader::Loader3DS::parse(): Parsing material '%s' specular color.", materialName.toUtf8().data());
+        qDebug("BGE::Storage::Loader::ThreeDS::parse(): Parsing material '%s' specular color.", materialName.toUtf8().data());
         break;
       }
 
@@ -199,7 +199,7 @@ Item* ThreeDS::load()
       case 0xA040 : {
         materialState = Shininess;
 
-        qDebug("BGE::Storage::Loader::Loader3DS::parse(): Parsing material '%s' shininess.", materialName.toUtf8().data());
+        qDebug("BGE::Storage::Loader::ThreeDS::parse(): Parsing material '%s' shininess.", materialName.toUtf8().data());
         break;
       }
 
@@ -223,7 +223,7 @@ Item* ThreeDS::load()
             break;
         }
 
-        qDebug("BGE::Storage::Loader::Loader3DS::parse(): Parsed color (%d, %d, %d).", red, green, blue);
+        qDebug("BGE::Storage::Loader::ThreeDS::parse(): Parsed color (%d, %d, %d).", red, green, blue);
         break;
       }
 
@@ -234,7 +234,7 @@ Item* ThreeDS::load()
           break;
         material->setShininess(percent);
 
-        qDebug("BGE::Storage::Loader::Loader3DS::parse(): Parsed procent (%d).", percent);
+        qDebug("BGE::Storage::Loader::ThreeDS::parse(): Parsed procent (%d).", percent);
         break;
       }
 

@@ -55,7 +55,7 @@ Item *Obj::load()
 
   QFile modelFile(filename());
   if (!modelFile.open(QFile::ReadOnly)) {
-    qWarning("BGE::Storage::Loader::ObjLoader::load(): Cannot open '%s'!", filename().toUtf8().data());
+    qWarning("BGE::Storage::Loader::Obj::load(): Cannot open '%s'!", filename().toUtf8().data());
     return 0l;
   }
 
@@ -72,7 +72,7 @@ Item *Obj::load()
   QRegExp mtllib("^\\s*mtllib.*", Qt::CaseInsensitive);
   QRegExp usemtl("^\\s*usemtl\\s(.*)\\s*", Qt::CaseInsensitive, QRegExp::RegExp2);
 
-  qDebug("BGE::Storage::Loader::ObjLoader::load(): Parsing file '%s'.", filename().toUtf8().data());
+  qDebug("BGE::Storage::Loader::Obj::load(): Parsing file '%s'.", filename().toUtf8().data());
   while (!modelFile.atEnd()) {
     QString line = modelFile.readLine();
     line.remove('\n');
@@ -82,7 +82,7 @@ Item *Obj::load()
     // Parse some meaningful stateless variables
     if (usemtl.exactMatch(line)) {
       currentMaterial = usemtl.cap(1);
-      qDebug("BGE::Storage::Loader::ObjLoader::load(): Set material name to '%s'.", currentMaterial.toUtf8().data());
+      qDebug("BGE::Storage::Loader::Obj::load(): Set material name to '%s'.", currentMaterial.toUtf8().data());
       continue;
     }
 
@@ -92,7 +92,7 @@ Item *Obj::load()
           vertices << Vector3f(vertex.cap(1).toFloat(), vertex.cap(2).toFloat(), vertex.cap(3).toFloat());
           break;
         } else {
-          qDebug("BGE::Storage::Loader::ObjLoader::load(): Parsed %d vertices.", vertices.size());
+          qDebug("BGE::Storage::Loader::Obj::load(): Parsed %d vertices.", vertices.size());
           stage = UVMapping;
         }
       }
@@ -102,7 +102,7 @@ Item *Obj::load()
           uvMaps << Vector2f(uvMap.cap(1).toFloat(), uvMap.cap(2).toFloat());
           break;
         } else {
-          qDebug("BGE::Storage::Loader::ObjLoader::load(): Parsed %d uv mappings.", uvMaps.size());
+          qDebug("BGE::Storage::Loader::Obj::load(): Parsed %d uv mappings.", uvMaps.size());
           stage = Normals;
         }
       }
@@ -112,7 +112,7 @@ Item *Obj::load()
           normals << Vector3f(normal.cap(1).toFloat(), normal.cap(2).toFloat(), normal.cap(3).toFloat()).normalized();
           break;
         } else {
-          qDebug("BGE::Storage::Loader::ObjLoader::load(): Parsed %d normals.", normals.size());
+          qDebug("BGE::Storage::Loader::Obj::load(): Parsed %d normals.", normals.size());
           stage = Faces;
         }
       }
@@ -177,7 +177,7 @@ Item *Obj::load()
     }
   }
 
-  qDebug("BGE::Storage::Loader::ObjLoader::load(): Parsed %d faces. Resulting in %d vertices, %d uvMappings, %d normals.", faces.size(), sortedVertices.size(), sortedUvs.size(), sortedNormals.size());
+  qDebug("BGE::Storage::Loader::Obj::load(): Parsed %d faces. Resulting in %d vertices, %d uvMappings, %d normals.", faces.size(), sortedVertices.size(), sortedUvs.size(), sortedNormals.size());
 
   Mesh *mesh = new Mesh(name());
   mesh->addVertices("mesh", sortedVertices);
