@@ -36,7 +36,7 @@
 #include "scene/partition.h"
 #include "scene/boundingvolume.h"
 
-#include "storage/storagemanager.h"
+#include "storage/manager.h"
 
 #include "rendering/lightingstage.h"
 #include "rendering/bloomstage.h"
@@ -147,7 +147,7 @@ void Canvas::resizeGL(int w, int h)
   // Default perspective setup
   QMatrix4x4 projection;
   // Careful! Values are also used by v-f culling
-  projection.perspective(80, (qreal) w / (qreal) h, 20, SceneSize.norm());
+  projection.perspective(80, (qreal) w / (qreal) h, 0.1, SceneSize.norm());
   Matrix4d temp;
   memcpy(temp.data(), projection.data(), 16 * sizeof(qreal));
   Scene::Camera::m_projection.matrix() = temp.cast<float>();
@@ -392,13 +392,13 @@ bool Canvas::removeLight(const QString &name)
 void Canvas::loadResource(const QString& fileName)
 {
   if (fileName.isEmpty()) {
-    Storage::StorageManager::self()->load();
+    Storage::Manager::self()->load();
     return;
   }
 
   if (!QResource::registerResource(fileName, "/bge_external"))
     qWarning("BGE::Canvas::loadResource: Cannot register '%s' resource!", fileName.toAscii().data());
-  Storage::StorageManager::self()->load();
+  Storage::Manager::self()->load();
   if (!QResource::unregisterResource(fileName, "/bge_external"))
     qWarning("BGE::Canvas::loadResource: Cannot unregister '%s' resource!", fileName.toAscii().data());
 }
@@ -553,7 +553,7 @@ void Canvas::cleanup()
   delete m_renderer;
 
   // Delete the storage
-  delete Storage::StorageManager::self();
+  delete Storage::Manager::self();
   delete m_time;
 
   if (m_recorder)

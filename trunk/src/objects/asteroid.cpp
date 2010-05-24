@@ -17,7 +17,7 @@
 #include "scene/camera.h"
 #include "scene/boundingvolume.h"
 
-#include "storage/storagemanager.h"
+#include "storage/manager.h"
 #include "storage/mesh.h"
 #include "storage/texture.h"
 
@@ -28,14 +28,14 @@ using namespace Objects;
 Asteroid::Asteroid(Sizes size)
   : m_size(size)
 {
-  QList<BGE::Storage::Item*> meshes = BGE::Storage::StorageManager::self()->get("/asteroids/models")->items();
+  QList<BGE::Storage::Item*> meshes = BGE::Storage::Manager::self()->get("/asteroids/models")->items();
   setMesh(static_cast<BGE::Storage::Mesh*> (meshes.at(qrand() % meshes.size())));
   loadMaterialsFromMesh();
 
   // Scale it to the designated size
   scale(radius() / boundingVolume()->radius());
 
-  setTexture(BGE::Storage::StorageManager::self()->get<BGE::Storage::Texture*>("/asteroids/textures/" + mesh()->name()));
+  setTexture(BGE::Storage::Manager::self()->get<BGE::Storage::Texture*>("/asteroids/textures/" + mesh()->name()));
 
   AsteroidList::self()->addAsteroid(this);
 

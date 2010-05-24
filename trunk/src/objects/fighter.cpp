@@ -14,7 +14,7 @@
 
 #include "BulletDynamics/Dynamics/btRigidBody.h"
 
-#include "storage/storagemanager.h"
+#include "storage/manager.h"
 #include "storage/mesh.h"
 #include "storage/texture.h"
 
@@ -25,9 +25,9 @@ using namespace Objects;
 
 Fighter::Fighter()
 {
-  setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/fighters/models/fighter"));
+  setMesh(BGE::Storage::Manager::self()->get<BGE::Storage::Mesh*>("/fighters/models/fighter"));
   loadMaterialsFromMesh();
-  setTexture(BGE::Storage::StorageManager::self()->get<BGE::Storage::Texture*>("/fighters/textures/fighter"));
+  setTexture(BGE::Storage::Manager::self()->get<BGE::Storage::Texture*>("/fighters/textures/fighter"));
 
   m_enginePower = 0;
   m_angularVelocity = Vector3f::Zero();

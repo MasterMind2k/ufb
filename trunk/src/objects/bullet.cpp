@@ -16,7 +16,7 @@
 
 #include "canvas.h"
 
-#include "storage/storagemanager.h"
+#include "storage/manager.h"
 #include "storage/mesh.h"
 #include "storage/material.h"
 
@@ -30,8 +30,8 @@ qreal Bullet::Velocity = 10000;
 
 Bullet::Bullet()
 {
-  setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/projectiles/bullet"));
-  BGE::Storage::Material *material = BGE::Storage::StorageManager::self()->get<BGE::Storage::Material*>("/projectiles/bullet/Material");
+  setMesh(BGE::Storage::Manager::self()->get<BGE::Storage::Mesh*>("/projectiles/bullet"));
+  BGE::Storage::Material *material = BGE::Storage::Manager::self()->get<BGE::Storage::Material*>("/projectiles/bullet/Material");
   material->setEmission(material->diffuse());
   loadMaterialsFromMesh();
   scale(50);

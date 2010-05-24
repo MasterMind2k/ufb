@@ -12,7 +12,7 @@
  ***************************************************************************/
 #include "outputstage.h"
 
-#include "storage/storagemanager.h"
+#include "storage/manager.h"
 #include "storage/shaderprogram.h"
 
 using namespace BGE;
@@ -20,7 +20,7 @@ using namespace BGE::Rendering;
 
 void OutputStage::render()
 {
-  Storage::StorageManager::self()->get<Storage::ShaderProgram*>("/shaders/OutputStage")->bind();
+  Storage::Manager::self()->get<Storage::ShaderProgram*>("/shaders/OutputStage")->bind();
   pass();
-  Storage::StorageManager::self()->get<Storage::ShaderProgram*>("/shaders/OutputStage")->unbind();
+  Storage::Manager::self()->get<Storage::ShaderProgram*>("/shaders/OutputStage")->unbind();
 }

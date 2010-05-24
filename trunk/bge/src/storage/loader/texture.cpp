@@ -10,30 +10,21 @@
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
  ***************************************************************************/
-#ifndef __BGE_STORAGE_LOADER_LOADER3DS_H
-#define __BGE_STORAGE_LOADER_LOADER3DS_H
+#include "texture.h"
 
-#include "storage/loader/abstractloader.h"
+#include "storage/texture.h"
 
-class QFile;
+using namespace BGE;
+using namespace BGE::Storage::Loader;
 
-namespace BGE {
-namespace Storage {
-namespace Loader {
-
-class Loader3DS : public AbstractLoader
+Storage::Item* Texture::load()
 {
-  public:
-  inline Loader3DS(const QString& filename) : AbstractLoader(filename) {}
+  QImage image(filename());
+  Storage::Texture* texture = 0l;
+  if (!image.isNull()) {
+    texture = new Storage::Texture(name());
+    texture->setTexture(image);
+  }
 
-  Item* load();
-
-  private:
-    QString readString(QFile& file) const;
-};
-
+  return texture;
 }
-}
-}
-
-#endif

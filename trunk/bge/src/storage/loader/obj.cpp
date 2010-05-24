@@ -10,7 +10,7 @@
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
  ***************************************************************************/
-#include "objloader.h"
+#include "obj.h"
 
 #include <QtCore/QFile>
 #include <QtCore/QStack>
@@ -32,7 +32,7 @@ bool vectorLessThan(const Vector3f &v1, const Vector3f &v2)
   return v1.z() > v2.z();
 }
 
-Item *ObjLoader::load()
+Item *Obj::load()
 {
   enum Stage {
     Vertices,
@@ -189,7 +189,7 @@ Item *ObjLoader::load()
 }
 
 // Took algorithem from http://www.cs.ucsb.edu/~suri/cs235/Triangulation.pdf
-QList<Vector3f> ObjLoader::triangulate(const QList<Vector3f> &vertices)
+QList<Vector3f> Obj::triangulate(const QList<Vector3f> &vertices)
 {
   QList<Vector3f> faces;
 
