@@ -10,7 +10,7 @@
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
  ***************************************************************************/
-#include "shaderloader.h"
+#include "shader.h"
 
 #include <QtCore/QFile>
 #include <QtCore/QRegExp>
@@ -19,7 +19,6 @@
 #include "storage/shaderprogram.h"
 
 using namespace BGE;
-using namespace BGE::Storage;
 using namespace BGE::Storage::Loader;
 
 QStringList parseSource(QString& source)
@@ -40,14 +39,14 @@ QStringList parseSource(QString& source)
   return modules;
 }
 
-Item* ShaderLoader::load()
+Storage::Item* Shader::load()
 {
   QFile file(filename());
   file.open(QFile::ReadOnly);
   QString source = QString::fromUtf8(file.readAll());
   file.close();
 
-  Shader* shader = new Shader(name());
+  Storage::Shader* shader = new Storage::Shader(name());
 
   QRegExp typeMatcher(".*\\.(.+)$", Qt::CaseInsensitive, QRegExp::RegExp2);
   if (!typeMatcher.exactMatch(filename()))
@@ -56,10 +55,10 @@ Item* ShaderLoader::load()
 
   if (extension == "vsm") {
     // Load vertex shader
-    shader->setShaderSource(source, Shader::VertexShader);
+    shader->setShaderSource(source, Storage::Shader::VertexShader);
   } else if (extension == "fsm") {
     // Load fragment shader
-    shader->setShaderSource(source, Shader::FragmentShader);
+    shader->setShaderSource(source, Storage::Shader::FragmentShader);
   } else if (extension == "sp") {
     // Parse and load shader program
     QString vertexSection = "[vertex]";
@@ -80,22 +79,22 @@ Item* ShaderLoader::load()
       vertexSource = source.mid(vertexPos + vertexSection.size());
     }
 
-    Shader* secondShader = 0l;
+    Storage::Shader* secondShader = 0l;
     if (!vertexSource.isEmpty() && !fragmentSource.isEmpty()) {
       shader->addDependencies(parseSource(vertexSource));
-      shader->setShaderSource(vertexSource, Shader::VertexShader);
-      secondShader = new Shader(name());
+      shader->setShaderSource(vertexSource, Storage::Shader::VertexShader);
+      secondShader = new Storage::Shader(name());
       secondShader->addDependencies(parseSource(fragmentSource));
-      secondShader->setShaderSource(fragmentSource, Shader::FragmentShader);
+      secondShader->setShaderSource(fragmentSource, Storage::Shader::FragmentShader);
     } else if (!vertexSource.isEmpty()) {
       shader->addDependencies(parseSource(vertexSource));
-      shader->setShaderSource(vertexSource, Shader::VertexShader);
+      shader->setShaderSource(vertexSource, Storage::Shader::VertexShader);
     } else if (!fragmentSource.isEmpty()) {
       shader->addDependencies(parseSource(fragmentSource));
-      shader->setShaderSource(fragmentSource, Shader::FragmentShader);
+      shader->setShaderSource(fragmentSource, Storage::Shader::FragmentShader);
     }
 
-    ShaderProgram* shaderProgram = new ShaderProgram(name());
+    Storage::ShaderProgram* shaderProgram = new Storage::ShaderProgram(name());
     shaderProgram->addShader(shader);
     shaderProgram->addShader(secondShader);
 

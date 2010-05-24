@@ -18,7 +18,7 @@
 #include "scene/camera.h"
 #include "scene/light.h"
 
-#include "storage/storagemanager.h"
+#include "storage/manager.h"
 #include "storage/mesh.h"
 
 #include "movingcube.h"
@@ -88,15 +88,15 @@ int main(int argc, char** argv)
   BGE::Canvas::canvas()->loadResource();
 
   // Our cube :D
-  BGE::Storage::StorageManager::self()->set(createCube(), "/models/");
+  BGE::Storage::Manager::self()->set(createCube(), "/models/");
 
   // Create moving cubes
   MovingCube* movingCube = new MovingCube(0);
-  movingCube->setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/models/Cube"));
+  movingCube->setMesh(BGE::Storage::Manager::self()->get<BGE::Storage::Mesh*>("/models/Cube"));
 
   // Lower left
   MovingCube* child = new MovingCube(1);
-  child->setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/models/Cube"));
+  child->setMesh(BGE::Storage::Manager::self()->get<BGE::Storage::Mesh*>("/models/Cube"));
   child->scale(0.5);
   child->move(-2, -2, 2);
   movingCube->addChild(child);
@@ -108,7 +108,7 @@ int main(int argc, char** argv)
 
   // Lower right
   child = new MovingCube(2);
-  child->setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/models/Cube"));
+  child->setMesh(BGE::Storage::Manager::self()->get<BGE::Storage::Mesh*>("/models/Cube"));
   child->scale(0.5);
   child->move(2, -2, 2);
   movingCube->addChild(child);
@@ -120,7 +120,7 @@ int main(int argc, char** argv)
 
   // Top left
   child = new MovingCube(3);
-  child->setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/models/Cube"));
+  child->setMesh(BGE::Storage::Manager::self()->get<BGE::Storage::Mesh*>("/models/Cube"));
   child->scale(0.5);
   child->move(-2, 2, -2);
   movingCube->addChild(child);
@@ -132,7 +132,7 @@ int main(int argc, char** argv)
 
   // Top right
   child = new MovingCube(4);
-  child->setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/models/Cube"));
+  child->setMesh(BGE::Storage::Manager::self()->get<BGE::Storage::Mesh*>("/models/Cube"));
   child->scale(0.5);
   child->move(2, 2, -2);
   movingCube->addChild(child);
@@ -145,7 +145,7 @@ int main(int argc, char** argv)
 
   // Big stacionary cubes
   BGE::Scene::Object* bigCube = new BGE::Scene::Object;
-  bigCube->setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/models/Cube"));
+  bigCube->setMesh(BGE::Storage::Manager::self()->get<BGE::Storage::Mesh*>("/models/Cube"));
   bigCube->scale(3);
   bigCube->move(10, 10, -10);
   // Camera
@@ -156,7 +156,7 @@ int main(int argc, char** argv)
   BGE::Canvas::canvas()->addSceneObject(bigCube);
 
   bigCube = new BGE::Scene::Object;
-  bigCube->setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/models/Cube"));
+  bigCube->setMesh(BGE::Storage::Manager::self()->get<BGE::Storage::Mesh*>("/models/Cube"));
   bigCube->scale(3);
   bigCube->move(10, -10, -10);
   // Camera
@@ -167,7 +167,7 @@ int main(int argc, char** argv)
   BGE::Canvas::canvas()->addSceneObject(bigCube);
 
   bigCube = new BGE::Scene::Object;
-  bigCube->setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/models/Cube"));
+  bigCube->setMesh(BGE::Storage::Manager::self()->get<BGE::Storage::Mesh*>("/models/Cube"));
   bigCube->scale(3);
   bigCube->move(-10, 10, -10);
   // Camera
@@ -178,7 +178,7 @@ int main(int argc, char** argv)
   BGE::Canvas::canvas()->addSceneObject(bigCube);
 
   bigCube = new BGE::Scene::Object;
-  bigCube->setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/models/Cube"));
+  bigCube->setMesh(BGE::Storage::Manager::self()->get<BGE::Storage::Mesh*>("/models/Cube"));
   bigCube->scale(3);
   bigCube->move(-10, -10, -10);
   // Camera
@@ -189,7 +189,7 @@ int main(int argc, char** argv)
   BGE::Canvas::canvas()->addSceneObject(bigCube);
 
   bigCube = new BGE::Scene::Object;
-  bigCube->setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/models/Cube"));
+  bigCube->setMesh(BGE::Storage::Manager::self()->get<BGE::Storage::Mesh*>("/models/Cube"));
   bigCube->scale(3);
   bigCube->move(10, 10, 10);
   // Camera
@@ -200,7 +200,7 @@ int main(int argc, char** argv)
   BGE::Canvas::canvas()->addSceneObject(bigCube);
 
   bigCube = new BGE::Scene::Object;
-  bigCube->setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/models/Cube"));
+  bigCube->setMesh(BGE::Storage::Manager::self()->get<BGE::Storage::Mesh*>("/models/Cube"));
   bigCube->scale(3);
   bigCube->move(10, -10, 10);
   // Camera
@@ -211,7 +211,7 @@ int main(int argc, char** argv)
   BGE::Canvas::canvas()->addSceneObject(bigCube);
 
   bigCube = new BGE::Scene::Object;
-  bigCube->setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/models/Cube"));
+  bigCube->setMesh(BGE::Storage::Manager::self()->get<BGE::Storage::Mesh*>("/models/Cube"));
   bigCube->scale(3);
   bigCube->move(-10, 10, 10);
   // Camera
@@ -222,7 +222,7 @@ int main(int argc, char** argv)
   BGE::Canvas::canvas()->addSceneObject(bigCube);
 
   bigCube = new BGE::Scene::Object;
-  bigCube->setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/models/Cube"));
+  bigCube->setMesh(BGE::Storage::Manager::self()->get<BGE::Storage::Mesh*>("/models/Cube"));
   bigCube->scale(3);
   bigCube->move(-10, -10, 10);
   // Camera

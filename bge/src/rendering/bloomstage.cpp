@@ -12,7 +12,7 @@
  ***************************************************************************/
 #include "bloomstage.h"
 
-#include "storage/storagemanager.h"
+#include "storage/manager.h"
 #include "storage/shaderprogram.h"
 
 using namespace BGE;
@@ -21,12 +21,12 @@ using namespace BGE::Rendering;
 void BloomStage::render()
 {
   setOutput(Textures);
-  Storage::StorageManager::self()->get<Storage::ShaderProgram*>("/shaders/BloomHorizontalStage")->bind();
+  Storage::Manager::self()->get<Storage::ShaderProgram*>("/shaders/BloomHorizontalStage")->bind();
   pass();
-  Storage::StorageManager::self()->get<Storage::ShaderProgram*>("/shaders/BloomHorizontalStage")->unbind();
+  Storage::Manager::self()->get<Storage::ShaderProgram*>("/shaders/BloomHorizontalStage")->unbind();
 
   setOutput(Display);
-  Storage::StorageManager::self()->get<Storage::ShaderProgram*>("/shaders/BloomVerticalStage")->bind();
+  Storage::Manager::self()->get<Storage::ShaderProgram*>("/shaders/BloomVerticalStage")->bind();
   pass();
-  Storage::StorageManager::self()->get<Storage::ShaderProgram*>("/shaders/BloomVerticalStage")->unbind();
+  Storage::Manager::self()->get<Storage::ShaderProgram*>("/shaders/BloomVerticalStage")->unbind();
 }

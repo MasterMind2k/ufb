@@ -12,7 +12,7 @@
  ***************************************************************************/
 #include "lightingstage.h"
 
-#include "storage/storagemanager.h"
+#include "storage/manager.h"
 #include "storage/shaderprogram.h"
 
 using namespace BGE;
@@ -20,11 +20,11 @@ using namespace BGE::Rendering;
 
 void LightingStage::render()
 {
-  Storage::StorageManager::self()->get("/shaders/LightingStage")->bind();
+  Storage::Manager::self()->get("/shaders/LightingStage")->bind();
 
   enableLights();
   pass();
   disableLights();
 
-  Storage::StorageManager::self()->get("/shaders/LightingStage")->unbind();
+  Storage::Manager::self()->get("/shaders/LightingStage")->unbind();
 }

@@ -14,7 +14,7 @@
 
 #include "canvas.h"
 
-#include "storage/storagemanager.h"
+#include "storage/manager.h"
 
 #include "scene/camera.h"
 #include "scene/light.h"

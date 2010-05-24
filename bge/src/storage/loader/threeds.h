@@ -10,24 +10,26 @@
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
  ***************************************************************************/
-#ifndef __BGE_LOADER_TEXTURELOADER_H
-#define __BGE_LOADER_TEXTURELOADER_H
+#ifndef __BGE_STORAGE_LOADER_LOADER3DS_H
+#define __BGE_STORAGE_LOADER_LOADER3DS_H
 
 #include "storage/loader/abstractloader.h"
 
+class QFile;
+
 namespace BGE {
 namespace Storage {
-class Item;
 namespace Loader {
 
-  class TextureLoader : public AbstractLoader
+class ThreeDS : public AbstractLoader
 {
   public:
-    inline TextureLoader(const QString& filename) : AbstractLoader(filename) {}
+  inline ThreeDS(const QString& filename) : AbstractLoader(filename) {}
 
-    Item* load();
+  Item* load();
 
   private:
+    QString readString(QFile& file) const;
 };
 
 }

@@ -27,7 +27,7 @@
 #include "scene/light.h"
 #include "scene/boundingvolume.h"
 
-#include "storage/storagemanager.h"
+#include "storage/manager.h"
 #include "storage/mesh.h"
 #include "storage/material.h"
 #include "storage/shaderprogram.h"
@@ -36,7 +36,7 @@ Lighting::Lighting()
   : QObject()
 {
   qsrand(time(0l));
-  BGE::Storage::Material *material = BGE::Storage::StorageManager::self()->get<BGE::Storage::Material*>("/materials/Light");
+  BGE::Storage::Material *material = BGE::Storage::Manager::self()->get<BGE::Storage::Material*>("/materials/Light");
   // Setup lights
   for (quint16 i = 0; i < 15; i ++) {
     QString lightName = "Light_" + QString::number(i);
@@ -44,7 +44,7 @@ Lighting::Lighting()
     BGE::Canvas::canvas()->addSceneObject(light);
     light->setQuadraticAttenuation(0.0005);
     light->move(qrand() % 500 - 300, 50, qrand() % 500 - 300);
-    light->setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/models/Cube"));
+    light->setMesh(BGE::Storage::Manager::self()->get<BGE::Storage::Mesh*>("/models/Cube"));
     light->addMaterial(material);
 
     // Make rigid body

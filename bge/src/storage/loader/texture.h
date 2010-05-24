@@ -10,22 +10,28 @@
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
  ***************************************************************************/
-#include "textureloader.h"
+#ifndef __BGE_LOADER_TEXTURELOADER_H
+#define __BGE_LOADER_TEXTURELOADER_H
 
-#include "storage/texture.h"
+#include "storage/loader/abstractloader.h"
 
-using namespace BGE;
-using namespace BGE::Storage;
-using namespace BGE::Storage::Loader;
+namespace BGE {
+namespace Storage {
+class Item;
+namespace Loader {
 
-Item* TextureLoader::load()
+class Texture : public AbstractLoader
 {
-  QImage image(filename());
-  Texture* texture = 0l;
-  if (!image.isNull()) {
-    texture = new Texture(name());
-    texture->setTexture(image);
-  }
+  public:
+    inline Texture(const QString& filename) : AbstractLoader(filename) {}
 
-  return texture;
+    Item* load();
+
+  private:
+};
+
 }
+}
+}
+
+#endif

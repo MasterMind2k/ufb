@@ -17,7 +17,7 @@
 
 #include "driver/abstractdriver.h"
 
-#include "storage/storagemanager.h"
+#include "storage/manager.h"
 #include "storage/shader.h"
 
 using namespace BGE;
@@ -36,7 +36,7 @@ bool ShaderProgram::prepareProgram()
     Shader* shader = queue.dequeue();
 
     foreach (QString import, shader->dependencies()) {
-      Shader* shaderDependancy = StorageManager::self()->get<Shader*>(import);
+      Shader* shaderDependancy = Manager::self()->get<Shader*>(import);
       if (!shaderDependancy) {
         qWarning("BGE::ShaderProgram::prepareProgram(): Shader program '%s' cannot be imported. Shader module '%s' is missing.", name().toUtf8().data(), import.toUtf8().data());
         return false;

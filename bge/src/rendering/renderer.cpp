@@ -21,7 +21,7 @@
 #include "scene/light.h"
 #include "scene/particleemitter.h"
 
-#include "storage/storagemanager.h"
+#include "storage/manager.h"
 #include "storage/mesh.h"
 #include "storage/texture.h"
 #include "storage/shaderprogram.h"
@@ -53,9 +53,9 @@ void Renderer::renderScene()
 
   // Geometry render
   Driver::AbstractDriver::self()->bindFBO();
-  Driver::AbstractDriver::self()->bind(Storage::StorageManager::self()->get<Storage::ShaderProgram*>("/shaders/FirstStage")); // FirstStage
+  Driver::AbstractDriver::self()->bind(Storage::Manager::self()->get<Storage::ShaderProgram*>("/shaders/FirstStage")); // FirstStage
   drawScene();
-  Driver::AbstractDriver::self()->unbind(Storage::StorageManager::self()->get<Storage::ShaderProgram*>("/shaders/FirstStage"));
+  Driver::AbstractDriver::self()->unbind(Storage::Manager::self()->get<Storage::ShaderProgram*>("/shaders/FirstStage"));
   Driver::AbstractDriver::self()->unbindFBO();
 
   // Shading stage(s)

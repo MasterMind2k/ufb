@@ -10,22 +10,26 @@
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
  ***************************************************************************/
-#ifndef __BGE_STORAGE_LOADER_SHADERLOADER_H
-#define __BGE_STORAGE_LOADER_SHADERLOADER_H
+#ifndef __BGE_STORAGE_LOADER_OBJLOADER_H
+#define __BGE_STORAGE_LOADER_OBJLOADER_H
 
 #include "storage/loader/abstractloader.h"
 
+#include "global.h"
+
 namespace BGE {
 namespace Storage {
-class Item;
 namespace Loader {
 
-  class ShaderLoader : public AbstractLoader
+class Obj : public AbstractLoader
 {
   public:
-    ShaderLoader(const QString& filename) : AbstractLoader(filename) {}
+    inline Obj(const QString& filename) : AbstractLoader(filename) {}
 
-    Item* load();
+    Item *load();
+
+  private:
+    QList<Vector3f> triangulate(const QList<Vector3f> &vertices);
 };
 
 }

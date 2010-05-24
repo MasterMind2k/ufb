@@ -21,7 +21,7 @@
 
 #include "canvas.h"
 
-#include "storage/storagemanager.h"
+#include "storage/manager.h"
 #include "storage/mesh.h"
 
 #include "motionstate.h"

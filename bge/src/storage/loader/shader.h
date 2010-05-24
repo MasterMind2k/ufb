@@ -10,66 +10,25 @@
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
  ***************************************************************************/
-#ifndef __BGE_STORAGE_STORAGEMANAGER_H
-#define __BGE_STORAGE_STORAGEMANAGER_H
+#ifndef __BGE_STORAGE_LOADER_SHADERLOADER_H
+#define __BGE_STORAGE_LOADER_SHADERLOADER_H
 
-#include <QtCore/QString>
+#include "storage/loader/abstractloader.h"
 
 namespace BGE {
 namespace Storage {
 class Item;
+namespace Loader {
 
-class StorageManager
+class Shader : public AbstractLoader
 {
   public:
-    /**
-     * Instance "getter" method.
-     */
-    inline static StorageManager* self()
-    {
-      if (!m_self)
-        m_self = new StorageManager;
+    Shader(const QString& filename) : AbstractLoader(filename) {}
 
-      return m_self;
-    }
-
-    ~StorageManager();
-
-    /**
-     * Loads the data from the :/bge_resources directory.
-     *
-     * @note Removes all previously loaded resources
-     */
-    void load();
-
-    /**
-     * Gets an item.
-     */
-    Item* get(const QString& path) const;
-    /**
-     * \overload
-     */
-    template <class T>
-    inline T get(const QString& path) const
-    {
-      return static_cast<T> (get(path));
-    }
-
-    /**
-     * Sets an item.
-     *
-     * @warning Use this method only when resources are loaded!
-     */
-    void set(Item* item, const QString& path);
-
-  private:
-    static StorageManager* m_self;
-    Item* m_root;
-
-    /* It's a singleton class */
-    StorageManager();
+    Item* load();
 };
 
+}
 }
 }
 

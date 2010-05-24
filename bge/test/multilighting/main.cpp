@@ -21,7 +21,7 @@
 
 #include "canvas.h"
 
-#include "storage/storagemanager.h"
+#include "storage/manager.h"
 #include "storage/mesh.h"
 #include "storage/material.h"
 #include "storage/texture.h"
@@ -81,14 +81,14 @@ int main(int argc, char** argv)
   QApplication app(argc, argv);
 
   // Load resources
-  BGE::Storage::StorageManager::self()->load();
+  BGE::Storage::Manager::self()->load();
 
   // Load cube
-  BGE::Storage::StorageManager::self()->set(createCube(), "/models/");
+  BGE::Storage::Manager::self()->set(createCube(), "/models/");
   BGE::Storage::Material *material = new BGE::Storage::Material("Light");
   material->setEmission(QColor(1 * 255, 1 * 255, 1 * 255));
   material->setFaceName("side");
-  BGE::Storage::StorageManager::self()->set(material, "/materials/");
+  BGE::Storage::Manager::self()->set(material, "/materials/");
 
   // Make the invisible fence
   btTransform transfom;
@@ -132,27 +132,27 @@ int main(int argc, char** argv)
 
   // Setup objects
   BGE::Scene::Object *object = new BGE::Scene::Object;
-  object->setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/models/Surface"));
+  object->setMesh(BGE::Storage::Manager::self()->get<BGE::Storage::Mesh*>("/models/Surface"));
   object->move(-150, 0, 150);
   BGE::Canvas::canvas()->addSceneObject(object);
 
   // Hard coding material :D
   BGE::Storage::Material *surfaceMaterial = new BGE::Storage::Material("Surface material", QColor(0.5 * 255, 0.5 * 255, 0.5 * 255), QColor(255, 255, 255), QColor(0, 0, 0), QColor(0, 0, 0), 80);
   surfaceMaterial->setFaceName("phong2SG");
-  BGE::Storage::StorageManager::self()->set(surfaceMaterial, "/materials");
+  BGE::Storage::Manager::self()->set(surfaceMaterial, "/materials");
   object->addMaterial(surfaceMaterial);
-  object->setTexture(BGE::Storage::StorageManager::self()->get<BGE::Storage::Texture*>("/textures/Desert"));
+  object->setTexture(BGE::Storage::Manager::self()->get<BGE::Storage::Texture*>("/textures/Desert"));
 
   // First R2-D2
   object = new BGE::Scene::Object;
-  object->setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/models/R2-D2"));
+  object->setMesh(BGE::Storage::Manager::self()->get<BGE::Storage::Mesh*>("/models/R2-D2"));
   object->loadMaterialsFromMesh();
   object->rotateX(-90);
   BGE::Canvas::canvas()->addSceneObject(object);
 
   // Second R2-D2
   object = new BGE::Scene::Object;
-  object->setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/models/R2-D2"));
+  object->setMesh(BGE::Storage::Manager::self()->get<BGE::Storage::Mesh*>("/models/R2-D2"));
   object->loadMaterialsFromMesh();
   object->move(100, 0, 100);
   object->rotateX(-90);
@@ -160,7 +160,7 @@ int main(int argc, char** argv)
 
   // Third R2-D2
   object = new BGE::Scene::Object;
-  object->setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/models/R2-D2"));
+  object->setMesh(BGE::Storage::Manager::self()->get<BGE::Storage::Mesh*>("/models/R2-D2"));
   object->loadMaterialsFromMesh();
   object->move(-100, 0, -100);
   object->rotateX(-90);
@@ -168,7 +168,7 @@ int main(int argc, char** argv)
 
   // Fourth R2-D2
   object = new BGE::Scene::Object;
-  object->setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/models/R2-D2"));
+  object->setMesh(BGE::Storage::Manager::self()->get<BGE::Storage::Mesh*>("/models/R2-D2"));
   object->loadMaterialsFromMesh();
   object->move(100, 0, -100);
   object->rotateX(-90);
@@ -176,7 +176,7 @@ int main(int argc, char** argv)
 
   // Fifth R2-D2
   object = new BGE::Scene::Object;
-  object->setMesh(BGE::Storage::StorageManager::self()->get<BGE::Storage::Mesh*>("/models/R2-D2"));
+  object->setMesh(BGE::Storage::Manager::self()->get<BGE::Storage::Mesh*>("/models/R2-D2"));
   object->loadMaterialsFromMesh();
   object->move(-100, 0, 100);
   object->rotateX(-90);

@@ -10,16 +10,16 @@
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
  ***************************************************************************/
-#include "storagemanager.h"
+#include "manager.h"
 
 #include <QtCore/QDir>
 #include <QtCore/QStack>
 #include <QtCore/QHash>
 
-#include "storage/loader/loader3ds.h"
-#include "storage/loader/objloader.h"
-#include "storage/loader/textureloader.h"
-#include "storage/loader/shaderloader.h"
+#include "storage/loader/threeds.h"
+#include "storage/loader/obj.h"
+#include "storage/loader/texture.h"
+#include "storage/loader/shader.h"
 
 #include "storage/item.h"
 #include "storage/mesh.h"
@@ -29,19 +29,19 @@
 using namespace BGE;
 using namespace BGE::Storage;
 
-StorageManager* StorageManager::m_self = 0l;
+Manager* Manager::m_self = 0l;
 
-StorageManager::StorageManager()
+Manager::Manager()
 {
   m_root = new Item("/");
 }
 
-StorageManager::~StorageManager()
+Manager::~Manager()
 {
   delete m_root;
 }
 
-void StorageManager::load()
+void Manager::load()
 {
   QStack<QFileInfo> dirs;
   dirs += QDir(":/bge_resources").entryInfoList().toVector();
@@ -69,20 +69,20 @@ void StorageManager::load()
 
       if (filename.endsWith(".3ds", Qt::CaseInsensitive)) {
         // Load 3ds
-        qDebug("BGE::Storage::StorageManager::load(): Loading model '%s'", absoluteFilePath.toUtf8().data());
-        loader = new Loader::Loader3DS(absoluteFilePath);
+        qDebug("BGE::Storage::Manager::load(): Loading model '%s'", absoluteFilePath.toUtf8().data());
+        loader = new Loader::ThreeDS(absoluteFilePath);
       } else if (filename.endsWith(".obj", Qt::CaseInsensitive)) {
         // Load obj
-        qDebug("BGE::Storage::StorageManager::load(): Loading model '%s'", absoluteFilePath.toUtf8().data());
-        loader = new Loader::ObjLoader(absoluteFilePath);
+        qDebug("BGE::Storage::Manager::load(): Loading model '%s'", absoluteFilePath.toUtf8().data());
+        loader = new Loader::Obj(absoluteFilePath);
       } else if (filename.endsWith(".png", Qt::CaseInsensitive) || filename.endsWith(".jpg", Qt::CaseInsensitive) || filename.endsWith(".bmp", Qt::CaseInsensitive)) {
         // Load texture
-        qDebug("BGE::Storage::StorageManager::load(): Loading texture '%s'", absoluteFilePath.toUtf8().data());
-        loader = new Loader::TextureLoader(absoluteFilePath);
+        qDebug("BGE::Storage::Manager::load(): Loading texture '%s'", absoluteFilePath.toUtf8().data());
+        loader = new Loader::Texture(absoluteFilePath);
       } else if (filename.endsWith(".vsm") || filename.endsWith(".fsm") || filename.endsWith(".sp")) {
         // Load shaders
-        qDebug("BGE::Storage::StorageManager::load(): Loading shader '%s'", absoluteFilePath.toUtf8().data());
-        loader = new Loader::ShaderLoader(absoluteFilePath);
+        qDebug("BGE::Storage::Manager::load(): Loading shader '%s'", absoluteFilePath.toUtf8().data());
+        loader = new Loader::Shader(absoluteFilePath);
       }
 
       if (loader) {
@@ -97,7 +97,7 @@ void StorageManager::load()
   }
 }
 
-Item* StorageManager::get(const QString &path) const
+Item* Manager::get(const QString &path) const
 {
   if (!path.startsWith("/") || path.endsWith("/"))
     return 0l;
@@ -119,7 +119,7 @@ Item* StorageManager::get(const QString &path) const
   }
 }
 
-void StorageManager::set(Item* item, const QString& path)
+void Manager::set(Item* item, const QString& path)
 {
   if (!path.startsWith("/"))
     return;

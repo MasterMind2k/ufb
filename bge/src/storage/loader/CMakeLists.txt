@@ -4,10 +4,10 @@ include_directories(../.. ${CMAKE_CURRENT_BINARY_DIR} ${EIGEN2_INCLUDE_DIR} ${QT
 
 set(loader_SRCS
   abstractloader.cpp
-  loader3ds.cpp
-  textureloader.cpp
-  shaderloader.cpp
-  objloader.cpp
+  threeds.cpp
+  texture.cpp
+  shader.cpp
+  obj.cpp
 )
 
 add_library(loader ${loader_SRCS})

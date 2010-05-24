@@ -10,7 +10,7 @@
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
  ***************************************************************************/
-#include "storage/loader/loader3ds.h"
+#include "storage/loader/threeds.h"
 
 #include <QtCore/QFile>
 #include <QtCore/QStringList>
@@ -25,11 +25,11 @@ using namespace BGE;
 using namespace BGE::Storage;
 using namespace BGE::Storage::Loader;
 
-Item* Loader3DS::load()
+Item* ThreeDS::load()
 {
   QFile modelFile(filename());
   if (!modelFile.open(QFile::ReadOnly)) {
-    qWarning("BGE::Loader::Loader3DS::load(): Cannot open model '%s'.", filename().toUtf8().data());
+    qWarning("BGE::Storage::Loader::Loader3DS::load(): Cannot open model '%s'.", filename().toUtf8().data());
     return 0l;
   }
 
@@ -77,7 +77,7 @@ Item* Loader3DS::load()
       case 0x4000: {
         objectName = readString(modelFile);
 
-        qDebug("BGE::Loader::Loader3DS::parse(): Parsing object '%s'", objectName.toUtf8().data());
+        qDebug("BGE::Storage::Loader::Loader3DS::parse(): Parsing object '%s'", objectName.toUtf8().data());
         break;
       }
 
@@ -97,7 +97,7 @@ Item* Loader3DS::load()
           mesh->calculateNormals(objectName);
         free(coordinates);
 
-        qDebug("BGE::Loader::Loader3DS::parse(): Parsed %d vertices.", verticesNumber);
+        qDebug("BGE::Storage::Loader::Loader3DS::parse(): Parsed %d vertices.", verticesNumber);
         break;
       }
 
@@ -123,7 +123,7 @@ Item* Loader3DS::load()
         if (calculateNormals)
           mesh->calculateNormals(objectName);
 
-        qDebug("BGE::Loader::Loader3DS::parse(): Parsed %d faces.", facesNumber);
+        qDebug("BGE::Storage::Loader::Loader3DS::parse(): Parsed %d faces.", facesNumber);
         break;
       }
 
@@ -139,7 +139,7 @@ Item* Loader3DS::load()
         }
         faceMaterials.insert(objectName, mat);
 
-        qDebug("BGE::Loader::Loader3DS::parse(): Parsed %d material mappings for faces.", facesNum);
+        qDebug("BGE::Storage::Loader::Loader3DS::parse(): Parsed %d material mappings for faces.", facesNum);
         break;
       }
 
@@ -156,7 +156,7 @@ Item* Loader3DS::load()
         free(raw);
         mesh->addTextureMaps(objectName, textureMaps);
 
-        qDebug("BGE::Loader::Loader3DS::parse(): Parsed %d texture mappings for vertices.", verticesNumber);
+        qDebug("BGE::Storage::Loader::Loader3DS::parse(): Parsed %d texture mappings for vertices.", verticesNumber);
         break;
       }
 
@@ -167,7 +167,7 @@ Item* Loader3DS::load()
         mesh->addItem(material);
         materials.insert(materialName, material);
 
-        qDebug("BGE::Storage::Loader:Loader3DS::parse(): Parsing material '%s'.", materialName.toUtf8().data());
+        qDebug("BGE::Storage::Storage::Loader:Loader3DS::parse(): Parsing material '%s'.", materialName.toUtf8().data());
         break;
       }
 
@@ -251,7 +251,7 @@ Item* Loader3DS::load()
   return mesh;
 }
 
-QString Loader3DS::readString(QFile& file) const
+QString ThreeDS::readString(QFile& file) const
 {
   QString output;
   quint8 byte;
