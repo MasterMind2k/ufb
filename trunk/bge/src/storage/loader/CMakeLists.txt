@@ -8,6 +8,7 @@ set(loader_SRCS
   texture.cpp
   shader.cpp
   obj.cpp
+  audio.cpp
 )
 
 add_library(loader ${loader_SRCS})

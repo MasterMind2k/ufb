@@ -47,6 +47,7 @@ int main(int argc, char **argv)
   Q_INIT_RESOURCE(bge_resources);
 
   QApplication app(argc, argv);
+  QApplication::setApplicationName("UFB");
 
   // Set the scene size
   BGE::Canvas::SceneSize = Vector3f(100000, 100000, 100000);

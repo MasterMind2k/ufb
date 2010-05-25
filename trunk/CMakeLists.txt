@@ -10,4 +10,3 @@ ENDIF(NOT CMAKE_BUILD_TYPE)
 
 add_subdirectory(bge)
 add_subdirectory(src)
-
