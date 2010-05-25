@@ -68,6 +68,10 @@ class Object
      */
     void scale(const Scaling3f& scale);
     /**
+     * Sets the new scale
+     */
+    void setScale(const Scaling3f& scale);
+    /**
      * \overload
      */
     inline void scale(float sx, float sy, float sz)

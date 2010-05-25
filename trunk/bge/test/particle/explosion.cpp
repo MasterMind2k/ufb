@@ -19,7 +19,7 @@
 Explosion::Explosion(const Vector3f &position)
   : BGE::Scene::ParticleEmitter()
 {
-  setBoundingVolume(new BGE::Scene::BoundingVolume(Vector3f::Zero(), Vector3f(200, 200, 200)));
+  setBoundingVolume(new BGE::Scene::BoundingVolume(Vector3f::Zero(), Vector3f(80, 80, 80)));
 
   for (quint16 i = 0; i < 1000; i++) {
     BGE::Scene::Particle particle;

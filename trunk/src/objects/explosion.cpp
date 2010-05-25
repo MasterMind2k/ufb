@@ -29,12 +29,25 @@ Explosion::Explosion(const Vector3f &position, Sizes size)
   quint16 particles;
   switch (size) {
     case Large:
+      a = 1000;
+      speed = 400;
+      m_lifetime = 2000;
+      particles = 3000;
+      m_particleSize = 50.0;
+      break;
+    case Medium:
+      a = 600;
+      speed = 100;
+      m_lifetime = 1500;
+      particles = 400;
+      m_particleSize = 30.0;
       break;
     case Small:
       a = 400;
       speed = 40;
       m_lifetime = 1500;
-      particles = 500;
+      particles = 200;
+      m_particleSize = 5.0;
       break;
   }
 
@@ -42,7 +55,7 @@ Explosion::Explosion(const Vector3f &position, Sizes size)
 
   for (quint16 i = 0; i < particles; i++) {
     BGE::Scene::Particle particle;
-    particle.alpha = 5;
+    particle.alpha = m_particleSize;
     particle.colorWeight = 0;
     particle.lifetime = 0;
     particle.position = position;
@@ -59,8 +72,6 @@ Explosion::Explosion(const Vector3f &position, Sizes size)
   material->setDiffuse(QColor(40, 40, 40));
   addMaterial(material);
 
-  move(position);
-
   // Add light
   BGE::Scene::Light *light = BGE::Canvas::canvas()->createLight(QString("Explosive light_%0").arg((int) this));
   light->setAmbientColor(QColor(180, 96, 0));
@@ -68,6 +79,8 @@ Explosion::Explosion(const Vector3f &position, Sizes size)
   light->setSpecularColor(Qt::white);
   light->setQuadraticAttenuation(0.2);
   addChild(light);
+
+  move(position);
 }
 
 Explosion::~Explosion()
@@ -84,5 +97,5 @@ void Explosion::calculateParticle(BGE::Scene::Particle &particle, qint32 timeDif
   particle.position += particle.velocity * timeDiff / 1000.0;
   particle.velocity = particle.initialVelocity * (1.0 - (qreal) particle.lifetime / m_lifetime);
   if (particle.alpha > 0.0)
-    particle.alpha = 5.0 - (5.0 * (qreal) particle.lifetime / m_lifetime);
+    particle.alpha = m_particleSize - (m_particleSize * (qreal) particle.lifetime / m_lifetime);
 }

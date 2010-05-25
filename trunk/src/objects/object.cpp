@@ -79,3 +79,18 @@ qreal Object::distance(Object *object) const
     return BGE::Canvas::SceneSize.norm();
   }
 }
+
+void Object::applyCentralImpulse(const Vector3f &direction)
+{
+  m_body->applyCentralImpulse(btVector3(direction.x(), direction.y(), direction.z()));
+}
+
+void Object::applyCentralForce(const Vector3f &direction)
+{
+  m_body->applyCentralForce(btVector3(direction.x(), direction.y(), direction.z()));
+}
+
+void Object::setAngularVelocity(const Vector3f &velocity)
+{
+  m_body->setAngularVelocity(btVector3(velocity.x(), velocity.y(), velocity.z()));
+}

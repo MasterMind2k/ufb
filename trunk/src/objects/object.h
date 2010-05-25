@@ -46,6 +46,24 @@ class Object : public BGE::Scene::Object
       return m_mass;
     }
 
+    void applyCentralImpulse(const Vector3f &direction);
+    inline void applyCentralImpulse(qreal x, qreal y, qreal z)
+    {
+      applyCentralImpulse(Vector3f(x, y, z));
+    }
+
+    void applyCentralForce(const Vector3f &direction);
+    inline void applyCentralForce(qreal x, qreal y, qreal z)
+    {
+      applyCentralForce(Vector3f(x, y, z));
+    }
+
+    virtual void setAngularVelocity(const Vector3f &velocity);
+    inline void setAngularVelocity(qreal x, qreal y, qreal z)
+    {
+      setAngularVelocity(Vector3f(x, y, z));
+    }
+
   private:
     btRigidBody *m_body;
     qreal m_mass;

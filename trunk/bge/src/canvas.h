@@ -277,8 +277,10 @@ class Canvas : public QGLWidget
     QTimer *m_timer;
     qint32 m_totalElapsed;
     QQueue<Scene::Object*> m_deletionQueue;
+    QQueue<Scene::Object*> m_deferredAdd;
     QMutex m_renderLocker;
     bool m_mouseGrabbed;
+    bool m_rendering;
 
     Recorder *m_recorder;
     quint32 m_timeSinceSnap;

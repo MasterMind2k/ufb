@@ -14,6 +14,8 @@
 
 #include "BulletDynamics/Dynamics/btDynamicsWorld.h"
 #include "BulletDynamics/Dynamics/btRigidBody.h"
+#include "LinearMath/btDefaultMotionState.h"
+#include "BulletCollision/CollisionShapes/btBoxShape.h"
 
 #include "objects/fighter.h"
 #include "objects/asteroid.h"
@@ -70,6 +72,10 @@ void MenuController::execute()
     case MenuOverlay::Play: {
       Game *game = new Game();
       BGE::Canvas::canvas()->pushGameState(game);
+
+      // Create bounderies
+      setRestraints();
+
       Objects::Fighter *fighter = new Objects::Fighter;
       game->setFighter(fighter);
       fighter->rotateY(180);
@@ -162,8 +168,8 @@ void MenuController::execute()
 
 void MenuController::populateAsteroids()
 {
-  int max = BGE::Canvas::canvas()->SceneSize.x();
-  int min = BGE::Canvas::canvas()->SceneSize.x() / 2;
+  int max = BGE::Canvas::canvas()->SceneSize.x() / 1.5 - 2000;
+  int min = max / 2 + 4000;
   qsrand(time(0l));
   for (quint16 i = 0; i < 30; i++) {
     Objects::Asteroid *asteroid = new Objects::Asteroid(Objects::Asteroid::Large);
@@ -171,5 +177,65 @@ void MenuController::populateAsteroids()
     BGE::Canvas::canvas()->addSceneObject(asteroid);
 
     asteroid->initBody();
+    Vector3f velocity(qrand() % 60 - 30, qrand() % 60 - 30, qrand() % 60 - 30);
+    velocity = velocity.normalized() * (qrand() % 2000 + 800);
+    asteroid->body()->setLinearVelocity(btVector3(velocity.x(), velocity.y(), velocity.z()));
   }
+}
+
+void MenuController::setRestraints()
+{
+  qreal width = BGE::Canvas::canvas()->SceneSize.x();
+  btRigidBody::btRigidBodyConstructionInfo info(0, 0l, new btBoxShape(btVector3(width, width, 1)), btVector3(0, 0, 0));
+  btTransform transform;
+
+  // Front
+  transform.setIdentity();
+  transform.setOrigin(btVector3(0, 0, -width / 2.0));
+  info.m_motionState = new btDefaultMotionState(transform);
+  btRigidBody *boundry = new btRigidBody(info);
+  BGE::Canvas::canvas()->dynamicsWorld()->addRigidBody(boundry);
+  boundry->setRestitution(1.0);
+
+  // Behind
+  transform.setIdentity();
+  transform.setOrigin(btVector3(0, 0, width / 2.0));
+  info.m_motionState = new btDefaultMotionState(transform);
+  boundry = new btRigidBody(info);
+  BGE::Canvas::canvas()->dynamicsWorld()->addRigidBody(boundry);
+  boundry->setRestitution(1.0);
+
+  // Left
+  transform.setIdentity();
+  transform.setOrigin(btVector3(-width / 2.0, 0, 0));
+  info.m_motionState = new btDefaultMotionState(transform);
+  info.m_collisionShape = new btBoxShape(btVector3(1, width, width));
+  boundry = new btRigidBody(info);
+  BGE::Canvas::canvas()->dynamicsWorld()->addRigidBody(boundry);
+  boundry->setRestitution(1.0);
+
+  // Right
+  transform.setIdentity();
+  transform.setOrigin(btVector3(width / 2.0, 0, 0));
+  info.m_motionState = new btDefaultMotionState(transform);
+  boundry = new btRigidBody(info);
+  BGE::Canvas::canvas()->dynamicsWorld()->addRigidBody(boundry);
+  boundry->setRestitution(1.0);
+
+  // Top
+  transform.setIdentity();
+  transform.setOrigin(btVector3(0, width / 2.0, 0));
+  info.m_collisionShape = new btBoxShape(btVector3(width, 1, width));
+  info.m_motionState = new btDefaultMotionState(transform);
+  boundry = new btRigidBody(info);
+  BGE::Canvas::canvas()->dynamicsWorld()->addRigidBody(boundry);
+  boundry->setRestitution(1.0);
+
+  // Bottom
+  transform.setIdentity();
+  transform.setOrigin(btVector3(0, -width / 2.0, 0));
+  info.m_motionState = new btDefaultMotionState(transform);
+  boundry = new btRigidBody(info);
+  BGE::Canvas::canvas()->dynamicsWorld()->addRigidBody(boundry);
+  boundry->setRestitution(1.0);
 }

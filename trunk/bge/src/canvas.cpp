@@ -55,7 +55,8 @@ Canvas* Canvas::m_self = 0l;
 
 Canvas::Canvas()
 : QGLWidget(),
-  m_mouseGrabbed(false)
+  m_mouseGrabbed(false),
+  m_rendering(false)
 {
   m_frames = 0;
   m_fps = 0;
@@ -121,7 +122,10 @@ Canvas::Canvas()
 
 void Canvas::addSceneObject(Scene::Object* object)
 {
-  m_scene->addChild(object);
+  if (!m_rendering)
+    m_scene->addChild(object);
+  else
+    m_deferredAdd.enqueue(object);
 }
 
 Canvas* Canvas::canvas()
@@ -147,7 +151,7 @@ void Canvas::resizeGL(int w, int h)
   // Default perspective setup
   QMatrix4x4 projection;
   // Careful! Values are also used by v-f culling
-  projection.perspective(80, (qreal) w / (qreal) h, 0.1, SceneSize.norm());
+  projection.perspective(80, (qreal) w / (qreal) h, 0.1, SceneSize.norm() * 2);
   Matrix4d temp;
   memcpy(temp.data(), projection.data(), 16 * sizeof(qreal));
   Scene::Camera::m_projection.matrix() = temp.cast<float>();
@@ -158,6 +162,7 @@ void Canvas::paintGL()
   if (!m_renderLocker.tryLock(0))
     return;
 
+  m_rendering = true;
   m_timer->stop();
 
   qint32 elapsed = m_time->restart();
@@ -292,9 +297,15 @@ void Canvas::paintGL()
     m_recorder->enqueueImage(img);
   }
 
+  m_rendering = false;
+
   // Delete the marked for deletion
   while (!m_deletionQueue.isEmpty())
     delete m_deletionQueue.dequeue();
+
+  // Deferred adding objects
+  while (!m_deferredAdd.isEmpty())
+    addSceneObject(m_deferredAdd.dequeue());
 
   checkMouse();
   m_renderLocker.unlock();

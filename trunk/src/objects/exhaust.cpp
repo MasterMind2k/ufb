@@ -18,6 +18,7 @@
 
 #include "scene/boundingvolume.h"
 #include "scene/light.h"
+#include "scene/camera.h"
 
 #include "fighter.h"
 
