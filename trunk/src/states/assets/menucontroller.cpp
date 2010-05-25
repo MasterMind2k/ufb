@@ -180,6 +180,9 @@ void MenuController::populateAsteroids()
     Vector3f velocity(qrand() % 60 - 30, qrand() % 60 - 30, qrand() % 60 - 30);
     velocity = velocity.normalized() * (qrand() % 2000 + 800);
     asteroid->body()->setLinearVelocity(btVector3(velocity.x(), velocity.y(), velocity.z()));
+
+    velocity = Vector3f(qrand() % 60 - 30, qrand() % 60 - 30, qrand() % 60 - 30).normalized();
+    asteroid->body()->setAngularVelocity(btVector3(velocity.x(), velocity.y(), velocity.z()));
   }
 }
 
