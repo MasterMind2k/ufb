@@ -37,9 +37,16 @@ class Asteroid : public Object
 
   private:
     Sizes m_size;
+    qreal m_structuralIntegrity;
+    qint32 m_dyingElapsedTime;
+    bool m_exploded;
+    bool m_stabilized;
+    qint32 m_previousExplosion;
 
     void postTransformCalculations(qint32 timeDiff);
     void collision(BGE::Scene::Object *object);
+
+    void spawn();
 };
 
 }

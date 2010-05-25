@@ -58,7 +58,7 @@ class BoundingVolume
       m_transform = transform;
       m_isCacheValid = false;
     }
-    inline const Transform3f & transform() const
+    inline const Transform3f &transform() const
     {
       return m_transform;
     }

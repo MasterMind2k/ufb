@@ -38,7 +38,7 @@ void BoundingVolume::calculateTransformedCorners() const
 {
   m_transformedCorners.clear();
   foreach (Vector3f corner, m_corners)
-    m_transformedCorners << m_transform * corner;
+    m_transformedCorners << m_transform * (corner);
 
   m_isCacheValid = true;
 }

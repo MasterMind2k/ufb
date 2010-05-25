@@ -36,6 +36,7 @@ class MenuController : public BGE::AbstractController
 
     void execute();
     void populateAsteroids();
+    void setRestraints();
 };
 
 }

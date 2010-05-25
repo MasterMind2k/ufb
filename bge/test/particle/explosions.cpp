@@ -25,7 +25,7 @@ Explosions::Explosions(QObject *parent)
   m_timer = new QTimer(this);
 
   connect(m_timer, SIGNAL(timeout()), SLOT(ignite()));
-  m_timer->start(qrand() % 1000);
+  //m_timer->start(qrand() % 1000);
 
   ignite();
 }
@@ -35,5 +35,5 @@ void Explosions::ignite()
   Explosion *explosion = new Explosion(Vector3f(qrand() % 100 - 50, qrand() % 100 - 50, qrand() % 100 - 50));
   BGE::Canvas::canvas()->addSceneObject(explosion);
 
-  m_timer->start(qrand() % 1000);
+  //m_timer->start(qrand() % 1000);
 }

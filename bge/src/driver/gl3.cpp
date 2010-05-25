@@ -20,6 +20,7 @@
 
 #include "scene/object.h"
 #include "scene/light.h"
+#include "scene/camera.h"
 #include "scene/particleemitter.h"
 #include "scene/boundingvolume.h"
 
@@ -479,7 +480,8 @@ void GL3::draw(Scene::ParticleEmitter *emitter)
   if (Canvas::canvas()->drawBoundingVolumes()) {
     // Vertices
     BufferElement *temp = (BufferElement*) calloc(1, sizeof(BufferElement));
-    foreach (Vector3f corner, emitter->boundingVolume()->corners()) {
+    foreach (Vector3f corner, emitter->boundingVolume()->transformedCorners()) {
+      corner = m_transform * corner;
       memcpy(temp->vertex, corner.data(), 3 * sizeof(GLfloat));
       memcpy(verticesPtr, temp, sizeof(BufferElement));
       verticesPtr++;
@@ -517,15 +519,14 @@ void GL3::draw(Scene::ParticleEmitter *emitter)
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicesSize * sizeof(quint16), indices, GL_STREAM_DRAW);
   free(indices);
 
-  Transform3f backup = m_transform;
-  setTransformMatrix(Transform3f(Transform3f::Identity()));
-
   // Bind
   bindUniformAttribute("ProjectionMatrix", m_projectionMatrix);
   bindAttribute("Vertex", 3, GL_FLOAT, sizeof(BufferElement), VERTEX_OFFSET);
   bindAttribute("Normal", 3, GL_FLOAT, sizeof(BufferElement), NORMAL_OFFSET);
   bindAttribute("TexCoord", 2, GL_FLOAT, sizeof(BufferElement), UV_OFFSET);
 
+  Transform3f backup = m_transform;
+  setTransformMatrix(Transform3f(Transform3f::Identity()));
   // Do the actual drawing :)
   Storage::Material *particleMaterial = m_materials.value("Particles");
   foreach (ParticlePlan plan, plans) {
@@ -549,13 +550,12 @@ void GL3::draw(Scene::ParticleEmitter *emitter)
     delete material;
   }
 
-  setTransformMatrix(backup);
-
   // Draw Bounding volume
   if (Canvas::canvas()->drawBoundingVolumes()) {
     setMaterial(m_materials.value("BGE::BoundingVolume"));
     glDrawElements(GL_LINES, 24, GL_UNSIGNED_SHORT, (GLushort*)0 + indicesSize - 24);
   }
+  setTransformMatrix(backup);
   setMaterial(0l);
 
   // Unbind

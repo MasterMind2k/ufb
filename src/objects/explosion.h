@@ -22,6 +22,7 @@ class Explosion : public BGE::Scene::ParticleEmitter
   public:
     enum Sizes {
       Large,
+      Medium,
       Small
     };
     Explosion(const Vector3f &position, Sizes size);
@@ -30,6 +31,7 @@ class Explosion : public BGE::Scene::ParticleEmitter
   private:
     void calculateParticle(BGE::Scene::Particle &particle, qint32 timeDiff);
     qreal m_lifetime;
+    qreal m_particleSize;
 };
 
 }

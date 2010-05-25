@@ -42,6 +42,8 @@ class AsteroidList
     {
       m_asteroids.removeOne(asteroid);
       m_transformedPositions.remove(asteroid);
+      if (m_nearestAsteroid == asteroid)
+        m_nearestAsteroid = 0l;
     }
     inline const QList<Asteroid*> &asteroids() const
     {
