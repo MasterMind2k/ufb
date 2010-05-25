@@ -59,4 +59,8 @@
   <file alias="Galaxy_RT.png">resources/skybox/space_rt.png</file>
   <file alias="Galaxy_UP.png">resources/skybox/space_up.png</file>
 </qresource>
+
+<qresource prefix="/sounds/">
+  <file alias="laser.mp3">resources/sounds/laser.mp3</file>
+</qresource>
 </RCC>

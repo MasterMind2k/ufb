@@ -8,6 +8,7 @@ set(storage_SRCS
   shader.cpp
   shaderprogram.cpp
   material.cpp
+  audio.cpp
 )
 
 add_library(storage ${storage_SRCS})

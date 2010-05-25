@@ -20,11 +20,9 @@
 #include "storage/loader/obj.h"
 #include "storage/loader/texture.h"
 #include "storage/loader/shader.h"
+#include "storage/loader/audio.h"
 
 #include "storage/item.h"
-#include "storage/mesh.h"
-#include "storage/texture.h"
-#include "storage/shader.h"
 
 using namespace BGE;
 using namespace BGE::Storage;
@@ -83,6 +81,10 @@ void Manager::load()
         // Load shaders
         qDebug("BGE::Storage::Manager::load(): Loading shader '%s'", absoluteFilePath.toUtf8().data());
         loader = new Loader::Shader(absoluteFilePath);
+      } else if (filename.endsWith(".mp3") || filename.endsWith(".wav")) {
+        // Load audio
+        qDebug("BGE::Storage::Manager::load(): Loading audio '%s'", absoluteFilePath.toUtf8().data());
+        loader = new Loader::Audio(absoluteFilePath);
       }
 
       if (loader) {
