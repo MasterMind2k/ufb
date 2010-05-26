@@ -40,9 +40,11 @@ void HUD::paint(QPainter *painter, qint32 elapsed)
     return;
 
   QSizeF size = BGE::Canvas::canvas()->size();
-  QColor green(0, 255, 0, 150);
-  QColor red(255, 0, 0, 150);
-  painter->setPen(green);
+  QColor greenPen(0, 255, 0, 150);
+  QColor green(0, 255, 0, 40);
+  QColor redPen(255, 0, 0, 150);
+  QColor red(255, 0, 0, 40);
+  painter->setPen(greenPen);
   painter->setBrush(Qt::NoBrush);
 
   // Center cross
@@ -61,7 +63,7 @@ void HUD::paint(QPainter *painter, qint32 elapsed)
   rect.moveTo(rect.left(), 160 - rect.height());
   painter->save();
   painter->setPen(Qt::NoPen);
-  painter->setBrush(QColor(0, 255, 0, 150));
+  painter->setBrush(green);
   painter->drawRect(rect);
   painter->restore();
 
@@ -75,7 +77,7 @@ void HUD::paint(QPainter *painter, qint32 elapsed)
   font.setPointSize(20);
   painter->setFont(font);
   paintStatus(painter, QRectF(0, 0, 500, 50), "Shields: " + QString::number(m_fighter->shields()) + "%");
-  painter->setPen(red);
+  painter->setPen(redPen);
   paintStatus(painter, QRectF(0, 50, 500, 50), "Hull: " + QString::number(m_fighter->hullIntegrity()) + "%");
   painter->restore();
 
@@ -94,9 +96,9 @@ void HUD::paint(QPainter *painter, qint32 elapsed)
 
     // Set color (Red - Fighter, green - other)
     if (object->name() == "Fighter")
-      painter->setPen(red);
+      painter->setPen(redPen);
     else
-      painter->setPen(green);
+      painter->setPen(greenPen);
 
     pos.x() = size.width() * ((pos.x() + 1.0) / 2.0);
     pos.y() = size.height() - size.height() * ((pos.y() + 1.0) / 2.0);
@@ -131,7 +133,7 @@ void HUD::paint(QPainter *painter, qint32 elapsed)
 
   // Direction to nearest fighter
   nearest = Util::ObjectList::self()->nearest("Fighter");
-  painter->setPen(red);
+  painter->setPen(redPen);
   painter->setBrush(red);
   if (nearest)
     paintNearestArrow(painter, nearest, size);
@@ -162,9 +164,11 @@ void HUD::paintNearestArrow(QPainter *painter, Objects::Object *nearest, const Q
   else
     y = false;
 
+  if ((BGE::Canvas::canvas()->activeCamera()->cameraTransform() * nearest->globalPosition()).z() > 0)
+    painter->setBrush(Qt::NoBrush);
+
   // Draw the arrow if we dont see the object
   if (x || y) {
-    painter->setBrush(Qt::NoBrush);
     qreal angle = 0;
     if (x && y) {
       if (pos.x() > 0 && pos.y() > 0)
@@ -199,8 +203,6 @@ void HUD::paintNearestArrow(QPainter *painter, Objects::Object *nearest, const Q
 
     painter->drawPolygon(arrow);
   } else {
-    if ((BGE::Canvas::canvas()->activeCamera()->cameraTransform() * nearest->globalPosition()).z() > 0)
-      painter->setBrush(Qt::NoBrush);
     // Otherwise make a circle
     painter->drawEllipse(pos.x() - 15, pos.y() - 15, 30, 30);
   }
