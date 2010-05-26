@@ -69,6 +69,16 @@ void HUD::paint(QPainter *painter, qint32 elapsed)
   rect.moveTo(rect.left(), 160 - rect.height());
   painter->drawRect(rect);
 
+  // Shields power
+  painter->save();
+  QFont font;
+  font.setPointSize(20);
+  painter->setFont(font);
+  paintStatus(painter, QRectF(0, 0, 500, 50), "Shields: " + QString::number(m_fighter->shields()) + "%");
+  painter->setPen(red);
+  paintStatus(painter, QRectF(0, 50, 500, 50), "Hull: " + QString::number(m_fighter->hullIntegrity()) + "%");
+  painter->restore();
+
   // Paint distances
   painter->save();
   Util::ObjectList::self()->sort();
@@ -194,4 +204,11 @@ void HUD::paintNearestArrow(QPainter *painter, Objects::Object *nearest, const Q
     // Otherwise make a circle
     painter->drawEllipse(pos.x() - 15, pos.y() - 15, 30, 30);
   }
+}
+
+void HUD::paintStatus(QPainter *painter, const QRectF &geometry, const QString &text)
+{
+  // Draw text
+  QRectF textRect = painter->boundingRect(geometry, Qt::AlignLeft | Qt::AlignVCenter, text);
+  painter->drawText(textRect, text);
 }

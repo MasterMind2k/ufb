@@ -61,14 +61,29 @@ class Fighter : public Object
 
     static const qreal MaxPower = 1000000;
     static const qreal MaxVelocity = 1435;
+    static const quint16 ShieldsRechargeTime = 2000;
+    static const float ShieldsRechargeTick = 10.0f;
+
+    inline float hullIntegrity() const
+    {
+      return m_hullIntegrity;
+    }
+    inline float shields() const
+    {
+      return m_shields;
+    }
 
   private:
     qreal m_enginePower;
     Vector3f m_angularVelocity;
     QTime m_previousShot;
+    QTime m_shieldsRecharge;
     Util::Ai *m_ai;
+    float m_shields;
+    float m_hullIntegrity;
 
     void calculateTransforms(qint32 timeDiff);
+    void collision(BGE::Scene::Object *object);
 };
 
 }

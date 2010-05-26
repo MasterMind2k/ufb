@@ -45,6 +45,8 @@ Bullet::Bullet()
   light->setSpecularColor(Qt::white);
   light->setQuadraticAttenuation(0.000001);
   addChild(light);
+
+  setName("Laser");
 }
 
 void Bullet::postTransformCalculations(qint32 timeDiff)
