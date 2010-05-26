@@ -11,6 +11,7 @@ ENDIF(CMAKE_BUILD_TYPE STREQUAL Debug)
 
 add_subdirectory(objects)
 add_subdirectory(states)
+add_subdirectory(util)
 
 set(ufb_SRCS
   main.cpp

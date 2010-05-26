@@ -9,3 +9,4 @@ set(objects_SRCS
 )
 
 add_library(objects ${objects_SRCS})
+target_link_libraries(objects util)

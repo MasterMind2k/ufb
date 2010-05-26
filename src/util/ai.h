@@ -10,48 +10,58 @@
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
  ***************************************************************************/
-#ifndef STATES_ASSETS_CONTROLLER_H
-#define STATES_ASSETS_CONTROLLER_H
+#ifndef AI_H
+#define AI_H
 
-#include "abstractcontroller.h"
-
-#include <QtCore/QObject>
-#include <QtCore/QTime>
-
-class QTimer;
+#include "global.h"
 
 namespace Objects {
 class Fighter;
 }
 
-namespace States {
-namespace Assets {
+namespace Util {
 
-class Controller : public QObject, public BGE::AbstractController
+class Ai
 {
-  Q_OBJECT
   public:
-    Controller();
+    inline Ai(Objects::Fighter *target) : m_target(target) {}
 
-    inline void setFighter(Objects::Fighter *fighter)
+    void calculateAngularVelocity();
+
+    inline void setControlled(Objects::Fighter *controlled)
     {
-      m_fighter = fighter;
+      m_controlled = controlled;
     }
 
-    void keyPressed(QKeyEvent *event);
-    void mouseMoved(QMouseEvent *event);
-    void mouseButtonPressed(QMouseEvent *event);
-    void mouseButtonReleased(QMouseEvent *event);
-
   private:
-    Objects::Fighter *m_fighter;
-    QTimer *m_timer;
+    Objects::Fighter *m_target;
+    Objects::Fighter *m_controlled;
 
-  private slots:
-    void fire();
+    inline static float roll(const Vector3f &target)
+    {
+      float roll = 0;
+      Vector3f rollVector = Vector3f(target.x(), target.y(), 0).normalized();
+      if (rollVector != Vector3f::UnitY()) {
+        roll = acos(rollVector.dot(Vector3f::UnitY()));
+
+        roll *= rollVector.cross(Vector3f::UnitY()).z() > 0 ? -1 : 1;
+      }
+      return roll;
+    }
+
+    inline static float pitch(const Vector3f &target)
+    {
+      float pitch = 0;
+
+      Vector3f normalized = Vector3f(0, target.y(), target.z()).normalized();
+      pitch = acos(normalized.dot(-Vector3f::UnitZ()));
+
+      pitch *= normalized.cross(-Vector3f::UnitZ()).x() > 0 ? -1 : 1;
+
+      return pitch;
+    }
 };
 
-}
 }
 
 #endif
