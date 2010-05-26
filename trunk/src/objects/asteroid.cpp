@@ -24,7 +24,8 @@
 #include "storage/mesh.h"
 #include "storage/texture.h"
 
-#include "asteroidlist.h"
+#include "util/objectlist.h"
+
 #include "explosion.h"
 
 using namespace Objects;
@@ -45,7 +46,7 @@ Asteroid::Asteroid(Sizes size)
 
   setTexture(BGE::Storage::Manager::self()->get<BGE::Storage::Texture*>("/asteroids/textures/" + mesh()->name()));
 
-  AsteroidList::self()->addAsteroid(this);
+  Util::ObjectList::self()->addAsteroid(this);
 
   switch (m_size) {
     case Large:
@@ -63,6 +64,9 @@ Asteroid::Asteroid(Sizes size)
       m_structuralIntegrity = 150;
       break;
   }
+
+  setName("Asteroid");
+  setRegistered(true);
 }
 
 qreal Asteroid::radius() const
@@ -91,10 +95,10 @@ void Asteroid::postTransformCalculations(qint32 timeDiff)
     }
   }
 
+  if (m_structuralIntegrity <= 0.0) {
+    // Let's remove ourselves from the list
+    setRegistered(false);
 
-  if (m_structuralIntegrity > 0.0) {
-    AsteroidList::self()->setPosition(this, BGE::Scene::Camera::projection() * BGE::Canvas::canvas()->activeCamera()->cameraTransform() * globalPosition());
-  } else {
     // Dying animation :)
     m_dyingElapsedTime += timeDiff;
     qreal distance = boundingVolume()->radius();
@@ -130,6 +134,8 @@ void Asteroid::postTransformCalculations(qint32 timeDiff)
       BGE::Canvas::canvas()->deleteSceneObject(this);
     }
   }
+
+  Object::postTransformCalculations(timeDiff);
 }
 
 void Asteroid::collision(BGE::Scene::Object *object)
@@ -139,10 +145,6 @@ void Asteroid::collision(BGE::Scene::Object *object)
     return;
 
   m_structuralIntegrity -= 10;
-
-  // Dead!
-  if (m_structuralIntegrity <= 0.0)
-    AsteroidList::self()->removeAsteroid(this);
 }
 
 void Asteroid::spawn()

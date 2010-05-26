@@ -48,6 +48,8 @@ Object::Object()
   m_observed = 0l;
   m_partition = 0l;
   m_boundingVolume = new BoundingVolume;
+
+  m_name = "Object";
 }
 
 Object::~Object()

@@ -44,6 +44,8 @@ Fighter::Fighter(Util::Ai *ai)
 
   // Laser reload
   m_previousShot.start();
+
+  setName("Fighter");
 }
 
 void Fighter::initBody()

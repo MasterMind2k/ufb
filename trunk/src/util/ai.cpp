@@ -16,7 +16,10 @@
 
 #include "canvas.h"
 
+#include "scene/boundingvolume.h"
 #include "scene/partition.h"
+
+#include "objectlist.h"
 
 #include "objects/fighter.h"
 #include "objects/asteroid.h"
@@ -40,49 +43,7 @@ void Ai::calculateAngularVelocity()
     engine = 0;
 
   // Make it avoid evil asteroids!
-  float min = 15000.0; // This is considered safe distance
-  Objects::Asteroid *nearest = 0l;
-  BGE::Scene::Partition *currentParent = 0l;
-  QQueue<BGE::Scene::Object*> objects;
-  objects.append(m_controlled->partition()->objects());
-  while (!objects.isEmpty()) {
-    BGE::Scene::Object *object = objects.dequeue();
-    Objects::Asteroid *asteroid = dynamic_cast<Objects::Asteroid*> (object);
-    if (!asteroid) {
-      // Widen the search, if we didn't find any nearest asteroids
-      if (objects.isEmpty() && object->partition()->parent()) {
-        if (object->partition()->parent() != currentParent) {
-          currentParent = object->partition()->parent();
-        foreach (BGE::Scene::Partition *partition, object->partition()->parent()->partitions()) {
-          if (partition == object->partition())
-            continue;
-
-          // Add only objects that are closer than min
-          foreach (BGE::Scene::Object *object, partition->objects()) {
-            if ((object->globalPosition() - m_controlled->globalPosition()).norm() < min)
-              objects.enqueue(object);
-          }
-        }
-        } else {
-        // Same for parent partition
-        foreach (BGE::Scene::Object *object, object->partition()->parent()->objects()) {
-          if ((object->globalPosition() - m_controlled->globalPosition()).norm() < min)
-            objects.enqueue(object);
-        }
-        }
-      }
-
-      continue;
-    }
-
-    // Let's find our minimum
-    float distance = (asteroid->globalPosition() - m_controlled->globalPosition()).norm();
-    if (distance < min) {
-      // A ne nearest asteroid!
-      min = distance;
-      nearest = asteroid;
-    }
-  }
+  Objects::Object *nearest = ObjectList::self()->nearest(m_controlled, "Asteroid", 15000); // 15000 is considered safe distance
 
   // We should have nearest asteroid (if not, then there is no in close range, or there is a bug and fighter will crash :D )
   if (nearest) {
@@ -94,7 +55,7 @@ void Ai::calculateAngularVelocity()
       Vector3f normalized;
       if (pitch < 0) {
         // Go below
-        normalized = (asteroid - Vector3f(0, nearest->radius() + 100, 0)).normalized();
+        normalized = (asteroid - Vector3f(0, nearest->boundingVolume()->radius() + 100, 0)).normalized();
         float newPitch = -acos(Vector3f(0, normalized.y(), normalized.z()).dot(-Vector3f::UnitZ()));
         if (newPitch < pitch) {
           pitch = newPitch;
@@ -102,7 +63,7 @@ void Ai::calculateAngularVelocity()
         }
       } else {
         // Go over
-        normalized = (asteroid + Vector3f(0, nearest->radius() - 100, 0)).normalized();
+        normalized = (asteroid + Vector3f(0, nearest->boundingVolume()->radius() - 100, 0)).normalized();
         float newPitch = acos(Vector3f(0, normalized.y(), normalized.z()).dot(-Vector3f::UnitZ()));
         if (newPitch > pitch) {
           pitch = newPitch;
@@ -117,7 +78,7 @@ void Ai::calculateAngularVelocity()
   }
 
   // Some actions
-  if (m_controlled->distance(m_target) < 30000 && qAbs(pitch) < 5.0 * M_PI / 180.0 && qAbs(roll) < 5.0 * M_PI / 180.0)
+  if (m_controlled->distance(m_target) < 30000 && qAbs(pitch) < 5.0 * M_PI / 180.0)
     m_controlled->fire();
 
   // Stabilizing

@@ -394,6 +394,11 @@ class Object
       return m_partition;
     }
 
+    inline const QString &name() const
+    {
+      return m_name;
+    }
+
   protected:
     /**
      * This method gets called _before_ transform matrices get updated. Reimplement
@@ -421,6 +426,11 @@ class Object
 
     virtual inline void collision(Object *object) {}
 
+    inline void setName(const QString &name)
+    {
+      m_name = name;
+    }
+
   private:
     Transform3f m_transform;
     Transform3f m_globalTransform;
@@ -435,6 +445,7 @@ class Object
     bool m_transformModified;
     bool m_isRenderable;
     bool m_isCulled;
+    QString m_name;
 
     Storage::Mesh* m_mesh;
     QHash<QString, Storage::Material*> m_materials;
