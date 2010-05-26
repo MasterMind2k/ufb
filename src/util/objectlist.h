@@ -10,65 +10,69 @@
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
  ***************************************************************************/
-#ifndef OBJECTS_ASTEROIDLIST_H
-#define OBJECTS_ASTEROIDLIST_H
+#ifndef UTIL_OBJECTLIST_H
+#define UTIL_OBJECTLIST_H
 
 #include "global.h"
 
 #include <QtCore/QList>
 
 namespace Objects {
-class Asteroid;
+class Object;
+}
 
-class AsteroidList
+namespace Util {
+
+class ObjectList
 {
   public:
-    AsteroidList();
+    ObjectList();
 
-    static inline AsteroidList *self()
+    static inline ObjectList *self()
     {
       if (!m_self)
-        m_self = new AsteroidList;
+        m_self = new ObjectList;
       return m_self;
     }
 
-    void setPosition(Asteroid *asteroid, const Vector3f &position);
+    void setPosition(Objects::Object *asteroid, const Vector3f &position);
 
-    inline void addAsteroid(Asteroid *asteroid)
+    inline void addAsteroid(Objects::Object *asteroid)
     {
-      m_asteroids << asteroid;
+      m_objects << asteroid;
     }
-    inline void removeAsteroid(Asteroid *asteroid)
+    inline void removeAsteroid(Objects::Object *asteroid)
     {
-      m_asteroids.removeOne(asteroid);
+      m_objects.removeOne(asteroid);
       m_transformedPositions.remove(asteroid);
       if (m_nearestAsteroid == asteroid)
         m_nearestAsteroid = 0l;
     }
-    inline const QList<Asteroid*> &asteroids() const
+    inline const QList<Objects::Object*> &asteroids() const
     {
-      return m_asteroids;
+      return m_objects;
     }
 
     void sort();
 
-    const QHash<Asteroid*, Vector3f> &transformedPositions() const
+    const QHash<Objects::Object*, Vector3f> &transformedPositions() const
     {
       return m_transformedPositions;
     }
 
-    inline Asteroid *nearestAsteroid() const
+    inline Objects::Object *nearestAsteroid() const
     {
       return m_nearestAsteroid;
     }
+    Objects::Object *nearest(Objects::Object *reference, const QString &name = QString(), float maxRange = 0) const;
 
   private:
-    QList<Asteroid*> m_asteroids;
-    QHash<Asteroid*, Vector3f> m_transformedPositions;
-    Asteroid *m_nearestAsteroid;
+    QList<Objects::Object*> m_objects;
+    QHash<Objects::Object*, Vector3f> m_transformedPositions;
+    Objects::Object *m_nearestAsteroid;
     float m_distance;
 
-    static AsteroidList *m_self;
+    static ObjectList *m_self;
 };
 
 }

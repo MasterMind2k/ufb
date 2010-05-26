@@ -19,9 +19,10 @@
 #include "scene/camera.h"
 #include "scene/boundingvolume.h"
 
+#include "util/objectlist.h"
+
 #include "objects/fighter.h"
 #include "objects/bullet.h"
-#include "objects/asteroidlist.h"
 #include "objects/asteroid.h"
 
 using namespace States;
@@ -67,9 +68,10 @@ void HUD::paint(QPainter *painter, qint32 elapsed)
   painter->drawRect(rect);
 
   // Paint distances
-  Objects::AsteroidList::self()->sort();
-  foreach (Objects::Asteroid *asteroid, Objects::AsteroidList::self()->asteroids()) {
-    Vector3f pos = Objects::AsteroidList::self()->transformedPositions().value(asteroid);
+  Util::ObjectList::self()->sort();
+  foreach (Objects::Object *object, Util::ObjectList::self()->asteroids()) {
+    Objects::Asteroid *asteroid = static_cast<Objects::Asteroid*> (object);
+    Vector3f pos = Util::ObjectList::self()->transformedPositions().value(asteroid);
     if (pos.z() < -1 || pos.z() > 1)
       break;
 
@@ -103,9 +105,9 @@ void HUD::paint(QPainter *painter, qint32 elapsed)
   }
 
   // Direction to nearest asteroid
-  Objects::Asteroid *nearest = Objects::AsteroidList::self()->nearestAsteroid();
+  Objects::Asteroid *nearest = static_cast<Objects::Asteroid*> (Util::ObjectList::self()->nearestAsteroid());
   if (nearest) {
-    Vector3f pos = Objects::AsteroidList::self()->transformedPositions().value(nearest);
+    Vector3f pos = Util::ObjectList::self()->transformedPositions().value(nearest);
     pos.x() = size.width() * ((pos.x() + 1.0) / 2.0);
     pos.y() = size.height() - size.height() * ((pos.y() + 1.0) / 2.0);
 

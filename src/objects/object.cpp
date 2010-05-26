@@ -24,7 +24,11 @@
 #include "storage/manager.h"
 #include "storage/mesh.h"
 
+#include "scene/camera.h"
+
 #include "motionstate.h"
+
+#include "util/objectlist.h"
 
 using namespace Objects;
 
@@ -32,7 +36,8 @@ btVoronoiSimplexSolver Object::m_solver;
 
 Object::Object()
   : m_body(0),
-    m_mass(1.0)
+    m_mass(1.0),
+    m_registered(false)
 {
 }
 
@@ -93,4 +98,17 @@ void Object::applyCentralForce(const Vector3f &direction)
 void Object::setAngularVelocity(const Vector3f &velocity)
 {
   m_body->setAngularVelocity(btVector3(velocity.x(), velocity.y(), velocity.z()));
+}
+
+void Object::setRegistered(bool registered)
+{
+  m_registered = registered;
+  if (!m_registered)
+    Util::ObjectList::self()->removeAsteroid(this);
+}
+
+void Object::postTransformCalculations(qint32 timeDiff)
+{
+  if (m_registered)
+    Util::ObjectList::self()->setPosition(this, BGE::Scene::Camera::projection() * BGE::Canvas::canvas()->activeCamera()->cameraTransform() * globalPosition());
 }

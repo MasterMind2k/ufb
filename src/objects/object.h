@@ -64,10 +64,15 @@ class Object : public BGE::Scene::Object
       setAngularVelocity(Vector3f(x, y, z));
     }
 
+  protected:
+    void setRegistered(bool registered);
+    void postTransformCalculations(qint32 timeDiff);
+
   private:
     btRigidBody *m_body;
     qreal m_mass;
     static btVoronoiSimplexSolver m_solver;
+    bool m_registered;
 };
 
 }
