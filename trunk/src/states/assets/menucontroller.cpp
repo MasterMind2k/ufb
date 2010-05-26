@@ -17,6 +17,8 @@
 #include "LinearMath/btDefaultMotionState.h"
 #include "BulletCollision/CollisionShapes/btBoxShape.h"
 
+#include "util/ai.h"
+
 #include "objects/fighter.h"
 #include "objects/asteroid.h"
 
@@ -78,7 +80,6 @@ void MenuController::execute()
 
       Objects::Fighter *fighter = new Objects::Fighter;
       game->setFighter(fighter);
-      fighter->rotateY(180);
       fighter->initBody();
       BGE::Canvas::canvas()->addSceneObject(fighter);
       populateAsteroids();
@@ -106,6 +107,14 @@ void MenuController::execute()
       BGE::Canvas::canvas()->light("Global light")->setPosition(0, 0, -1);
       //BGE::Canvas::canvas()->camera("Global camera")->move(0, 600, 0);
       //BGE::Canvas::canvas()->camera("Global camera")->rotateX(-90);
+
+      // Add Ai fighter
+      Util::Ai *ai = new Util::Ai(fighter);
+      fighter = new Objects::Fighter(ai);
+      ai->setControlled(fighter);
+      fighter->move(0, -10000, 0);
+      fighter->initBody();
+      BGE::Canvas::canvas()->addSceneObject(fighter);
 
       // Create skybox for game
       // Front
@@ -178,7 +187,7 @@ void MenuController::populateAsteroids()
 
     asteroid->initBody();
     Vector3f velocity(qrand() % 60 - 30, qrand() % 60 - 30, qrand() % 60 - 30);
-    velocity = velocity.normalized() * (qrand() % 2000 + 800);
+    velocity = velocity.normalized() * (qrand() % 1000 + 800);
     asteroid->body()->setLinearVelocity(btVector3(velocity.x(), velocity.y(), velocity.z()));
 
     velocity = Vector3f(qrand() % 60 - 30, qrand() % 60 - 30, qrand() % 60 - 30).normalized();

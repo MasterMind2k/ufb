@@ -29,7 +29,6 @@ Controller::Controller()
 {
   m_timer = new QTimer(this);
   m_timer->setInterval(500);
-  m_previousShot.start();
   connect(m_timer, SIGNAL(timeout()), SLOT(fire()));
 }
 
@@ -94,8 +93,7 @@ void Controller::mouseButtonPressed(QMouseEvent *event)
 
   switch (event->button()) {
     case Qt::LeftButton:
-      if (m_previousShot.elapsed() > m_timer->interval())
-        fire();
+      fire();
       m_timer->start();
       break;
   }
@@ -119,5 +117,4 @@ void Controller::fire()
     return;
 
   m_fighter->fire();
-  m_previousShot.restart();
 }

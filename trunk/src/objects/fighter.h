@@ -15,12 +15,18 @@
 
 #include "object.h"
 
+#include <QtCore/QTime>
+
+namespace Util{
+class Ai;
+}
+
 namespace Objects {
 
 class Fighter : public Object
 {
   public:
-    Fighter();
+    Fighter(Util::Ai *ai = 0l);
 
     inline void setEnginePower(qreal enginePower)
     {
@@ -59,6 +65,8 @@ class Fighter : public Object
   private:
     qreal m_enginePower;
     Vector3f m_angularVelocity;
+    QTime m_previousShot;
+    Util::Ai *m_ai;
 
     void calculateTransforms(qint32 timeDiff);
 };

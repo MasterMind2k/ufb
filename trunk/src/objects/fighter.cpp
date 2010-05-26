@@ -18,12 +18,15 @@
 #include "storage/mesh.h"
 #include "storage/texture.h"
 
+#include "util/ai.h"
+
 #include "bullet.h"
 #include "exhaust.h"
 
 using namespace Objects;
 
-Fighter::Fighter()
+Fighter::Fighter(Util::Ai *ai)
+  : m_ai(ai)
 {
   setMesh(BGE::Storage::Manager::self()->get<BGE::Storage::Mesh*>("/fighters/models/fighter"));
   loadMaterialsFromMesh();
@@ -38,6 +41,9 @@ Fighter::Fighter()
   child(0)->move(18, 50, 240);
   addChild(new Exhaust(this));
   child(1)->move(-18, 50, 240);
+
+  // Laser reload
+  m_previousShot.start();
 }
 
 void Fighter::initBody()
@@ -48,10 +54,15 @@ void Fighter::initBody()
 
 void Fighter::fire()
 {
+  if (m_previousShot.elapsed() < 500)
+    return;
+  else
+    m_previousShot.restart();
+
   // Right bullet
   Bullet *bullet = new Bullet;
   bullet->setOrientation(globalOrientation());
-  bullet->move(globalPosition() + globalOrientation() * Vector3f(150, -10, 0));
+  bullet->move(globalPosition() + globalOrientation() * Vector3f(150, 0, -450));
 
   parent()->addChild(bullet);
   bullet->initBody();
@@ -64,7 +75,7 @@ void Fighter::fire()
   // Left bullet
   bullet = new Bullet;
   bullet->setOrientation(globalOrientation());
-  bullet->move(globalPosition() + globalOrientation() * Vector3f(-150, -10, 0));
+  bullet->move(globalPosition() + globalOrientation() * Vector3f(-150, 0, -450));
 
   parent()->addChild(bullet);
   bullet->initBody();
@@ -76,6 +87,9 @@ void Fighter::fire()
 void Fighter::calculateTransforms(qint32 timeDiff)
 {
   Q_UNUSED(timeDiff);
+
+  if (m_ai)
+    m_ai->calculateAngularVelocity();
 
   Vector3f enginePower = globalOrientation() * Vector3f(0, 0, -m_enginePower);
   body()->applyCentralForce(btVector3(enginePower.x(), enginePower.y(), enginePower.z()));
