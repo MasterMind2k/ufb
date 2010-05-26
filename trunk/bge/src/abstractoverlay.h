@@ -13,6 +13,8 @@
 #ifndef __BGE_ABSTRACTOVERLAY_H
 #define __BGE_ABSTRACTOVERLAY_H
 
+#include "global.h"
+
 #include <QtCore/QObject>
 
 class QPainter;

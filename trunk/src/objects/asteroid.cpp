@@ -45,9 +45,6 @@ Asteroid::Asteroid(Sizes size)
   scale(radius() / boundingVolume()->radius());
 
   setTexture(BGE::Storage::Manager::self()->get<BGE::Storage::Texture*>("/asteroids/textures/" + mesh()->name()));
-
-  Util::ObjectList::self()->addAsteroid(this);
-
   switch (m_size) {
     case Large:
       setMass(2000);

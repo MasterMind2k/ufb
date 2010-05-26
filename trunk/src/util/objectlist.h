@@ -35,20 +35,22 @@ class ObjectList
       return m_self;
     }
 
-    void setPosition(Objects::Object *asteroid, const Vector3f &position);
+    void setPosition(Objects::Object *object, const Vector3f &position);
 
-    inline void addAsteroid(Objects::Object *asteroid)
+    inline void add(Objects::Object *object)
     {
-      m_objects << asteroid;
+      m_objects << object;
     }
-    inline void removeAsteroid(Objects::Object *asteroid)
+    inline void remove(Objects::Object *object)
     {
-      m_objects.removeOne(asteroid);
-      m_transformedPositions.remove(asteroid);
-      if (m_nearestAsteroid == asteroid)
+      m_objects.removeOne(object);
+      m_transformedPositions.remove(object);
+      if (m_nearestAsteroid == object)
         m_nearestAsteroid = 0l;
+      else if (m_nearestFighter == object)
+        m_nearestFighter = 0l;
     }
-    inline const QList<Objects::Object*> &asteroids() const
+    inline const QList<Objects::Object*> &objects() const
     {
       return m_objects;
     }
@@ -60,17 +62,28 @@ class ObjectList
       return m_transformedPositions;
     }
 
-    inline Objects::Object *nearestAsteroid() const
+    /**
+     * Nearest object relative to the player.
+     */
+    inline Objects::Object *nearest(const QString &name) const
     {
-      return m_nearestAsteroid;
+      if (name == "Asteroid")
+        return m_nearestAsteroid;
+      else
+        return m_nearestFighter;
     }
+    /**
+     * Nearest object relative to the reference object.
+     */
     Objects::Object *nearest(Objects::Object *reference, const QString &name = QString(), float maxRange = 0) const;
 
   private:
     QList<Objects::Object*> m_objects;
     QHash<Objects::Object*, Vector3f> m_transformedPositions;
     Objects::Object *m_nearestAsteroid;
-    float m_distance;
+    Objects::Object *m_nearestFighter;
+    float m_distanceAsteroid;
+    float m_distanceFighter;
 
     static ObjectList *m_self;
 };

@@ -44,18 +44,34 @@ ObjectList::ObjectList()
   m_nearestAsteroid = 0l;
 }
 
-void ObjectList::setPosition(Objects::Object *asteroid, const Vector3f &position)
+void ObjectList::setPosition(Objects::Object *object, const Vector3f &position)
 {
-  m_transformedPositions.insert(asteroid, position);
+  m_transformedPositions.insert(object, position);
+  float distance = (BGE::Canvas::canvas()->activeCamera()->globalPosition() - object->globalPosition()).norm() - object->boundingVolume()->radius();
 
-  if (!m_nearestAsteroid) {
-    m_nearestAsteroid = asteroid;
-    m_distance = (BGE::Canvas::canvas()->activeCamera()->globalPosition() - asteroid->globalPosition()).norm() - asteroid->boundingVolume()->radius();
+  if (object->name() == "Asteroid") {
+    // Set as nearest if we don't have any nearest asteroids.
+    if (!m_nearestAsteroid) {
+      m_nearestAsteroid = object;
+      m_distanceAsteroid = distance;
+    } else {
+      // Update nearest
+      if (distance < m_distanceAsteroid) {
+        m_nearestAsteroid = object;
+        m_distanceAsteroid = distance;
+      }
+    }
   } else {
-    float distance = (BGE::Canvas::canvas()->activeCamera()->globalPosition() - asteroid->globalPosition()).norm() - asteroid->boundingVolume()->radius();
-    if (distance < m_distance) {
-      m_nearestAsteroid = asteroid;
-      m_distance = distance;
+    // Set as nearest if we don't have any nearest asteroids.
+    if (!m_nearestFighter) {
+      m_nearestFighter = object;
+      m_distanceFighter = distance;
+    } else {
+      // Update nearest
+      if (distance < m_distanceAsteroid) {
+        m_nearestFighter = object;
+        m_distanceFighter = distance;
+      }
     }
   }
 }

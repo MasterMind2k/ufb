@@ -103,8 +103,10 @@ void Object::setAngularVelocity(const Vector3f &velocity)
 void Object::setRegistered(bool registered)
 {
   m_registered = registered;
-  if (!m_registered)
-    Util::ObjectList::self()->removeAsteroid(this);
+  if (m_registered)
+    Util::ObjectList::self()->add(this);
+  else
+    Util::ObjectList::self()->remove(this);
 }
 
 void Object::postTransformCalculations(qint32 timeDiff)
