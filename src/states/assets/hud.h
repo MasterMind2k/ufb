@@ -15,7 +15,10 @@
 
 #include "abstractoverlay.h"
 
+class QSizeF;
+
 namespace Objects {
+class Object;
 class Fighter;
 }
 
@@ -36,6 +39,7 @@ class HUD : public BGE::AbstractOverlay
     Objects::Fighter *m_fighter;
 
     void paint(QPainter *painter, qint32 elapsed);
+    static void paintNearestArrow(QPainter *painter, Objects::Object *nearest, const QSizeF &drawingSize);
 };
 
 }

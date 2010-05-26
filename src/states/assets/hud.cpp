@@ -40,7 +40,9 @@ void HUD::paint(QPainter *painter, qint32 elapsed)
     return;
 
   QSizeF size = BGE::Canvas::canvas()->size();
-  painter->setPen(QColor(0, 255, 0, 150));
+  QColor green(0, 255, 0, 150);
+  QColor red(255, 0, 0, 150);
+  painter->setPen(green);
   painter->setBrush(Qt::NoBrush);
 
   // Center cross
@@ -68,10 +70,10 @@ void HUD::paint(QPainter *painter, qint32 elapsed)
   painter->drawRect(rect);
 
   // Paint distances
+  painter->save();
   Util::ObjectList::self()->sort();
-  foreach (Objects::Object *object, Util::ObjectList::self()->asteroids()) {
-    Objects::Asteroid *asteroid = static_cast<Objects::Asteroid*> (object);
-    Vector3f pos = Util::ObjectList::self()->transformedPositions().value(asteroid);
+  foreach (Objects::Object *object, Util::ObjectList::self()->objects()) {
+    Vector3f pos = Util::ObjectList::self()->transformedPositions().value(object);
     if (pos.z() < -1 || pos.z() > 1)
       break;
 
@@ -80,12 +82,18 @@ void HUD::paint(QPainter *painter, qint32 elapsed)
     if (pos.y() < -1 || pos.y() > 1)
       break;
 
+    // Set color (Red - Fighter, green - other)
+    if (object->name() == "Fighter")
+      painter->setPen(red);
+    else
+      painter->setPen(green);
+
     pos.x() = size.width() * ((pos.x() + 1.0) / 2.0);
     pos.y() = size.height() - size.height() * ((pos.y() + 1.0) / 2.0);
     painter->drawPoint(pos.x(), pos.y());
 
-    float distance = asteroid->distance(m_fighter);
-    painter->drawText(pos.x() + 5, pos.y() + 5, "Asteroid: " + QString::number(distance));
+    float distance = object->distance(m_fighter);
+    painter->drawText(pos.x() + 5, pos.y() + 5, QString("%0: %1").arg(object->name()).arg(distance));
 
     // Is it in weapon's range?
     if (distance < (m_fighter->velocity() + m_fighter->globalOrientation() * Vector3f(0, 0, -Objects::Bullet::Velocity)).norm() * Objects::Bullet::MaxLifetime / 1000.0) {
@@ -103,68 +111,87 @@ void HUD::paint(QPainter *painter, qint32 elapsed)
       painter->drawLine(pos.x() + 15, pos.y() + 15, pos.x() + 15, pos.y() + 10);
     }
   }
+  painter->restore();
 
   // Direction to nearest asteroid
-  Objects::Asteroid *nearest = static_cast<Objects::Asteroid*> (Util::ObjectList::self()->nearestAsteroid());
-  if (nearest) {
-    Vector3f pos = Util::ObjectList::self()->transformedPositions().value(nearest);
-    pos.x() = size.width() * ((pos.x() + 1.0) / 2.0);
-    pos.y() = size.height() - size.height() * ((pos.y() + 1.0) / 2.0);
+  Objects::Object *nearest = Util::ObjectList::self()->nearest("Asteroid");
+  painter->setBrush(green);
+  if (nearest)
+    paintNearestArrow(painter, nearest, size);
 
-    bool x = true;
-    bool y = true;
-    if (pos.x() > size.width())
-      pos.x() = size.width();
-    else if (pos.x() < 0)
-      pos.x() = 0;
-    else
-      x = false;
+  // Direction to nearest fighter
+  nearest = Util::ObjectList::self()->nearest("Fighter");
+  painter->setPen(red);
+  painter->setBrush(red);
+  if (nearest)
+    paintNearestArrow(painter, nearest, size);
+}
 
-    if (pos.y() > size.height())
-      pos.y() = size.height();
-    else if (pos.y() < 0)
-      pos.y() = 0;
-    else if ((BGE::Canvas::canvas()->activeCamera()->cameraTransform() * nearest->globalPosition()).z() > 0) {
-      if (pos.y() < size.height() / 2.0)
-        pos.y() = 0;
+void HUD::paintNearestArrow(QPainter *painter, Objects::Object *nearest, const QSizeF &drawingSize)
+{
+  Vector3f pos = Util::ObjectList::self()->transformedPositions().value(nearest);
+
+  // Project to the screen
+  pos.x() = drawingSize.width() * ((pos.x() + 1.0) / 2.0);
+  pos.y() = drawingSize.height() - drawingSize.height() * ((pos.y() + 1.0) / 2.0);
+
+  // Determining the corner
+  bool x = true;
+  bool y = true;
+  if (pos.x() > drawingSize.width())
+    pos.x() = drawingSize.width();
+  else if (pos.x() < 0)
+    pos.x() = 0;
+  else
+    x = false;
+
+  if (pos.y() > drawingSize.height())
+    pos.y() = drawingSize.height();
+  else if (pos.y() < 0)
+    pos.y() = 0;
+  else
+    y = false;
+
+  // Draw the arrow if we dont see the object
+  if (x || y) {
+    painter->setBrush(Qt::NoBrush);
+    qreal angle = 0;
+    if (x && y) {
+      if (pos.x() > 0 && pos.y() > 0)
+        angle = 3.0 * M_PI / 4.0;
+      else if (pos.x() > 0 && pos.y() == 0)
+        angle = M_PI / 4.0;
+      else if (pos.x() == 0 && pos.y() > 0)
+        angle = -3.0 * M_PI / 4.0;
       else
-        pos.y() = size.height();
-    } else
-      y = false;
-
-    if (x || y) {
-      qreal angle = 0;
-      if (x && y) {
-        if (pos.x() > 0 && pos.y() > 0)
-          angle = 3.0 * M_PI / 4.0;
-        else if (pos.x() > 0 && pos.y() == 0)
-          angle = M_PI / 4.0;
-        else if (pos.x() == 0 && pos.y() > 0)
-          angle = -3.0 * M_PI / 4.0;
-        else
-          angle = -M_PI / 4.0;
-      } else if (!x) {
-        if (pos.y() > 0)
-          angle = M_PI;
-      } else if (!y) {
-        if (pos.x() > 0)
-          angle = M_PI / 2.0;
-        else
-          angle = -M_PI / 2.0;
-      }
-      Vector2f tip(0, 0), left(-25, 25), right(25, 25);
-      Rotation2Df rot(angle);
-      tip = rot * tip;
-      left = rot * left;
-      right = rot * right;
-
-      QPolygon arrow;
-      arrow << QPoint(tip.x(), tip.y());
-      arrow << QPoint(left.x(), left.y());
-      arrow << QPoint(right.x(), right.y());
-      arrow.translate(pos.x(), pos.y());
-
-      painter->drawPolygon(arrow);
+        angle = -M_PI / 4.0;
+    } else if (!x) {
+      if (pos.y() > 0)
+        angle = M_PI;
+    } else if (!y) {
+      if (pos.x() > 0)
+        angle = M_PI / 2.0;
+      else
+        angle = -M_PI / 2.0;
     }
+    // Prepare the arrow
+    Vector2f tip(0, 0), left(-25, 25), right(25, 25);
+    Rotation2Df rot(angle);
+    tip = rot * tip;
+    left = rot * left;
+    right = rot * right;
+
+    QPolygon arrow;
+    arrow << QPoint(tip.x(), tip.y());
+    arrow << QPoint(left.x(), left.y());
+    arrow << QPoint(right.x(), right.y());
+    arrow.translate(pos.x(), pos.y());
+
+    painter->drawPolygon(arrow);
+  } else {
+    if ((BGE::Canvas::canvas()->activeCamera()->cameraTransform() * nearest->globalPosition()).z() > 0)
+      painter->setBrush(Qt::NoBrush);
+    // Otherwise make a circle
+    painter->drawEllipse(pos.x() - 15, pos.y() - 15, 30, 30);
   }
 }

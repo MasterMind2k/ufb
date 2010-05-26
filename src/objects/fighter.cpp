@@ -46,6 +46,10 @@ Fighter::Fighter(Util::Ai *ai)
   m_previousShot.start();
 
   setName("Fighter");
+
+  // Register only ai controlled fighters
+  if (ai)
+    setRegistered(true);
 }
 
 void Fighter::initBody()
