@@ -26,7 +26,9 @@
 using namespace Objects;
 
 Fighter::Fighter(Util::Ai *ai)
-  : m_ai(ai)
+  : m_ai(ai),
+    m_hullIntegrity(100),
+    m_shields(100)
 {
   setMesh(BGE::Storage::Manager::self()->get<BGE::Storage::Mesh*>("/fighters/models/fighter"));
   loadMaterialsFromMesh();
@@ -94,6 +96,12 @@ void Fighter::calculateTransforms(qint32 timeDiff)
 {
   Q_UNUSED(timeDiff);
 
+  if (m_shields < 100.0f && m_shieldsRecharge.elapsed() > ShieldsRechargeTime) {
+    m_shields += ShieldsRechargeTick;
+    m_shields = qMin(m_shields, 100.0f);
+    m_shieldsRecharge.restart();
+  }
+
   if (m_ai)
     m_ai->calculateAngularVelocity();
 
@@ -101,4 +109,33 @@ void Fighter::calculateTransforms(qint32 timeDiff)
   body()->applyCentralForce(btVector3(enginePower.x(), enginePower.y(), enginePower.z()));
   Vector3f angularVelocity = globalOrientation() * m_angularVelocity;
   body()->setAngularVelocity(btVector3(angularVelocity.x(), angularVelocity.y(), angularVelocity.z()));
+}
+
+void Fighter::collision(BGE::Scene::Object *object)
+{
+  // Nothing to hit :D
+  if (m_hullIntegrity <= 0.0f)
+    return;
+
+  if (object->name() == "Laser") {
+    // Divert power to shields!
+    m_shieldsRecharge.start();
+
+    if (m_shields > 0.0) {
+      // We have shields!
+      m_shields -= 10;
+      if (m_shields < 0.0) {
+        // Shields collapsed! (electrical surges, falling wiring, etc. :P )
+        m_hullIntegrity += m_shields;
+        m_shields = 0;
+      }
+    } else {
+      // No shields
+      m_hullIntegrity = qMax(0.0f, m_hullIntegrity - 10.0f);
+    }
+  } else if (object->name() == "Asteroid" || object->name() == "Fighter") {
+    // We are done for!
+    m_shields = 0;
+    m_hullIntegrity = 0;
+  }
 }

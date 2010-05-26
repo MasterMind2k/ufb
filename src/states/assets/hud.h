@@ -16,6 +16,7 @@
 #include "abstractoverlay.h"
 
 class QSizeF;
+class QRectF;
 
 namespace Objects {
 class Object;
@@ -40,6 +41,7 @@ class HUD : public BGE::AbstractOverlay
 
     void paint(QPainter *painter, qint32 elapsed);
     static void paintNearestArrow(QPainter *painter, Objects::Object *nearest, const QSizeF &drawingSize);
+    static void paintStatus(QPainter *painter, const QRectF &geometry, const QString &text);
 };
 
 }
