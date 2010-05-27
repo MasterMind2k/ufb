@@ -15,6 +15,8 @@
 
 #include "global.h"
 
+#include <QtCore/QTime>
+
 namespace Objects {
 class Fighter;
 }
@@ -24,7 +26,16 @@ namespace Util {
 class Ai
 {
   public:
-    inline Ai(Objects::Fighter *target) : m_target(target) {}
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+    inline Ai(Objects::Fighter *target) : m_target(target), m_running(false), m_makeSpace(false)
+    {
+      m_locationChange.start();
+    }
+
+    inline void setTarget(Objects::Fighter *target)
+    {
+      m_target = target;
+    }
 
     void calculateAngularVelocity();
 
@@ -34,8 +45,12 @@ class Ai
     }
 
   private:
+    Vector3f m_fleeLocation;
     Objects::Fighter *m_target;
     Objects::Fighter *m_controlled;
+    QTime m_locationChange;
+    bool m_running;
+    bool m_makeSpace;
 
     inline static float roll(const Vector3f &target)
     {
@@ -56,7 +71,8 @@ class Ai
       Vector3f normalized = Vector3f(0, target.y(), target.z()).normalized();
       pitch = acos(normalized.dot(-Vector3f::UnitZ()));
 
-      pitch *= normalized.cross(-Vector3f::UnitZ()).x() > 0 ? -1 : 1;
+      if (target.z() < 0)
+        pitch *= normalized.cross(-Vector3f::UnitZ()).x() > 0 ? -1 : 1;
 
       return pitch;
     }

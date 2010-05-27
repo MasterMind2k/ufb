@@ -98,15 +98,12 @@ void MenuController::execute()
       BGE::Canvas::canvas()->camera("Side camera")->move(600, 0, 0);
       BGE::Canvas::canvas()->camera("Side camera")->rotateY(90);
 
-      // Default camera
-      BGE::Canvas::canvas()->activateCamera("First person camera");
-
-      //BGE::Canvas::canvas()->addSceneObject(BGE::Canvas::canvas()->createCamera("Global camera"));
       BGE::Canvas::canvas()->addSceneObject(BGE::Canvas::canvas()->createLight("Global light"));
       BGE::Canvas::canvas()->light("Global light")->setPositional(false);
       BGE::Canvas::canvas()->light("Global light")->setPosition(0, 0, -1);
-      //BGE::Canvas::canvas()->camera("Global camera")->move(0, 600, 0);
-      //BGE::Canvas::canvas()->camera("Global camera")->rotateX(-90);
+
+      // Default camera
+      BGE::Canvas::canvas()->activateCamera("First person camera");
 
       // Add Ai fighter
       Util::Ai *ai = new Util::Ai(fighter);
@@ -177,7 +174,7 @@ void MenuController::execute()
 
 void MenuController::populateAsteroids()
 {
-  int max = BGE::Canvas::canvas()->SceneSize.x() / 1.5 - 2000;
+  int max = BGE::Canvas::canvas()->SceneSize.x() - 2000;
   int min = max / 2 + 4000;
   qsrand(time(0l));
   for (quint16 i = 0; i < 30; i++) {

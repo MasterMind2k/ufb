@@ -50,7 +50,7 @@ int main(int argc, char **argv)
   QApplication::setApplicationName("UFB");
 
   // Set the scene size
-  BGE::Canvas::SceneSize = Vector3f(100000, 100000, 100000);
+  BGE::Canvas::SceneSize = Vector3f(500000, 500000, 500000);
 
   // Load data
   BGE::Canvas::canvas()->loadResource("./resources.rcc");
