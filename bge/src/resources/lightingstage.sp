@@ -146,7 +146,7 @@ void main(void)
       color = vec4(1.0);
     }
   }
-  if (colorMap.r + colorMap.g + colorMap.g > 0.0)
+  if (colorMap.r + colorMap.g + colorMap.b > 0.0)
     color *= colorMap;
   gl_FragData[0] = color;
 }
