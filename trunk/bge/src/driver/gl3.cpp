@@ -363,7 +363,8 @@ void GL3::setLight(Scene::Light *light)
   if (light->isPositional() && light->isSpot()) {
     temp.spot_cutoff = light->spotCutOff();
     temp.spot_exponent = light->spotExponent();
-    temp.spot_direction = m_transform.rotation() * Vector3f(0, 0, -1);
+    // Use active's camera rotation and light's rotation
+    temp.spot_direction = BGE::Canvas::canvas()->activeCamera()->globalOrientation().inverse() * light->globalOrientation() * -Vector3f::UnitZ();
   } else {
     temp.spot_cutoff = 180;
   }
@@ -378,15 +379,9 @@ void GL3::resetLighting()
 void GL3::setTransformMatrix(const Transform3f& transform)
 {
   m_transform = transform;
-  Matrix4f inverse;
-  transform.matrix().computeInverse(&inverse);
-  inverse.transposeInPlace();
-  m_normalMatrix = inverse.block<3, 3>(0, 0);
 
-  if (m_boundShader) {
+  if (m_boundShader)
     bindUniformAttribute("ModelViewMatrix", m_transform.matrix());
-    bindUniformAttribute("NormalMatrix", m_normalMatrix);
-  }
 }
 
 void GL3::draw()

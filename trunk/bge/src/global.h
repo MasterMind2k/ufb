@@ -18,8 +18,6 @@
 
 #include <Eigen/Core>
 #include <Eigen/Geometry>
-#include <Eigen/LU>
-#include <Eigen/SVD>
 
 /* Debugging */
 #include <QtDebug>
