@@ -88,7 +88,7 @@ Objects::Object *ObjectList::nearest(Objects::Object *reference, const QString &
     min = BGE::Canvas::SceneSize.norm();
 
   Objects::Object *nearest = 0l;
-  BGE::Scene::Partition *currentParent = 0l;
+  const BGE::Scene::Partition *currentParent = 0l;
   QQueue<BGE::Scene::Object*> objects;
   objects.append(reference->partition()->objects());
   while (!objects.isEmpty()) {

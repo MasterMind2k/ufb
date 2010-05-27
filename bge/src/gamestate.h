@@ -54,13 +54,29 @@ class GameState
     virtual ~GameState();
 
   protected:
+    /**
+     * This method gets called when the game state is loading.
+     */
     inline virtual void load() {}
+    /**
+     * This method gets called when the game state is unloading.
+     */
     inline virtual void unload() {}
 
+    /**
+     * Set the overlay with this method.
+     *
+     * Don't change the overlay after the first loading.
+     */
     inline void setOverlay(AbstractOverlay *overlay)
     {
       m_overlay = overlay;
     }
+    /**
+     * Set the controller with this method.
+     *
+     * Don't change the overlay after the first loading.
+     */
     inline void setController(AbstractController *controller)
     {
       m_controller = controller;

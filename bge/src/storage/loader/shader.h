@@ -20,12 +20,15 @@ namespace Storage {
 class Item;
 namespace Loader {
 
+/**
+ * A shader loader.
+ */
 class Shader : public AbstractLoader
 {
   public:
-    Shader(const QString& filename) : AbstractLoader(filename) {}
+    Shader(const QString &filename) : AbstractLoader(filename) {}
 
-    Item* load();
+    Item *load();
 };
 
 }

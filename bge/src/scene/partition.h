@@ -20,67 +20,53 @@
 #include "global.h"
 
 namespace BGE {
+class Canvas;
 
 namespace Scene {
-
 class Object;
 class BoundingVolume;
 
+/**
+ * A node in the spatial octree.
+ *
+ * When there are many objects inside one partition, that partition gets divided
+ * to eight parts.
+ */
 class Partition
 {
   public:
-    inline Partition()
-    {
-      m_partitions.reserve(8);
-      m_parent = 0l;
-      m_boundingVolume = 0l;
-    }
-    Partition(const Vector3f &size);
-    Partition(float width, float height, float depth);
     ~Partition();
 
-    void addObject(Object *object);
-    inline void removeObject(int index)
-    {
-      m_objects.removeAt(index);
-    }
-    void removeObject(Object *object);
+    /**
+     * Returns tobjects that are inside this partition.
+     *
+     * @note This list does not contain objects inside subpartitions.
+     */
     inline const QList<Object*> &objects() const
     {
       return m_objects;
     }
-    inline Object *object(int index) const
-    {
-      return m_objects.at(index);
-    }
 
-    inline void setBoundingVolume(BoundingVolume *boundingVolume)
-    {
-      m_boundingVolume = boundingVolume;
-    }
-    inline const BoundingVolume *size() const
-    {
-      return m_boundingVolume;
-    }
-
+    /**
+     * Returns the subpartitions.
+     */
     inline const QVector<Partition*> &partitions() const
     {
       return m_partitions;
     }
-    inline Partition *partition(int index) const
-    {
-      return m_partitions.at(index);
-    }
 
+    /**
+     * Returns the bounding volume of this partition.
+     */
     inline const BoundingVolume *boundingVolume() const
     {
       return m_boundingVolume;
     }
 
-    void partition();
-    void departition();
-
-    inline Partition *parent() const
+    /**
+     * Returns the parent partition.
+     */
+    inline const Partition *parent() const
     {
       return m_parent;
     }
@@ -90,6 +76,46 @@ class Partition
     QList<Object*> m_objects;
     QVector<Partition*> m_partitions;
     Partition *m_parent;
+
+    // Partitioning methods
+    void partition();
+    void departition();
+
+    // Accessable only from partition
+    inline void setBoundingVolume(BoundingVolume *boundingVolume)
+    {
+      m_boundingVolume = boundingVolume;
+    }
+
+    // Accessable from Canvas
+    inline Partition()
+    {
+      m_partitions.reserve(8);
+      m_parent = 0l;
+      m_boundingVolume = 0l;
+    }
+    Partition(const Vector3f &size);
+    Partition(float width, float height, float depth);
+
+    // Accessable from Canvas and Object
+    void addObject(Object *object);
+    inline void removeObject(int index)
+    {
+      m_objects.removeAt(index);
+    }
+    void removeObject(Object *object);
+
+    inline Partition *partition(int index)
+    {
+      return m_partitions.at(index);
+    }
+    inline Partition *parent()
+    {
+      return m_parent;
+    }
+
+    friend class BGE::Canvas;
+    friend class BGE::Scene::Object;
 };
 
 }

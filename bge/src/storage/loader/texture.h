@@ -20,14 +20,15 @@ namespace Storage {
 class Item;
 namespace Loader {
 
+/**
+ * A texture loader.
+ */
 class Texture : public AbstractLoader
 {
   public:
-    inline Texture(const QString& filename) : AbstractLoader(filename) {}
+    inline Texture(const QString &filename) : AbstractLoader(filename) {}
 
-    Item* load();
-
-  private:
+    Item *load();
 };
 
 }

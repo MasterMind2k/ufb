@@ -24,7 +24,7 @@ void Overlay::paint(QPainter *painter, qint32 elapsed)
   painter->save();
 
   painter->setPen(Qt::white);
-  painter->drawText(5, 15, "Active camera: " + canvas()->activeCamera()->name());
+  painter->drawText(5, 15, "Active camera: " + BGE::Canvas::canvas()->activeCamera()->name());
 
   painter->restore();
 }

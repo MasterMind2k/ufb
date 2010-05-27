@@ -18,6 +18,10 @@
 namespace BGE {
 namespace Rendering {
 
+/**
+ * Blurs all emissive colors, so the light sources get an impressive bloom
+ * effect.
+ */
 class BloomStage : public BGE::Rendering::Stage
 {
   public:

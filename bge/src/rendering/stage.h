@@ -28,11 +28,19 @@ class ShaderProgram;
 
 namespace Rendering {
 
+/**
+ * An abstract stage. To define your own, you have to reimplement render method.
+ */
 class Stage
 {
   public:
+    /**
+     * Output methods.
+     */
     enum Output {
+      /** Stage is rendered to a texture. */
       Textures,
+      /** Stage is rendered directly to the display. */
       Display
     };
 
@@ -43,32 +51,51 @@ class Stage
       m_framebuffer = 0l;
     }
 
+    /**
+     * This method renders the stage.
+     */
     virtual void render() = 0;
 
   protected:
     /**
-     * Creates the pass.
+     * Renders a pass.
      */
     void pass();
 
+    /**
+     * Sets the render output.
+     */
     inline void setOutput(Output renderOutput)
     {
       m_renderOutput = renderOutput;
     }
+    /**
+     * Returns the selected rendering output.
+     */
     inline Output renderOutput() const
     {
       return m_renderOutput;
     }
 
+    /**
+     * Bind the lighting to the shaders. One pass will be rendered multiple
+     * times and its outputs will be additively blended.
+     */
     inline void enableLights()
     {
       m_needLights = true;
     }
+    /**
+     * Doesn't bind the lights. The rendering pass will render only once.
+     */
     inline void disableLights()
     {
       m_needLights = false;
     }
 
+    /**
+     * Adds a texture for fragment shader to use.
+     */
     inline void addTexture(const QString &name)
     {
       m_textures << name;

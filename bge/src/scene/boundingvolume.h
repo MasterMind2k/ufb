@@ -17,11 +17,19 @@
 
 namespace BGE {
 namespace Scene {
+class Object;
+class Partition;
 
+/**
+ * Bounding volume class. It contains radius and bounding box.
+ */
 class BoundingVolume
 {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+    /**
+     * Creates a 0-sized bounding volume.
+     */
     inline BoundingVolume()
     {
       m_corners.reserve(8);
@@ -33,6 +41,10 @@ class BoundingVolume
       m_isCacheValid = false;
       calculateCorners();
     }
+    /**
+     * Creates a bounding volume from defined sphere radius and bounding box
+     * with min and max.
+     */
     inline BoundingVolume(float radius, const Vector3f &min, const Vector3f &max)
     {
       m_corners.reserve(8);
@@ -44,6 +56,9 @@ class BoundingVolume
       m_isCacheValid = false;
       calculateCorners();
     }
+    /**
+     * Creates a bounding volume from defined center and size.
+     */
     inline BoundingVolume(const Vector3f &center, const Vector3f &size)
     {
       m_corners.reserve(8);
@@ -53,51 +68,67 @@ class BoundingVolume
       setSize(size);
     }
 
-    inline void setTransform(const Transform3f &transform)
-    {
-      m_transform = transform;
-      m_isCacheValid = false;
-    }
-    inline const Transform3f &transform() const
-    {
-      return m_transform;
-    }
-
+    /**
+     * Returns the size of a bounding box in a vector.
+     *
+     * x - width
+     * y - height
+     * z - depth
+     */
     inline const Vector3f &size() const
     {
       return m_size;
     }
-    inline void setSize(const Vector3f &size)
-    {
-      m_size = size;
-      m_isCacheValid = false;
-      calculateCorners();
-      calculateRadius();
-    }
 
+    /**
+     * Returns the radius of a bounding sphere.
+     */
     inline const float radius() const
     {
       return m_radius;
     }
 
+    /**
+     * Returns corners of the bounding box.
+     */
     inline const QVector<Vector3f> &corners() const
     {
       return m_corners;
     }
+    /**
+     * Returns the min corner. It is transformed.
+     *
+     * @see transformedCorners
+     */
     inline const Vector3f &min() const
     {
       return transformedCorners().last();
     }
+    /**
+     * Returns the max corner. It is transformed.
+     *
+     * @see transformedCorners
+     */
     inline const Vector3f &max() const
     {
       return transformedCorners().first();
     }
 
+    /**
+     * Returns the center of the bounding volume.
+     *
+     * @see transformedCenter
+     */
     inline const Vector3f &center() const
     {
       return m_center;
     }
 
+    /**
+     * Returns the transformed center.
+     *
+     * @see center
+     */
     inline const Vector3f &transformedCenter() const
     {
       if (!m_isCacheValid) {
@@ -106,6 +137,11 @@ class BoundingVolume
       }
       return m_transformedCenter;
     }
+    /**
+     * Returns the transformed corners of the bounding box.
+     *
+     * @see corners
+     */
     inline const QVector<Vector3f> &transformedCorners() const
     {
       if (!m_isCacheValid) {
@@ -116,11 +152,20 @@ class BoundingVolume
       return m_transformedCorners;
     }
 
+    /**
+     * Is it bigger of the specified bounding volume?
+     */
     inline bool isBigger(const BoundingVolume *boundingVolume) const
     {
       return boundingVolume->m_radius > m_radius;
     }
+    /**
+     * Is the bounding volume inside this one?
+     */
     bool isInside(const BoundingVolume *boundingVolume) const;
+    /**
+     * Is the specified pointer inside this bounding volume?
+     */
     bool isInside(const Vector3f &point) const;
 
   private:
@@ -133,9 +178,29 @@ class BoundingVolume
     mutable QVector<Vector3f> m_transformedCorners;
     mutable bool m_isCacheValid;
 
+    // Calculates corners
     void calculateCorners();
+    // Transforms the corners
     void calculateTransformedCorners() const;
+    // Calculates the radius
     void calculateRadius();
+
+    // Should be accessed only from BGE::Scene::Object and BGE::Scene::Partition
+    inline void setTransform(const Transform3f &transform)
+    {
+      m_transform = transform;
+      m_isCacheValid = false;
+    }
+    inline void setSize(const Vector3f &size)
+    {
+      m_size = size;
+      m_isCacheValid = false;
+      calculateCorners();
+      calculateRadius();
+    }
+
+    friend class BGE::Scene::Object;
+    friend class BGE::Scene::Partition;
 };
 
 }

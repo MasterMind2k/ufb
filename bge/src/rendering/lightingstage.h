@@ -18,6 +18,10 @@
 namespace BGE {
 namespace Rendering {
 
+/**
+ * A default lighting stage. It renders all lights using Phong lighting
+ * model.
+ */
 class LightingStage : public BGE::Rendering::Stage
 {
   public:

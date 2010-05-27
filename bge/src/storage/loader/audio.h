@@ -19,6 +19,11 @@ namespace BGE {
 namespace Storage {
 namespace Loader {
 
+/**
+ * An audio loader.
+ *
+ * @note Engine currently does not support audio playback.
+ */
 class Audio : public BGE::Storage::Loader::AbstractLoader
 {
   public:

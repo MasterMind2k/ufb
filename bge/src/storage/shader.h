@@ -20,9 +20,15 @@
 namespace BGE {
 namespace Storage {
 
+/**
+ * A shader item. A shader is a part of a shader program.
+ */
 class Shader : public Item
 {
   public:
+    /**
+     * Supported shader types.
+     */
     enum Type {
       VertexShader,
       FragmentShader
@@ -30,29 +36,47 @@ class Shader : public Item
 
     inline Shader(const QString& name) : Item(name) {}
 
+    /**
+     * Sets the shader source.
+     */
     inline void setShaderSource(const QString& source, Type type)
     {
       m_source = source;
       m_type = type;
     }
-    inline const QString& shaderSource() const
+    /**
+     * Returns the shader source.
+     */
+    inline const QString &shaderSource() const
     {
       return m_source;
     }
+    /**
+     * Returns the shader type.
+     */
     inline Type type() const
     {
       return m_type;
     }
 
-    inline void addDependency(const QString& dependency)
+    /**
+     * Adds shader loading dependency.
+     */
+    inline void addDependency(const QString &dependency)
     {
       m_deps << dependency;
     }
-    inline void addDependencies(const QStringList& dependencies)
+    /**
+     * Adds shader loading dependencies.
+     */
+    inline void addDependencies(const QStringList &dependencies)
     {
       m_deps += dependencies;
     }
-    inline const QStringList& dependencies() const
+    /**
+     * Returns list of shader dependencies.
+     */
+    inline const QStringList &dependencies() const
     {
       return m_deps;
     }
