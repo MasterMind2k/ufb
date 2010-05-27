@@ -31,11 +31,12 @@ void Ai::calculateAngularVelocity()
 {
   // Transform target's position to controlled eye space
   Vector3f target;
+  float distance = m_controlled->distance(m_target);
   if (m_running && m_controlled->shields() >= 80.0f || !m_running && m_controlled->shields() > 10.0f) {
     // Attack
     m_running = false;
     target = m_controlled->globalOrientation().inverse() * ((m_target->globalPosition() + (m_target->velocity())
-                                                             * m_controlled->distance(m_target) / (Objects::Bullet::Velocity + m_controlled->velocity().norm()))
+                                                             * distance / (Objects::Bullet::Velocity + m_controlled->velocity().norm()))
                                                             - m_controlled->globalPosition());
   } else{
     // Flee
@@ -47,7 +48,6 @@ void Ai::calculateAngularVelocity()
     }
     target = m_controlled->globalOrientation().inverse() * (m_fleeLocation - m_controlled->globalPosition());
   }
-  float distance = target.norm();
   float engine = distance * 1000;
 
   // Are we too close to target? (if we are not running)
@@ -82,7 +82,7 @@ void Ai::calculateAngularVelocity()
   Objects::Object *nearest = ObjectList::self()->nearest(m_controlled, "Asteroid", 15000); // 15000 is considered safe distance
 
   if (m_running || m_makeSpace) {
-    if (!nearest || m_controlled->distance(nearest) > m_controlled->distance(m_target))
+    if (!nearest || m_controlled->distance(nearest) > distance)
       nearest = m_target;
   }
 
