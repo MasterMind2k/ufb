@@ -12,6 +12,8 @@
  ***************************************************************************/
 #include "explosions.h"
 
+#include <ctime>
+
 #include <QtCore/QTimer>
 
 #include "canvas.h"
