@@ -324,6 +324,8 @@ class Canvas : public QGLWidget
       QGLWidget::showEvent(event);
     }
 
+    void setupDynamicsWorld();
+
   private slots:
     void cleanup();
     void updateFPS();

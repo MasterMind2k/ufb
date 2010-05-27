@@ -28,6 +28,7 @@ class MenuOverlay : public BGE::AbstractOverlay
   public:
     enum Buttons {
       Play,
+      Continue,
       Quit
     };
 

@@ -35,8 +35,6 @@ class MenuController : public BGE::AbstractController
     MenuOverlay *m_overlay;
 
     void execute();
-    void populateAsteroids();
-    void setRestraints();
 };
 
 }
