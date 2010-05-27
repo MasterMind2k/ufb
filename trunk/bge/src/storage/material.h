@@ -20,10 +20,13 @@
 namespace BGE {
 namespace Storage {
 
+/**
+ * A material item.
+ */
 class Material : public Item
 {
   public:
-  inline Material(const QString& name) : Item(name)
+  inline Material(const QString &name) : Item(name)
     {
       /* Default values */
       m_ambient = QColor(0.2 * 255, 0.2 * 255, 0.2 * 255, 255);
@@ -33,7 +36,7 @@ class Material : public Item
       m_faceName = name;
     }
 
-  inline Material(const QString& name, const QColor& ambient, const QColor& diffuse, const QColor& specular, const QColor& emission, qint32 shininess) : Item(name)
+  inline Material(const QString &name, const QColor &ambient, const QColor &diffuse, const QColor &specular, const QColor &emission, qint32 shininess) : Item(name)
     {
       m_ambient = ambient;
       m_diffuse = diffuse;
@@ -43,35 +46,35 @@ class Material : public Item
       m_faceName = name;
     }
 
-    inline void setAmbient(const QColor& ambient)
+    inline void setAmbient(const QColor &ambient)
     {
       m_ambient = ambient;
     }
-    inline const QColor& ambient() const
+    inline const QColor &ambient() const
     {
       return m_ambient;
     }
-    inline void setDiffuse(const QColor& diffuse)
+    inline void setDiffuse(const QColor &diffuse)
     {
       m_diffuse = diffuse;
     }
-    inline const QColor& diffuse() const
+    inline const QColor &diffuse() const
     {
       return m_diffuse;
     }
-    inline void setSpecular(const QColor& specular)
+    inline void setSpecular(const QColor &specular)
     {
       m_specular = specular;
     }
-    inline const QColor& specular() const
+    inline const QColor &specular() const
     {
       return m_specular;
     }
-    inline void setEmission(const QColor& emission)
+    inline void setEmission(const QColor &emission)
     {
       m_emission = emission;
     }
-    inline const QColor& emission() const
+    inline const QColor &emission() const
     {
       return m_emission;
     }

@@ -19,6 +19,12 @@
 
 namespace BGE {
 
+/**
+ * A simple bridge between BGE and Bullet.
+ *
+ * Use this class to map BGE Object with Bullet's body. If you need something
+ * extra, subclass btMotionState from Bullet.
+ */
 class MotionState : public btMotionState
 {
   public:

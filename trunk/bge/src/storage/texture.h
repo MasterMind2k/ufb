@@ -20,6 +20,9 @@
 namespace BGE {
 namespace Storage {
 
+/**
+ * Texture item.
+ */
 class Texture : public Item
 {
   public:

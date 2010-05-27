@@ -18,6 +18,9 @@
 namespace BGE {
 namespace Driver {
 
+/**
+ * A helper class for texture managment.
+ */
 class TextureManager
 {
   public:
@@ -50,11 +53,6 @@ class TextureManager
     {
       return m_mapping.value(textureId, -1);
     }
-
-    /**
-     * Copies rendered image to texture.
-     */
-    void copyRenderedToTexture(quint32 textureId);
 
   private:
     static TextureManager *m_self;

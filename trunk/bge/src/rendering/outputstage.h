@@ -18,6 +18,9 @@
 namespace BGE {
 namespace Rendering {
 
+/**
+ * The last rendering stage. It renders to the display directly.
+ */
 class OutputStage : public BGE::Rendering::Stage
 {
   public:

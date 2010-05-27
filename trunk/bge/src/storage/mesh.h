@@ -27,6 +27,7 @@
 namespace BGE {
 namespace Scene {
 class BoundingVolume;
+class Object;
 }
 namespace Storage {
 class Material;
@@ -38,6 +39,9 @@ typedef QHash<quint16, QString> FaceMaterial;
 namespace BGE {
 namespace Storage {
 
+/**
+ * Mesh item.
+ */
 class Mesh : public Item
 {
   public:
@@ -45,11 +49,12 @@ class Mesh : public Item
      * Rendering primitives
      */
     enum Primitives {
+      /** @deprecated */
       Quads,
       Triangles
     };
 
-    inline Mesh(const QString& name) : Item(name), m_rawVertices(0l), m_numVertices(0)
+    inline Mesh(const QString &name) : Item(name), m_rawVertices(0l), m_numVertices(0)
     {
       m_boundingVolume = 0l;
     }
@@ -61,25 +66,31 @@ class Mesh : public Item
     /**
      * Adds vertices to the list.
      */
-    void addVertices(const QString& name, const VectorList& vertices);
+    void addVertices(const QString &name, const VectorList &vertices);
     /**
      * \overload
      */
-    inline void addVertices(const QString& name, const QVector<Vector3f>& vertices)
+    inline void addVertices(const QString &name, const QVector<Vector3f> &vertices)
     {
       addVertices(name, vertices.toList());
     }
     /**
      * Gets vertices.
      */
-    inline QVector<Vector3f> vertices(const QString& name) const
+    inline QVector<Vector3f> vertices(const QString &name) const
     {
       return m_vertices.value(name);
     }
-    inline const float* vertices() const
+    /**
+     * Returns the raw vertices array.
+     */
+    inline const float *vertices() const
     {
       return m_rawVertices;
     }
+    /**
+     * Number of vertices.
+     */
     inline quint16 numVertices() const
     {
       return m_numVertices;
@@ -91,7 +102,7 @@ class Mesh : public Item
      * @param primitive The primitive used at rendering/binding
      * @param face A vector of _index-es_ of bounding vertices
      */
-    void addFace(const QString& name, Primitives primitive, const QVector<quint16>& face);
+    void addFace(const QString &name, Primitives primitive, const QVector<quint16> &face);
     /**
      * Adds faces.
      */
@@ -101,7 +112,7 @@ class Mesh : public Item
      *
      * @note You can use Face type for conviniance.
      */
-    inline QList<QPair<Primitives, QVector<quint16> > > faces(const QString& name) const
+    inline QList<QPair<Primitives, QVector<quint16> > > faces(const QString &name) const
     {
       return m_faces.value(name);
     }
@@ -109,7 +120,7 @@ class Mesh : public Item
     /**
      * Calculates and sets the normals.
      */
-    void calculateNormals(const QString& name);
+    void calculateNormals(const QString &name);
     /**
      * Adds the normals. If you have valid normals, please not recalculate them.
      */
@@ -122,7 +133,7 @@ class Mesh : public Item
     /**
      * Gets the normals.
      */
-    inline QVector<Vector3f> normals(const QString& name) const
+    inline QVector<Vector3f> normals(const QString &name) const
     {
       return m_normals.value(name);
     }
@@ -132,7 +143,7 @@ class Mesh : public Item
      *
      * @warning Make sure you add as much mappings as you have vertices!
      */
-    inline void addTextureMap(const QString& name, const Vector2f& map)
+    inline void addTextureMap(const QString &name, const Vector2f &map)
     {
       QVector<Vector2f> temp = m_textureMaps.value(name);
       temp += map;
@@ -148,22 +159,31 @@ class Mesh : public Item
     /**
      * Gets the uv texture mappings.
      */
-    inline QVector<Vector2f> textureMaps(const QString& name) const
+    inline QVector<Vector2f> textureMaps(const QString &name) const
     {
       return m_textureMaps.value(name);
     }
 
-    inline void addFaceMaterial(const QString& name, quint16 face, const QString& materialName)
+    /**
+     * Adds a face material.
+     */
+    inline void addFaceMaterial(const QString &name, quint16 face, const QString &materialName)
     {
       FaceMaterial temp = m_materials.value(name);
       temp.insert(face, materialName);
       m_materials.insert(name, temp);
     }
+    /**
+     * Adds face materials.
+     */
     inline void addFacesMaterials(const QString &name, const FaceMaterial &facesMaterials)
     {
       m_materials.insert(name, facesMaterials);
     }
-    inline FaceMaterial faceMaterials(const QString& name)
+    /**
+     * Returns list of face materials.
+     */
+    inline FaceMaterial faceMaterials(const QString &name)
     {
       return m_materials.value(name);
     }
@@ -171,7 +191,7 @@ class Mesh : public Item
     /**
      * Adds the object name to the list.
      */
-    inline void createObject(const QString& name)
+    inline void createObject(const QString &name)
     {
       m_objects << name;
     }
@@ -195,15 +215,20 @@ class Mesh : public Item
       m_textureMaps.remove(name);
     }
 
+    /**
+     * Rotates the vertices.
+     */
     void rotate(const AngleAxisf &rotation);
 
     /**
      * A conveniance method for creating rectangles.
      */
-    void addRectangle(const QString& objectName, const Vector3f& bottomLeft, const Vector3f& bottomRight, const Vector3f& topLeft, const Vector3f& topRight);
+    void addRectangle(const QString &objectName, const Vector3f &bottomLeft, const Vector3f &bottomRight, const Vector3f &topLeft, const Vector3f &topRight);
 
+    /**
+     * Returns the bounding volume of the mesh.
+     */
     const Scene::BoundingVolume *boundingVolume() const;
-    Scene::BoundingVolume *calculateBoundingVolume();
 
     void bind();
     void unbind();
@@ -224,6 +249,10 @@ class Mesh : public Item
     /* The uv texture mapping */
     QHash<QString, QVector<Vector2f> > m_textureMaps;
     Scene::BoundingVolume *m_boundingVolume;
+
+    Scene::BoundingVolume *calculateBoundingVolume();
+
+    friend class BGE::Scene::Object;
 };
 
 }

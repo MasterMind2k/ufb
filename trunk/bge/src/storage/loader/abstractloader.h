@@ -20,21 +20,36 @@ namespace Storage {
 class Item;
 namespace Loader {
 
+/**
+ * An abstract loader to subclass, to create your own loader.
+ *
+ * A game cannot create it's own loader.
+ */
 class AbstractLoader
 {
   public:
-    inline AbstractLoader(const QString& filename)
+    inline AbstractLoader(const QString &filename)
     {
       m_filename = filename;
     }
 
-    virtual Item* load() = 0;
+    /**
+     * Loads the data and create a representing item in the storage API.
+     */
+    virtual Item *load() = 0;
 
   protected:
-    inline const QString& filename() const
+    /**
+     * Returns the full file name with the path. Can be used as an argument
+     * for QFile & friends.
+     */
+    inline const QString &filename() const
     {
       return m_filename;
     }
+    /**
+     * Returns the name of the file, without the path.
+     */
     QString name() const;
 
   private:

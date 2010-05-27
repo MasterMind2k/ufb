@@ -26,6 +26,11 @@ class BoundingVolume;
 
 namespace Driver {
 
+/**
+ * Driver implementation for OpenGL 1 spec. It is very inefficient driver.
+ *
+ * All shading stages are ignored in this driver.
+ */
 class GL1 : public AbstractDriver
 {
   public:

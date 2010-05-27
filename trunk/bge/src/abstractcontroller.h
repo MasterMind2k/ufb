@@ -34,19 +34,19 @@ class AbstractController
     /**
      * This method gets called when a user presses a key.
      */
-    virtual void keyPressed(QKeyEvent* event) {}
+    virtual void keyPressed(QKeyEvent *event) {}
     /**
      * This method gets called wen user moves a mouse.
      */
-    virtual void mouseMoved(QMouseEvent* event) {}
+    virtual void mouseMoved(QMouseEvent *event) {}
     /**
      * This method gets called wen user presses a mouse button.
      */
-    virtual void mouseButtonPressed(QMouseEvent* event) {}
+    virtual void mouseButtonPressed(QMouseEvent *event) {}
     /**
      * This method gets called wen user releases a mouse button.
      */
-    virtual void mouseButtonReleased(QMouseEvent* event) {}
+    virtual void mouseButtonReleased(QMouseEvent *event) {}
 };
 
 }

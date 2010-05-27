@@ -16,37 +16,43 @@
 #include "storage/item.h"
 
 namespace BGE {
+namespace Driver {
+class GL3;
+}
+
 namespace Storage {
 class Shader;
 
+/**
+ * A Shader program.
+ */
 class ShaderProgram : public Item
 {
   public:
-    inline ShaderProgram(const QString& name) : Item(name)
+    inline ShaderProgram(const QString &name) : Item(name)
     {
       m_hasFailed = false;
     }
 
-    inline void addShader(Shader* shader)
+    /**
+     * Adds a shader.
+     */
+    inline void addShader(Shader *shader)
     {
       if (shader)
         m_shaders << shader;
     }
-    inline Shader* shader(int i) const
-    {
-      return m_shaders.at(i);
-    }
-    inline const QList<Shader*>& shaders() const
+    /**
+     * Returns the list of shaders.
+     */
+    inline const QList<Shader*> &shaders() const
     {
       return m_shaders;
     }
 
-    bool prepareProgram();
-
-    inline void setFailed(bool failed)
-    {
-      m_hasFailed = failed;
-    }
+    /**
+     * Has loading of shader program failed?
+     */
     inline bool hasFailed() const
     {
       return m_hasFailed;
@@ -59,6 +65,14 @@ class ShaderProgram : public Item
   private:
     QList<Shader*> m_shaders;
     bool m_hasFailed;
+
+    bool prepareProgram();
+    inline void setFailed(bool failed)
+    {
+      m_hasFailed = failed;
+    }
+
+    friend class BGE::Driver::GL3;
 };
 
 }

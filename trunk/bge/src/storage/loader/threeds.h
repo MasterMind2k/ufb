@@ -21,15 +21,20 @@ namespace BGE {
 namespace Storage {
 namespace Loader {
 
+/**
+ * Loader for 3DS models. It also loads the materials.
+ *
+ * @note Engine does not support animated models.
+ */
 class ThreeDS : public AbstractLoader
 {
   public:
-  inline ThreeDS(const QString& filename) : AbstractLoader(filename) {}
+    inline ThreeDS(const QString &filename) : AbstractLoader(filename) {}
 
-  Item* load();
+    Item *load();
 
   private:
-    QString readString(QFile& file) const;
+    QString readString(QFile &file) const;
 };
 
 }

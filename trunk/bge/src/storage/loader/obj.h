@@ -21,10 +21,18 @@ namespace BGE {
 namespace Storage {
 namespace Loader {
 
+/**
+ * Obj model loader.
+ *
+ * It does not load materials.
+ *
+ * It works properly only when faces are convex. The loader triangulates all
+ * faces before loadig.
+ */
 class Obj : public AbstractLoader
 {
   public:
-    inline Obj(const QString& filename) : AbstractLoader(filename) {}
+    inline Obj(const QString &filename) : AbstractLoader(filename) {}
 
     Item *load();
 

@@ -19,6 +19,9 @@ namespace BGE {
 namespace Storage {
 class Item;
 
+/**
+ * A singleton class for managing storage items.
+ */
 class Manager
 {
   public:
@@ -45,12 +48,14 @@ class Manager
     /**
      * Gets an item.
      */
-    Item* get(const QString& path) const;
+    Item* get(const QString &path) const;
     /**
-     * \overload
+     * @overload
+     *
+     * It casts the item.
      */
     template <class T>
-    inline T get(const QString& path) const
+    inline T get(const QString &path) const
     {
       return static_cast<T> (get(path));
     }
@@ -60,7 +65,7 @@ class Manager
      *
      * @warning Use this method only when resources are loaded!
      */
-    void set(Item* item, const QString& path);
+    void set(Item *item, const QString &path);
 
   private:
     static Manager* m_self;

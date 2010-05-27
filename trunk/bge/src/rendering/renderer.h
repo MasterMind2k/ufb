@@ -30,7 +30,7 @@ namespace Rendering {
 /**
  * @short Abstract renderer
  *
- * It's an abstract interface to the OpenGL rendering.
+ * A rendering interface for rendering to the scene.
  */
 class Renderer
 {

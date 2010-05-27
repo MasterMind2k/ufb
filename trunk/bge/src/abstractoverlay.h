@@ -20,24 +20,21 @@
 class QPainter;
 
 namespace BGE {
-class Canvas;
 
+/**
+ * @short Overlay API
+ *
+ * Reimplement this class to draw 2D graphics on top of the OpenGL viewport.
+ */
 class AbstractOverlay
 {
   public:
     inline AbstractOverlay() {}
 
-    virtual void paint(QPainter* painter, qint32 elapsed) = 0;
-
-    inline Canvas* canvas() const
-    {
-      return m_canvas;
-    }
-
-  private:
-    Canvas* m_canvas;
-
-  friend class BGE::Canvas;
+    /**
+     * Reimplement this method to do painting.
+     */
+    virtual void paint(QPainter *painter, qint32 elapsed) = 0;
 };
 
 }

@@ -62,11 +62,11 @@ class Canvas : public QGLWidget
      *
      * @see Scene::SceneObject
      */
-    void addSceneObject(Scene::Object* object);
+    void addSceneObject(Scene::Object *object);
     /**
      * Delayed deletion of a scene object.
      */
-    inline void deleteSceneObject(Scene::Object* object)
+    inline void deleteSceneObject(Scene::Object *object)
     {
       m_deletionQueue.enqueue(object);
     }
@@ -79,7 +79,7 @@ class Canvas : public QGLWidget
     }
 
     /**
-     * Returns root cube.
+     * Returns root spatial octree partition.
      */
     inline Scene::Partition *partition() const
     {
@@ -89,7 +89,7 @@ class Canvas : public QGLWidget
     /**
      * Returns the instancce of the canvas.
      */
-    static Canvas* canvas();
+    static Canvas *canvas();
 
     /**
      * Sets the input controller. All keyboard and mouse events will
@@ -97,7 +97,7 @@ class Canvas : public QGLWidget
      *
      * @see AbstractController
      */
-    inline void setController(AbstractController* controller)
+    inline void setController(AbstractController *controller)
     {
       m_controller = controller;
     }
@@ -107,8 +107,12 @@ class Canvas : public QGLWidget
      *
      * @see AbstractOverlay
      */
-    void setOverlay(AbstractOverlay* overlay);
+    void setOverlay(AbstractOverlay *overlay);
 
+    /**
+     * Returns the status of bounding volumes.
+     * Settable only through the command line arguments.
+     */
     inline bool drawBoundingVolumes() const
     {
       return m_drawBoundingVolumes;
@@ -122,7 +126,7 @@ class Canvas : public QGLWidget
      *
      * @see Scene::Camera
      */
-    Scene::Camera* createCamera(const QString& name = QString());
+    Scene::Camera *createCamera(const QString &name);
     /**
      * Get a camera with a name. If it doesn't exist, then this method will
      * return null.
@@ -133,7 +137,7 @@ class Canvas : public QGLWidget
      *
      * @see createCamera
      */
-    inline Scene::Camera* camera(const QString& name) const
+    inline Scene::Camera *camera(const QString &name) const
     {
       return m_cameras.value(name);
     }
@@ -153,17 +157,17 @@ class Canvas : public QGLWidget
      *
      * @see createCamera
      */
-    bool activateCamera(const QString& name);
+    bool activateCamera(const QString &name);
     /**
      * Removes a camera. Note that you cannot remove an active camera!
      *
      * @return @c false Camera was not removed, it wasn't found or it is active
      */
-    bool removeCamera(const QString& name);
+    bool removeCamera(const QString &name);
     /**
      * Returns an active camera.
      */
-    inline Scene::Camera* activeCamera()
+    inline Scene::Camera *activeCamera()
     {
       return m_activeCamera;
     }
@@ -173,15 +177,15 @@ class Canvas : public QGLWidget
      * If you want to create a directional light, you don't
      * have to add it to the scene.
      */
-    Scene::Light* createLight(const QString& name = QString());
+    Scene::Light *createLight(const QString &name);
     /**
      * Removes the light.
      */
-    bool removeLight(const QString& name);
+    bool removeLight(const QString &name);
     /**
      * Gets the light.
      */
-    inline Scene::Light* light(const QString& name) const
+    inline Scene::Light *light(const QString &name) const
     {
       return m_lights.value(name);
     }
@@ -193,19 +197,35 @@ class Canvas : public QGLWidget
       return m_lights.values();
     }
 
+    /**
+     * Sets if the FPS gets shown.
+     */
     inline void setFPSShown(bool show)
     {
       m_isFPSShown = show;
     }
+    /**
+     * Returns the status of FPS visibility.
+     */
     inline bool isFPSShown() const
     {
       return m_isFPSShown;
     }
 
+    /**
+     * Grabs the mouse.
+     *
+     * Take a look at Qt's documentation.
+     */
     inline void grabMouse()
     {
       m_mouseGrabbed = true;
     }
+    /**
+     * Ungrabs the mouse.
+     *
+     * Take a look at Qt's documentation.
+     */
     inline void ungrabMouse()
     {
       m_mouseGrabbed = false;
@@ -216,7 +236,7 @@ class Canvas : public QGLWidget
      *
      * @note This method uses QResource class.
      */
-    void loadResource(const QString& fileName = QString());
+    void loadResource(const QString &fileName = QString());
 
     /**
      * Replaces the occupiing stage.
@@ -230,19 +250,24 @@ class Canvas : public QGLWidget
      */
     void registerStage(quint8 index, Rendering::Stage *stage);
 
+    /**
+     * Returns the Bullets dynamic world.
+     */
     inline btDynamicsWorld *dynamicsWorld() const
     {
       return m_dynamicsWorld;
     }
-    inline void setDynamicsWorld(btDynamicsWorld *dynamicsWorld)
-    {
-      m_dynamicsWorld = dynamicsWorld;
-    }
 
+    /**
+     * Returns VSync property.
+     */
     inline bool isVSyncEnabled() const
     {
       return m_vsync;
     }
+    /**
+     * Enables or disables VSync.
+     */
     void toggleVSync(bool enable);
 
     /**
@@ -302,9 +327,14 @@ class Canvas : public QGLWidget
 
     static Canvas* m_self;
 
+    // Private methods
     Canvas();
     void unloadState(GameState *state);
     void loadState(GameState *state);
+    inline void setDynamicsWorld(btDynamicsWorld *dynamicsWorld)
+    {
+      m_dynamicsWorld = dynamicsWorld;
+    }
 
     /* Reimplemented methods */
     void initializeGL();

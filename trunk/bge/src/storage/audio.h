@@ -20,6 +20,11 @@
 namespace BGE {
 namespace Storage {
 
+/**
+ * Audio item.
+ *
+ * Currently audio is not supported in the engine.
+ */
 class Audio : public BGE::Storage::Item
 {
   public:
@@ -32,6 +37,9 @@ class Audio : public BGE::Storage::Item
       delete m_buffer;
     }
 
+    /**
+     * Returns pointer to the buffer.
+     */
     inline QBuffer *buffer()
     {
       return m_buffer;

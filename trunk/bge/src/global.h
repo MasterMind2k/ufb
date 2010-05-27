@@ -68,29 +68,47 @@ inline bool operator==(const Vector3f &v1, const Vector3f &v2)
 /**
  * @short Main namespace of the engine.
  */
-namespace BGE
-{
+namespace BGE {
 
+/**
+ * Containment, used for culling.
+ */
 enum Containment {
+  /** Completely inside, render all children. */
   FullyInside,
+  /** Go deeper, and check further. */
   PartialyInside,
+  /** Ignore all children. */
   Outside
 };
 
 /**
  * @short All scene graph related classes are inside this namespace.
  */
-namespace Scene
-{
-}
+namespace Scene {}
 
 /**
  * @short Namespace containing rendering classes.
- * Classes from this namespace should be used only inside the
- * engine and specific render methods of the BGE::Scene classes.
  */
-namespace Rendering
-{
+namespace Rendering {}
+
+/**
+ * @short OpenGL specific codes (Sometime perhaps even OpenAL).
+ *
+ * This classes should not be accessed outside BGE.
+ */
+namespace Driver {}
+
+/**
+ * @short The main Storage API.
+ */
+namespace Storage {
+/**
+ * @short Loaders for loading items.
+ *
+ * Classes inside this namespace, should be used only inside BGE.
+ */
+namespace Loader {}
 }
 
 }

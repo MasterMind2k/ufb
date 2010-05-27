@@ -25,9 +25,9 @@ void Overlay::paint(QPainter *painter, qint32 elapsed)
   painter->save();
 
   painter->setPen(Qt::white);
-  painter->drawText(5, 15, "Active camera: " + canvas()->activeCamera()->name());
+  painter->drawText(5, 15, "Active camera: " + BGE::Canvas::canvas()->activeCamera()->name());
 
-  QString lightsType = static_cast<BGE::Scene::Light*> (canvas()->lights().first())->isSpot() ? "spotlight" : "omni light";
+  QString lightsType = static_cast<BGE::Scene::Light*> (BGE::Canvas::canvas()->lights().first())->isSpot() ? "spotlight" : "omni light";
   painter->drawText(5, 30, "Active lights type: " + lightsType);
 
   painter->restore();

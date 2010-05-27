@@ -57,6 +57,9 @@ class Camera : public Object
       return m_name;
     }
 
+    /**
+     * Returns the camera transformation matrix.
+     */
     inline const Transform3f &cameraTransform() const
     {
       if (m_cameraTransform.matrix().isIdentity())
@@ -64,13 +67,14 @@ class Camera : public Object
       return m_cameraTransform;
     }
 
+    /**
+     * Returns the projection transformation matrix.
+     */
     inline static const Transform3f &projection()
     {
       return m_projection;
     }
 
-    Containment isSphereInFrustrum(const BoundingVolume *boundingVolume) const;
-    Containment isBoxInFrustrum(const BoundingVolume *boundingVolume) const;
 
   private:
     mutable Transform3f m_cameraTransform;
@@ -95,7 +99,11 @@ class Camera : public Object
     Camera(const QString &name = QString());
     ~Camera() {}
 
-  friend class BGE::Canvas;
+    // Methods for culling
+    Containment isSphereInFrustrum(const BoundingVolume *boundingVolume) const;
+    Containment isBoxInFrustrum(const BoundingVolume *boundingVolume) const;
+
+    friend class BGE::Canvas;
 };
 
 }

@@ -27,6 +27,11 @@ class Material;
 }
 namespace Driver {
 
+/**
+ * Driver implementation for OpenGL 3 spec.
+ *
+ * It is implemented with deferred shading technique.
+ */
 class GL3 : public AbstractDriver
 {
   public:

@@ -335,7 +335,6 @@ void Canvas::checkMouse(const QPoint &pos)
 
 void Canvas::setOverlay(AbstractOverlay *overlay)
 {
-  overlay->m_canvas = this;
   m_overlay = overlay;
 }
 
@@ -488,7 +487,7 @@ void Canvas::loadState(GameState *state)
   m_scene = state->m_scene;
 
   if (!state->m_partition)
-    state->m_partition = new Scene::Partition(m_partition->size()->size());
+    state->m_partition = new Scene::Partition(m_partition->boundingVolume()->size());
   m_partition = state->m_partition;
 
   if (!state->m_dynamicsWorld)

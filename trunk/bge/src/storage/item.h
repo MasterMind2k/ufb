@@ -21,13 +21,13 @@
 namespace BGE {
 namespace Storage {
 
+/**
+ * An abstract storage item.
+ */
 class Item
 {
   public:
-    /**
-     * A default constructor.
-     */
-    inline Item(const QString& name)
+    inline Item(const QString &name)
     {
       m_name = name;
       m_bindId = 0;
@@ -35,9 +35,6 @@ class Item
       m_parent = 0l;
     }
 
-    /**
-     * A default destructor. Make sure you call it in your implementation.
-     */
     virtual inline ~Item()
     {
       foreach (Item* item, m_items) {
@@ -49,7 +46,7 @@ class Item
     /**
      * Name of the item.
      */
-    inline const QString& name() const
+    inline const QString &name() const
     {
       return m_name;
     }
@@ -60,7 +57,7 @@ class Item
      * @see item
      * @see removeItem
      */
-    inline void addItem(Item* item)
+    inline void addItem(Item *item)
     {
       if (!item)
         return;
@@ -72,14 +69,14 @@ class Item
      *
      * @see addItem
      */
-    bool removeItem(const QString& name);
+    bool removeItem(const QString &name);
     /**
      * Gets an item by name.
      *
      * @see addItem
      * @see removeItem
      */
-    inline Item* item(const QString& name) const
+    inline Item* item(const QString &name) const
     {
       return m_items.value(name, 0l);
     }
@@ -91,7 +88,10 @@ class Item
       return m_items.values();
     }
 
-    inline Item* parent() const
+    /**
+     * Returns the item's parent.
+     */
+    inline Item *parent() const
     {
       return m_parent;
     }
@@ -119,30 +119,6 @@ class Item
      * Returns the path.
      */
     QString path() const;
-
-    inline quint32 refCount() const
-    {
-      return m_refCount;
-    }
-
-  protected:
-    /**
-     * Increments the reference counter.
-     */
-    inline quint32 incrementReferenceCount()
-    {
-      return ++m_refCount;
-    }
-    /**
-     * Decrements the reference counter.
-     */
-    inline quint32 decrementReferenceCount()
-    {
-      if (!m_refCount)
-        return 0;
-
-      return --m_refCount;
-    }
 
   private:
     QString m_name;

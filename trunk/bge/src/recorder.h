@@ -22,6 +22,9 @@
 
 namespace BGE {
 
+/**
+ * A recorder class. It saves images from framebuffer to designated path.
+ */
 class Recorder : public QThread
 {
   Q_OBJECT
@@ -31,27 +34,34 @@ class Recorder : public QThread
       m_stop = false;
     }
 
-    inline void enqueueImage(const QImage& image)
+    inline void enqueueImage(const QImage &image)
     {
       m_mutex.lock();
       m_queue.enqueue(image);
       m_mutex.unlock();
     }
+    /**
+     * Stops the thread loop
+     */
     inline void stop()
     {
       m_stop = true;
     }
-    inline void setOutput(const QDir& output)
+    /**
+     * Sets the save output.
+     */
+    inline void setOutput(const QDir &output)
     {
       m_outputDir = output;
     }
-    void run();
 
   private:
     QDir m_outputDir;
     QQueue<QImage> m_queue;
     bool m_stop;
     QMutex m_mutex;
+
+    void run();
 
 };
 

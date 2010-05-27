@@ -36,9 +36,8 @@ class BoundingVolume;
 /**
  *@short Main Scene graph object representation
  *
- * It contains the basic transform commands (currently move and rotate).
- * It should contain also a texture and material settings for an
- * object.
+ * It contains the basic transform commands.
+ * It should contain also a texture and material settings for an object.
  */
 class Object
 {
@@ -138,9 +137,6 @@ class Object
     /**
      * Returns the local transformation matrix. Relative to the parent.
      *
-     * @warning It contains proper values when all transforms get calculated.
-     * Outside rendering framework, use the position and orientation methods.
-     *
      * @see position
      * @see orientation
      */
@@ -150,9 +146,6 @@ class Object
     }
     /**
      * Returns the global transformation matrix.
-     *
-     * @warning It contains proper values when all transforms get calculated.
-     * Outside rendering framework, use the position and orientation methods.
      *
      * @see globalPosition
      * @see globalOrientation
@@ -240,8 +233,6 @@ class Object
     /**
      * Returns a child.
      *
-     * @warning You may get ASSERT error if you get out of bounds!
-     *
      * @see childrenNum
      */
     inline Object* child(int index) const
@@ -256,7 +247,7 @@ class Object
       return m_children.size();
     }
     /**
-     * Returns a list of all children.
+     * Returns a list of children.
      *
      * @note It returns a read only reference
      */
@@ -309,16 +300,16 @@ class Object
     }
 
     /**
-     * Sets the material.
+     * Adds a material.
      */
-    inline void addMaterial(Storage::Material* material)
+    inline void addMaterial(Storage::Material *material)
     {
       m_materials.insert(material->faceName(), material);
     }
     /**
-     * Gets the mesh.
+     * Gets the materials.
      */
-    inline const QHash<QString, Storage::Material*>& materials() const
+    inline const QHash<QString, Storage::Material*> &materials() const
     {
       return m_materials;
     }
@@ -326,50 +317,62 @@ class Object
     /**
      * Sets the texture.
      */
-    inline void setTexture(Storage::Texture* texture)
+    inline void setTexture(Storage::Texture *texture)
     {
       m_texture = texture;
     }
     /**
      * Gets the texture.
      */
-    inline Storage::Texture* texture() const
+    inline Storage::Texture *texture() const
     {
       return m_texture;
     }
 
     /**
-     * Sets the orientation so the camera looks at the center of the
+     * Sets the orientation so the object looks at the center of the
      * specified object.
      */
-    void lookAt(Object* object);
+    void lookAt(Object *object);
 
     /**
      * Sets the object, to be looked at.
      *
      * @see lookAt
      */
-    inline void observe(Object* object)
+    inline void observe(Object *object)
     {
       m_observed = object;
     }
     /**
      * Gets the observed object.
      */
-    inline Object* observed() const
+    inline Object *observed() const
     {
       return m_observed;
     }
 
+    /**
+     * Creates a Object from a submesh and add it as a child to this object.
+     */
     Object *objectify(const QString& objectName);
 
+    /**
+     * Loads all materials that are defined in the model.
+     */
     void loadMaterialsFromMesh();
 
+    /**
+     * Gets the bounding volume.
+     */
     inline const BoundingVolume *boundingVolume() const
     {
       return m_boundingVolume;
     }
 
+    /**
+     * Returns if this object is a renderable object.
+     */
     inline bool isRenderable() const
     {
       return m_isRenderable;
@@ -384,16 +387,25 @@ class Object
     {
       m_isCulled = false;
     }
+    /**
+     * Returns culling status.
+     */
     inline bool isCulled() const
     {
       return m_isCulled;
     }
 
+    /**
+     * Returns the octree partition this object belonfs to.
+     */
     inline const Partition *partition() const
     {
       return m_partition;
     }
 
+    /**
+     * Name of the object.
+     */
     inline const QString &name() const
     {
       return m_name;
@@ -402,30 +414,54 @@ class Object
   protected:
     /**
      * This method gets called _before_ transform matrices get updated. Reimplement
-     * it to add your own transforms.
+     * it to add your own transform calculations.
      */
     virtual inline void calculateTransforms(qint32 timeDiff)
     {
       Q_UNUSED(timeDiff);
     }
 
+    /**
+     * This method gets called _after_ transform matrices get updated.
+     */
     virtual inline void postTransformCalculations(qint32 timeDiff)
     {
       Q_UNUSED(timeDiff);
     }
 
+    /**
+     * Sets the renderable status of the object.
+     */
     inline void setRenderable(bool isRenderable)
     {
       m_isRenderable = isRenderable;
     }
 
+    /**
+     * Sets the bounding volume.
+     */
     inline void setBoundingVolume(BoundingVolume *boundingVolume)
     {
       m_boundingVolume = boundingVolume;
     }
 
+    /**
+     * This method gets called when a collision occurs. For this to happen,
+     * you have to set user pointers to the Bullet dynamic bodies.
+     *
+     * Also note that, both objects (that collide) have to have user pointer
+     * defined.
+     *
+     * Use name to distinguish between objects.
+     *
+     * @see setName
+     * @see name
+     */
     virtual inline void collision(Object *object) {}
 
+    /**
+     * Sets the name.
+     */
     inline void setName(const QString &name)
     {
       m_name = name;
