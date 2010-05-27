@@ -18,7 +18,6 @@
 class Explosion : public BGE::Scene::ParticleEmitter
 {
   public:
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     Explosion(const Vector3f &position);
 
   protected:
