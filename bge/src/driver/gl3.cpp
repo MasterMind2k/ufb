@@ -360,12 +360,13 @@ void GL3::setLight(Scene::Light *light)
   temp.constant = light->constantAttenuation();
   temp.linear = light->linearAttenuation();
   temp.quadratic = light->quadraticAttenuation();
-  if (light->isPositional() && light->isSpot())
+  if (light->isPositional() && light->isSpot()) {
     temp.spot_cutoff = light->spotCutOff();
-  else
+    temp.spot_exponent = light->spotExponent();
+    temp.spot_direction = m_transform.rotation() * Vector3f(0, 0, -1);
+  } else {
     temp.spot_cutoff = 180;
-  temp.spot_exponent = light->spotExponent();
-  temp.spot_direction = m_transform.rotation() * Vector3f(0, 0, -1);
+  }
   m_lights << temp;
 }
 
