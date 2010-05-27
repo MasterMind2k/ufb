@@ -491,21 +491,29 @@ void GL3::draw(Scene::ParticleEmitter *emitter)
     }
     free(temp);
     // Indices
+    /* Mapping guide:
+     * X => b000
+     * 0 - positive
+     * 1 - negative
+     * First: x
+     * Second: y
+     * Third: z
+     */
     QVector<quint16> idxs;
-    idxs << i + 0b000 << i + 0b001
-         << i + 0b001 << i + 0b011
-         << i + 0b011 << i + 0b010
-         << i + 0b010 << i + 0b000
+    idxs << i + 0 << i + 1
+         << i + 1 << i + 3
+         << i + 3 << i + 2
+         << i + 2 << i + 0
 
-         << i + 0b100 << i + 0b101
-         << i + 0b101 << i + 0b111
-         << i + 0b111 << i + 0b110
-         << i + 0b110 << i + 0b100
+         << i + 4 << i + 5
+         << i + 5 << i + 7
+         << i + 7 << i + 6
+         << i + 6 << i + 4
 
-         << i + 0b000 << i + 0b100
-         << i + 0b001 << i + 0b101
-         << i + 0b011 << i + 0b111
-         << i + 0b010 << i + 0b110;
+         << i + 0 << i + 4
+         << i + 1 << i + 5
+         << i + 3 << i + 7
+         << i + 2 << i + 6;
     memcpy(indicesPtr, idxs.data(), idxs.size() * sizeof(quint16));
   }
 
@@ -917,20 +925,28 @@ void GL3::load(Storage::Mesh *mesh)
     // Add BB plans
     if (Canvas::canvas()->drawBoundingVolumes()) {
       quint16 meshOffset = vertices.size();
-      idxs << meshOffset + 0b000 << meshOffset + 0b001
-           << meshOffset + 0b001 << meshOffset + 0b011
-           << meshOffset + 0b011 << meshOffset + 0b010
-           << meshOffset + 0b010 << meshOffset + 0b000
+      /* Mapping guide:
+       * X => b000
+       * 0 - positive
+       * 1 - negative
+       * First: x
+       * Second: y
+       * Third: z
+       */
+      idxs << meshOffset + 0 << meshOffset + 1
+           << meshOffset + 1 << meshOffset + 3
+           << meshOffset + 3 << meshOffset + 2
+           << meshOffset + 2 << meshOffset + 0
 
-           << meshOffset + 0b100 << meshOffset + 0b101
-           << meshOffset + 0b101 << meshOffset + 0b111
-           << meshOffset + 0b111 << meshOffset + 0b110
-           << meshOffset + 0b110 << meshOffset + 0b100
+           << meshOffset + 4 << meshOffset + 5
+           << meshOffset + 5 << meshOffset + 7
+           << meshOffset + 7 << meshOffset + 6
+           << meshOffset + 6 << meshOffset + 4
 
-           << meshOffset + 0b000 << meshOffset + 0b100
-           << meshOffset + 0b001 << meshOffset + 0b101
-           << meshOffset + 0b011 << meshOffset + 0b111
-           << meshOffset + 0b010 << meshOffset + 0b110;
+           << meshOffset + 0 << meshOffset + 4
+           << meshOffset + 1 << meshOffset + 5
+           << meshOffset + 3 << meshOffset + 7
+           << meshOffset + 2 << meshOffset + 6;
 
       Plan plan;
       plan.primitive = GL_LINES;
