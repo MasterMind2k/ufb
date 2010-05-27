@@ -28,6 +28,7 @@ class Exhaust : public BGE::Scene::ParticleEmitter
   private:
     Fighter *m_fighter;
     Vector3f m_previousPosition;
+    Quaternionf m_previousOrientation;
 
     void calculateParticle(BGE::Scene::Particle &particle, qint32 timeDiff);
     void spawnParticles(qint32 timeDiff);

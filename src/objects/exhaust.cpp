@@ -41,6 +41,7 @@ Exhaust::Exhaust(Fighter *fighter)
   // Add light
   BGE::Scene::Light *light = BGE::Canvas::canvas()->createLight(QString("Exhaust light_%0").arg((int) this));
   light->setAmbientColor(QColor(180, 96, 0));
+  light->setAmbientColor(QColor(180, 96, 0));
   light->setDiffuseColor(QColor(255, 136, 0));
   light->setSpecularColor(Qt::white);
   light->setQuadraticAttenuation(1);
@@ -59,8 +60,7 @@ void Exhaust::calculateParticle(BGE::Scene::Particle &particle, qint32 timeDiff)
   particle.lifetime += timeDiff;
   particle.position += particle.velocity * timeDiff / 1000.0;
 
-  if (particle.alpha > 0.0)
-    particle.alpha = 3.0 - 3.0 * particle.lifetime / 200.0;
+  particle.alpha = qMax(3.0 - 3.0 * particle.lifetime / 150.0, 0.0);
 }
 
 void Exhaust::spawnParticles(qint32 timeDiff)
@@ -68,10 +68,12 @@ void Exhaust::spawnParticles(qint32 timeDiff)
   qreal usage = m_fighter->enginePower() / Fighter::MaxPower;
 
   Vector3f currentPosition = globalTransform() * Vector3f(0, 0, 0);
+  float previousAlpha = (3.0 - 3.0 * timeDiff / 150.0);
 
   quint16 particles = 300 * usage;
   if (!particles) {
     m_previousPosition = currentPosition;
+    m_previousOrientation = globalOrientation();
     static_cast<BGE::Scene::Light*> (child(0))->setQuadraticAttenuation(1.0);
     return;
   }
@@ -81,20 +83,21 @@ void Exhaust::spawnParticles(qint32 timeDiff)
   qreal n = 1.0 / particles;
   for (quint16 i = 0; i < particles; i++) {
     BGE::Scene::Particle particle;
-    particle.alpha = 3.0;
+    particle.alpha = 3.0 - i * n * (3.0 - previousAlpha);
     particle.colorWeight = 0;
-    particle.lifetime = 0;
+    particle.lifetime = i * n * timeDiff;
+
+    float t = particle.lifetime;
+    Quaternionf orientation = globalOrientation().slerp(t / timeDiff, m_previousOrientation);
+    particle.velocity = orientation * Vector3f(qrand() % 4 - 2, qrand() % 4 - 2, 50).normalized() * 2000 * usage;
 
     // Interpolating points
-    particle.position = currentPosition - i * n * (currentPosition - m_previousPosition);
-
-    particle.velocity = Vector3f(qrand() % 10 - 5, qrand() % 10 - 5, 10).normalized() * (qrand() % 100 + 80);
-
-    particle.position += i * timeDiff / 1000.0 * n * particle.velocity;
+    particle.position = currentPosition - i * n * (currentPosition - m_previousPosition) + particle.velocity * particle.lifetime / 1000.0 + orientation * Vector3f(qrand() % 20 - 10, qrand() % 20 - 10, 0);
 
     particle.initialVelocity = particle.velocity;
     emitParticle(particle);
   }
 
   m_previousPosition = currentPosition;
+  m_previousOrientation = globalOrientation();
 }
