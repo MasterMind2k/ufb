@@ -194,7 +194,7 @@ GL3::GL3()
   m_quadIdxs = 0;
   m_shading = false;
 
-  m_boundingMaterial = new Storage::Material("BGE::BoundingVolume", QColor(0, 0, 0), QColor(0, 0, 0), QColor(0, 0, 0), QColor(255, 255, 255), 0);
+  m_boundingMaterial = new Storage::Material("BGE::BoundingVolume", QColor(255, 255, 255), QColor(0, 0, 0), QColor(0, 0, 0), QColor(0, 0, 0), 0);
 
   m_globalUniforms << "Positions" // With added specular power
                    << "Normals" // With lighting toggle
@@ -394,12 +394,17 @@ void GL3::draw()
   Storage::Material* currentMaterial = 0l;
   setMaterial(currentMaterial);
   foreach (Plan plan, m_plans.value(m_boundMesh->bindId())) {
+    if (hasLighting() && plan.materialName == "BGE::BoundingVolume")
+      bindUniformAttribute("HasLighting", 0.0f);
     if (currentMaterial != m_materials.value(plan.materialName)) {
       currentMaterial = m_materials.value(plan.materialName);
       setMaterial(currentMaterial);
     }
 
     glDrawElements(plan.primitive, plan.count, GL_UNSIGNED_SHORT, (GLushort*)0 + plan.offset);
+
+    if (hasLighting() && plan.materialName == "BGE::BoundingVolume")
+      bindUniformAttribute("HasLighting", 1.0f);
   }
 }
 
