@@ -19,6 +19,8 @@
 
 #include "canvas.h"
 
+#include "statehandler.h"
+
 using namespace States;
 using namespace States::Assets;
 
@@ -45,11 +47,17 @@ void MenuOverlay::moveSelection(Directions direction)
 {
   switch (m_selectedButton) {
     case Play:
-      m_selectedButton = direction == Up ? m_selectedButton : Quit;
+      if (direction == Down)
+        m_selectedButton = StateHandler::self()->hasGame() ? Continue : Quit;
+      break;
+
+    case Continue:
+      m_selectedButton = direction == Up ? Play : Quit;
       break;
 
     case Quit:
-      m_selectedButton = direction == Up ? Play : m_selectedButton;
+      if (direction == Up)
+        m_selectedButton = StateHandler::self()->hasGame() ? Continue : Play;
       break;
   }
 }
@@ -69,6 +77,14 @@ void MenuOverlay::paint(QPainter *painter, qint32 elapsed)
   painter->save();
   drawButton(Play, geometry, painter);
   painter->restore();
+
+  // Continue
+  if (StateHandler::self()->hasGame()) {
+    geometry.translate(0, m_buttonSize.height() + 30);
+    painter->save();
+    drawButton(Continue, geometry, painter);
+    painter->restore();
+  }
 
   // Quit
   geometry.translate(0, m_buttonSize.height() + 30);
@@ -99,6 +115,9 @@ QString MenuOverlay::buttonText(Buttons button)
   switch (button) {
     case Play:
       return "Play";
+
+    case Continue:
+      return "Continue";
 
     case Quit:
       return "Quit";

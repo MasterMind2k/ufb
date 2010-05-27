@@ -3,6 +3,7 @@ set(assets_SRCS
   menucontroller.cpp
   controller.cpp
   hud.cpp
+  statehandler.cpp
 )
 
 set(assets_HDRS

@@ -10,30 +10,46 @@
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
  ***************************************************************************/
-#include "gamestate.h"
+#ifndef STATES_ASSETS_STATEHANDLER_H
+#define STATES_ASSETS_STATEHANDLER_H
 
-#include "BulletDynamics/Dynamics/btDynamicsWorld.h"
-
-#include "scene/object.h"
-#include "scene/partition.h"
-
-using namespace BGE;
-
-GameState::GameState()
-{
-  m_scene = new Scene::Object;
-  m_overlay = 0l;
-  m_controller = 0l;
-  m_activeCamera = 0l;
-  m_partition = 0l;
-  m_dynamicsWorld = 0l;
+namespace BGE {
+class GameState;
 }
 
-GameState::~GameState()
+namespace States {
+namespace Assets {
+
+class StateHandler
 {
-  delete m_scene;
-  if (m_partition)
-    delete m_partition;
-  if (m_dynamicsWorld)
-    delete m_dynamicsWorld;
+  public:
+    inline static StateHandler *self()
+    {
+      if (!StateHandler::m_self)
+        StateHandler::m_self = new StateHandler;
+      return StateHandler::m_self;
+    }
+
+    void play();
+    void unload();
+    void resume();
+    inline bool hasGame() const
+    {
+      return m_game != 0l;
+    }
+
+  private:
+    static StateHandler *m_self;
+    BGE::GameState *m_game;
+
+    /* Singleton class */
+    StateHandler();
+
+    void populateAsteroids();
+    void setRestraints();
+};
+
 }
+}
+
+#endif

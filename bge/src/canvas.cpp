@@ -110,9 +110,7 @@ Canvas::Canvas()
   registerStage(-1, new Rendering::OutputStage);
 
   // Setup default dynamics world
-  btDefaultCollisionConfiguration *collisionConfiguration = new btDefaultCollisionConfiguration;
-  m_dynamicsWorld = new btDiscreteDynamicsWorld(new btCollisionDispatcher(collisionConfiguration), new btDbvtBroadphase, new btSequentialImpulseConstraintSolver, collisionConfiguration);
-  m_dynamicsWorld->setGravity(btVector3(0, -10, 0));
+  setupDynamicsWorld();
 
   setMouseTracking(true);
 
@@ -491,6 +489,11 @@ void Canvas::loadState(GameState *state)
   if (!state->m_partition)
     state->m_partition = new Scene::Partition(m_partition->size()->size());
   m_partition = state->m_partition;
+
+  if (!state->m_dynamicsWorld)
+    setupDynamicsWorld();
+  else
+    m_dynamicsWorld = state->m_dynamicsWorld;
 }
 
 void Canvas::unloadState(GameState *state)
@@ -508,6 +511,7 @@ void Canvas::unloadState(GameState *state)
   state->m_controller = m_controller;
   state->m_overlay = m_overlay;
   state->m_partition = m_partition;
+  state->m_dynamicsWorld = m_dynamicsWorld;
 }
 
 void Canvas::keyPressEvent(QKeyEvent* event)
@@ -550,6 +554,13 @@ void Canvas::mouseReleaseEvent(QMouseEvent *event)
   if (m_controller)
     m_controller->mouseButtonReleased(event);
   QWidget::mousePressEvent(event);
+}
+
+void Canvas::setupDynamicsWorld()
+{
+  btDefaultCollisionConfiguration *collisionConfiguration = new btDefaultCollisionConfiguration;
+  m_dynamicsWorld = new btDiscreteDynamicsWorld(new btCollisionDispatcher(collisionConfiguration), new btDbvtBroadphase, new btSequentialImpulseConstraintSolver, collisionConfiguration);
+  m_dynamicsWorld->setGravity(btVector3(0, -10, 0));
 }
 
 void Canvas::cleanup()

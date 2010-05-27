@@ -77,6 +77,14 @@ class ObjectList
      */
     Objects::Object *nearest(Objects::Object *reference, const QString &name = QString(), float maxRange = 0) const;
 
+    inline void clear()
+    {
+      m_objects.clear();
+      m_transformedPositions.clear();
+      m_nearestAsteroid = 0l;
+      m_nearestFighter = 0l;
+    }
+
   private:
     QList<Objects::Object*> m_objects;
     QHash<Objects::Object*, Vector3f> m_transformedPositions;

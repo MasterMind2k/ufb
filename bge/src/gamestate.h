@@ -15,6 +15,8 @@
 
 #include <QtCore/QHash>
 
+class btDynamicsWorld;
+
 namespace BGE {
 class AbstractOverlay;
 class AbstractController;
@@ -72,6 +74,7 @@ class GameState
     QHash<QString, Scene::Light*> m_lights;
     QHash<QString, Scene::Camera*> m_cameras;
     Scene::Camera *m_activeCamera;
+    btDynamicsWorld *m_dynamicsWorld;
 
     friend class Canvas;
 };

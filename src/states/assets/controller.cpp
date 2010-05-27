@@ -20,6 +20,8 @@
 
 #include "objects/fighter.h"
 
+#include "statehandler.h"
+
 using namespace States;
 using namespace States::Assets;
 
@@ -51,6 +53,11 @@ void Controller::keyPressed(QKeyEvent *event)
 
     case Qt::Key_Minus: {
       m_fighter->setEnginePower(m_fighter->enginePower() - 50000);
+      break;
+    }
+
+    case Qt::Key_Escape: {
+      StateHandler::self()->unload();
       break;
     }
 
