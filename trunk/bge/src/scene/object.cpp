@@ -147,7 +147,6 @@ void Object::lookAt(Object *object)
   matrix(0,2) = -forward.x();
   matrix(1,2) = -forward.y();
   matrix(2,2) = -forward.z();
-  matrix(3,2) = 0;
 
   // And convert the rotation matrix to quaternion
   Quaternionf rotation(matrix);
