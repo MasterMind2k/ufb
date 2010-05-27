@@ -135,29 +135,22 @@ void Object::lookAt(Object *object)
   up = side.cross(forward).normalized();
 
   // Setup transform matrix
-  Transform3f matrix;
+  Matrix3f matrix;
   matrix(0,0) = side.x();
   matrix(1,0) = side.y();
   matrix(2,0) = side.z();
-  matrix(3,0) = 0;
 
   matrix(0,1) = up.x();
   matrix(1,1) = up.y();
   matrix(2,1) = up.z();
-  matrix(3,1) = 0;
 
   matrix(0,2) = -forward.x();
   matrix(1,2) = -forward.y();
   matrix(2,2) = -forward.z();
   matrix(3,2) = 0;
 
-  matrix(0,3) = 0;
-  matrix(1,3) = 0;
-  matrix(2,3) = 0;
-  matrix(3,3) = 1;
-
-  // And get the rotation :)
-  Quaternionf rotation(matrix.rotation());
+  // And convert the rotation matrix to quaternion
+  Quaternionf rotation(matrix);
   setOrientation(rotation);
 }
 
