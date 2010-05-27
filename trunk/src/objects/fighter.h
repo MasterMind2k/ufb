@@ -59,10 +59,10 @@ class Fighter : public Object
 
     void fire();
 
-    static const qreal MaxPower = 1000000;
-    static const qreal MaxVelocity = 1435;
-    static const quint16 ShieldsRechargeTime = 2000;
-    static const float ShieldsRechargeTick = 10.0f;
+    static qreal MaxPower;
+    static qreal MaxVelocity;
+    static quint16 ShieldsRechargeTime;
+    static float ShieldsRechargeTick;
 
     inline float hullIntegrity() const
     {

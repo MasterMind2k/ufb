@@ -25,6 +25,11 @@
 
 using namespace Objects;
 
+qreal Fighter::MaxPower = 1000000.0;
+qreal Fighter::MaxVelocity = 1435.0;
+quint16 Fighter::ShieldsRechargeTime = 2000;
+float Fighter::ShieldsRechargeTick = 10.0f;
+
 Fighter::Fighter(Util::Ai *ai)
   : m_ai(ai),
     m_hullIntegrity(100),

@@ -94,10 +94,6 @@ class Camera : public Object
     // I do not allow creation of cameras outside the engine!
     Camera(const QString &name = QString());
     ~Camera() {}
-    Camera()
-    {
-      qFatal("BGE::Scene::Camera(): Invalid constructor!");
-    }
 
   friend class BGE::Canvas;
 };

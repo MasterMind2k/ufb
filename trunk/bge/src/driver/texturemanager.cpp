@@ -14,6 +14,14 @@
 
 #include "canvas.h"
 
+#ifdef _WIN32
+typedef void (APIENTRY *glActiveTexture_t) (GLenum shader);
+glActiveTexture_t _glActiveTexture = 0l;
+
+#undef glActiveTexture
+#define glActiveTexture _glActiveTexture
+#endif
+
 using namespace BGE;
 using namespace Driver;
 
@@ -77,4 +85,12 @@ void TextureManager::copyRenderedToTexture(quint32 textureId)
 
   glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F_ARB, 0, 0, Canvas::canvas()->size().width(), Canvas::canvas()->size().height(), 0);
   unbind(textureId);
+}
+
+TextureManager::TextureManager()
+{
+  m_usedSlots = 0;
+#ifdef _WIN32
+  _glActiveTexture = (glActiveTexture_t) Canvas::canvas()->context()->getProcAddress("glActiveTexture");
+#endif
 }

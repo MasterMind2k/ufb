@@ -172,7 +172,7 @@ void Canvas::paintGL()
     m_dynamicsWorld->stepSimulation((qreal) elapsed / 1000.0, 7);
 
     // Get collisions
-    int manifolds = m_dynamicsWorld->getDispatcher()->getNumManifolds();
+    quint32 manifolds = m_dynamicsWorld->getDispatcher()->getNumManifolds();
     for (quint32 i = 0; i < manifolds; i++) {
       btPersistentManifold *manifold = m_dynamicsWorld->getDispatcher()->getManifoldByIndexInternal(i);
       btCollisionObject *objectA = static_cast<btCollisionObject*> (manifold->getBody0());
@@ -372,6 +372,7 @@ bool Canvas::removeCamera(const QString& name)
 
   m_cameras.remove(name);
   delete camera;
+  return true;
 }
 
 Scene::Light* Canvas::createLight(const QString& name)

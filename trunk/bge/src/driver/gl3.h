@@ -30,6 +30,29 @@ namespace Driver {
 class GL3 : public AbstractDriver
 {
   public:
+    struct Plan {
+      quint32 primitive;
+      quint32 count;
+      QString materialName;
+      quint32 offset;
+    };
+    struct Light {
+      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+      Vector4f position;
+      // Colors
+      Vector4f ambient;
+      Vector4f diffuse;
+      Vector4f specular;
+      // Attenuations
+      float constant;
+      float linear;
+      float quadratic;
+      // Spot properties
+      float spot_cutoff;
+      float spot_exponent;
+      Vector3f spot_direction;
+    };
+
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     GL3();
     ~GL3();
@@ -82,28 +105,6 @@ class GL3 : public AbstractDriver
     void pass(Rendering::Stage *stage);
 
   private:
-    struct Plan {
-      quint32 primitive;
-      quint32 count;
-      QString materialName;
-      quint32 offset;
-    };
-    struct Light {
-      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-      Vector4f position;
-      // Colors
-      Vector4f ambient;
-      Vector4f diffuse;
-      Vector4f specular;
-      // Attenuations
-      float constant;
-      float linear;
-      float quadratic;
-      // Spot properties
-      float spot_cutoff;
-      float spot_exponent;
-      Vector3f spot_direction;
-    };
     QHash<quint32, quint32> m_indices;
     QHash<quint32, QList<Plan> > m_plans;
     Matrix4f m_projectionMatrix;

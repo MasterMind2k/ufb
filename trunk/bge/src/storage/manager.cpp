@@ -114,11 +114,13 @@ Item* Manager::get(const QString &path) const
     node = node->item(part);
     // The looked for item does not exist
     if (!node)
-      return 0l;
+      break;
 
     if (i == splited.size() - 1)
       return node;
   }
+
+  return 0l;
 }
 
 void Manager::set(Item* item, const QString& path)
