@@ -51,7 +51,7 @@ class Material : public Item
     {
       return m_ambient;
     }
-    inline const QColor& setDiffuse(const QColor& diffuse)
+    inline void setDiffuse(const QColor& diffuse)
     {
       m_diffuse = diffuse;
     }

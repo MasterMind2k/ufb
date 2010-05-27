@@ -10,7 +10,6 @@
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
  ***************************************************************************/
-#include "Eigen/QtAlignedMalloc"
 #include <QtGui/QApplication>
 
 #include "BulletDynamics/Dynamics/btDynamicsWorld.h"
@@ -43,7 +42,6 @@ void createSkyboxQuad()
 
 int main(int argc, char **argv)
 {
-  qsrand(time(0l));
   Q_INIT_RESOURCE(bge_resources);
 
   QApplication app(argc, argv);
@@ -62,8 +60,8 @@ int main(int argc, char **argv)
   BGE::Scene::Light::setGlobalAmbient(QColor(120, 120, 120));
 
   // Fix fighter model :)
-  BGE::Storage::Manager::self()->get<BGE::Storage::Mesh*>("/fighters/models/fighter")->rotate(AngleAxisf(-M_PI / 2, Vector3f::UnitX()));
-  BGE::Storage::Manager::self()->get<BGE::Storage::Mesh*>("/projectiles/bullet")->rotate(AngleAxisf(-M_PI / 2, Vector3f::UnitX()));
+  BGE::Storage::Manager::self()->get<BGE::Storage::Mesh*>("/fighters/models/fighter")->rotate(AngleAxisf(-M_PI / 2.0, Vector3f::UnitX()));
+  BGE::Storage::Manager::self()->get<BGE::Storage::Mesh*>("/projectiles/bullet")->rotate(AngleAxisf(-M_PI / 2.0, Vector3f::UnitX()));
 
   BGE::Canvas::canvas()->pushGameState(new States::Menu);
 

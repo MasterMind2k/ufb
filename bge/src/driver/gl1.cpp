@@ -299,7 +299,7 @@ void GL1::draw()
   if (!hasLighting())
     glDisable(GL_LIGHTING);
 
-  while (m_renderedLights < m_lights.size()) {
+  while (m_renderedLights < (quint32) m_lights.size()) {
     if (!isFirstPass)
       loadLights();
 
@@ -414,7 +414,7 @@ void GL1::loadLights()
   if (m_renderedLights)
     offset = m_renderedLights;
   for (quint32 i = 0; i < 8; i++) {
-    if (i + offset >= m_lights.size())
+    if (i + offset >= (quint32) m_lights.size())
       break;
 
     Scene::Light *light = m_lights.at(i + offset);

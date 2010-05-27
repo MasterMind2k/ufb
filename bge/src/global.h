@@ -19,6 +19,10 @@
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
+#ifdef _WIN32
+#include "3rdparty/gl.h"
+#endif
+
 /* Debugging */
 #include <QtDebug>
 

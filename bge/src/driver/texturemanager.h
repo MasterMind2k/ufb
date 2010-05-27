@@ -64,10 +64,7 @@ class TextureManager
     quint16 m_usedSlots;
 
     // A forbidden constructor :D
-    inline TextureManager()
-    {
-      m_usedSlots = 0;
-    }
+    TextureManager();
 };
 
 }

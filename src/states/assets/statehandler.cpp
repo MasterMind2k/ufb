@@ -12,6 +12,8 @@
  ***************************************************************************/
 #include "statehandler.h"
 
+#include <ctime>
+
 #include "BulletDynamics/Dynamics/btDynamicsWorld.h"
 #include "BulletDynamics/Dynamics/btRigidBody.h"
 #include "LinearMath/btDefaultMotionState.h"
