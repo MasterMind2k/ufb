@@ -253,8 +253,8 @@ Vektor $\overrightarrow{V_f}$ izračunam z
 \end{eqnarray*},
 kjer so
 \begin{description}
-  \item[$\overrightarrow{P_{ol}}$] \dots pozicija \emph{opazovanca} v lokalni prostor \emph{gledalca},
-  \item[$O_p$] \dots globalna orientacija očeta \emph{gledalca} (quaternion),
+  \item[$\overrightarrow{P_{ol}}$] \dots pozicija \emph{opazovanca} v lokalnem prostoru \emph{gledalca},
+  \item[$O_p$] \dots globalna orientacija starša \emph{gledalca} (quaternion),
   \item[$\overrightarrow{P_o}$] \dots globalna pozicija \emph{opazovanca},
   \item[$\overrightarrow{P_p}$] \dots globalna pozicija očeta \emph{gledalca},
   \item[$\overrightarrow{P}$] \dots globalna pozicija \emph{gledalca},
@@ -328,7 +328,7 @@ V GL3 gonilniku se uporabljajo VBO\footnote{Vertex Buffer Object}-ji za izris mo
 
 \begin{lstlisting}[caption={Struktura posameznega oglišča}]
 struct BufferElement {
-  float position[3];
+  GLfloat position[3];
   GLfloat normal[3];
   GLfloat uvMap[2];
   GLubyte padding[32]; /* Potrebno zaradi 64-bit `„alignmenta“~ */
@@ -566,23 +566,23 @@ Z miškinim levim klikom se izstrelita dva laserska „izstrelka“, ki potujeta
 \subsection{HUD}
 Na HUD projeciram položaje vidnih asteroidov ter letal z enačbo
 \begin{eqnarray*}
-V_s =& P \cdot C \cdot V_o\\
-x =& \frac{w \cdot (V_s[1] + 1)}{2} \\
-y =& h - \frac{h \cdot (V_s[2] + 1)}{2}
+\overrightarrow{V_s} =& P \cdot C \cdot \overrightarrow{V_o}\\
+x =& \frac{w \cdot (\overrightarrow{V_s}[1] + 1)}{2} \\
+y =& h - \frac{h \cdot (\overrightarrow{V_s}[2] + 1)}{2}
 \end{eqnarray*},
 pri čemer so:
 \begin{description}
-  \item[$V_s$] \dots projeciran položaj objekta,
+  \item[$\overrightarrow{V_s}$] \dots projeciran položaj objekta,
   \item[$P$] \dots projekcijska matrika,
   \item[$C$] \dots matrika kamere,
-  \item[$V_o$] \dots globalni položaj objekta,
+  \item[$\overrightarrow{V_o}$] \dots globalni položaj objekta,
   \item[$x$] \dots x koordinata ekrana,
   \item[$y$] \dots y koordinata ekrana,
   \item[$w$] \dots širina ekrana,
   \item[$h$] \dots višina ekrana.
 \end{description}
 
-Omenim samo še to, da sem opazil, da projekcijska matrika projecira y koordinato na klasični koordinatni sistem (y 0 je spodaj), medtem ko Qt-jev 2D API ima obrnjeno y os (y 0 je zgoraj).
+Omenim samo še to, da sem opazil, da projekcijska matrika projecira y koordinato na klasični koordinatni sistem ($y = 0$ je spodaj), medtem ko Qt-jev 2D API ima obrnjeno y os ($y = 0$ je zgoraj).
 
 Da je iskanje objektov najbolj optimalno, sem naredil zadevo tako, da vsak objekt, ki je zanimiva igralcu, osveži svoj položaj v vrsti (položaj je že projeciran). In ko pride čas za izris HUD, se najprej uredi seznam, nato se pa sprehodi po seznamu in izrisuje relevantne podatke, dokler ne pride do objekta, ki ga ni več na ekranu.
 
