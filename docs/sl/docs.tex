@@ -67,6 +67,11 @@
 \section{Uvod}
 Seminarsko sem se lotil tako, da sem najprej razvil pogon, Besterd Game Engine (BGE), ter nato igro Ultimate Flying Bastards(UFB). Zaradi tega sem to poročilo razdelil na dva sklopa.
 
+\subsection{Uporabljene tehnologije}
+Uporabil sem v veliki meri Qt ogrodje, kar se tiče 2D izrisa ter samega jedra (\emph{QGLWidget}). Vse ostalo je pa uporaba osnovnih OpenGL ukazov.
+
+Uporabljam tudi Bullet Physics pogon, a ga BGE zelo ohlapno abstrahira, tako da je odvisno od uporabnika kako ga bo uporabljal. Je pa priložen razred \emph{MotionState} za posodabljanje stanja s fizikalnega pogona v BGE.
+
 \section{BGE}
 Sam pogon BGE je razdeljen na podmodule:
 \begin{description}
@@ -243,7 +248,7 @@ To matriko nato dam v Quaternion in z njo določim novo orientacijo objekta.
 
 Vektor $\overrightarrow{V_f}$ izračunam z
 \begin{eqnarray*}
-\overrightarrow{P_{ol}} =& O_p^{-1} * (\overrightarrow{P_o} - \overrightarrow{P_p}) + \overrightarrow{P_p} \\
+\overrightarrow{P_{ol}} =& O_p^{-1} \cdot (\overrightarrow{P_o} - \overrightarrow{P_p}) + \overrightarrow{P_p} \\
 \overrightarrow{V_f} =& \frac{\overrightarrow{P_{ol}} - \overrightarrow{P}}{\left| \overrightarrow{P_{ol}} - \overrightarrow{P} \right|} \\
 \end{eqnarray*},
 kjer so
@@ -269,6 +274,8 @@ kjer sta:
 
 \subsubsection{Kamera}
 Kamero se naredi preko Canvas-a, in jo je potrebno aktivirati. Kamero lahko premikamo, lahko jo pripnemo nekemu drugemu objektu ipd. Vse ostalo potem dela pogon.
+
+Transformatorsko matriko kamere moram spremeniti, da jo lahko uporabim kot matriko kamere. Najprej naredim ločeno matriko rotacije ter translacije (rotacija je inverzna in translacija je negativna). V primeru, če ima kamera kot objekt starša, je potrebno popraviti rotacijsko matriko. Rotacijski matriki je potrebno „odšteti“ lokalni položaj, potem pa obrniti za njeno globalno rotacijo ter nazaj prišteti njeno lokalno pozicijo. Na koncu še z desne zmnožim rotacijsko matriko z translacijsko in tako dobim matriko za „eye“ položaj objekta.
 
 \subsubsection{Luči}
 Podobno kot kamere, se jih naredi preko Canvas-a. Lučem lahko nastavimo parametre, ki so uporabljeni v \emph{Phong} modelu osvetljevanja. Ker je izpeljan iz razreda \emph{Object}, ga lahko pripnemo katerekoli objektu, in mu tako dodamo luč.
@@ -437,9 +444,11 @@ Zaradi teh problemov sem se odločil, da naredim plan izrisa. Vsak del plana nos
     
     \node[texture] (middle) [right = of rendering] {Vmesne teksture};
     
-    \node[stage] (finish) [below = of ]
+    \node[stage] (finish) [below = of commit] {Zadnja stopnja};
     
     \draw[->] (first) -- (setup);
+    
+    \draw[<->] (middle.west) -- (rendering.east);
     
     % From setup to rendering
     \draw[->] ([xshift = -20mm] setup.south) -- ([xshift = -20mm] rendering.north);
@@ -449,7 +458,6 @@ Zaradi teh problemov sem se odločil, da naredim plan izrisa. Vsak del plana nos
     \draw[->] ([xshift = 20mm] setup.south) -- ([xshift = 20mm] rendering.north);
     
     \draw[->] (data) -- (setup);
-    \draw[->] (middle.north) -- (setup.east);
     
     % From rendering to commit
     \draw[->] ([xshift = -20mm] rendering.south) -- ([xshift = -20mm] commit.north);
@@ -458,12 +466,13 @@ Zaradi teh problemov sem se odločil, da naredim plan izrisa. Vsak del plana nos
     \draw[->] ([xshift = 10mm] rendering.south) -- ([xshift = 10mm] commit.north);
     \draw[->] ([xshift = 20mm] rendering.south) -- ([xshift = 20mm] commit.north);
     
-    \draw[->] (commit.east) -- (middle.south);
-    
     % Loop
-    \draw[->, dotted] (commit.west) .. controls +(-2, 2) .. (setup.west);
+    \draw[->, dotted] (commit.west) .. controls +(-1.8, 0.0) and +(-1.8, 0) .. (setup.west);
     
+    % From commit to final
+    \draw[->] (commit) -- (finish);
     
+    \draw[->] (data.east) .. controls +(1, 0) and +(5, 0) .. (finish.east);
   
   \end{tikzpicture}
   
@@ -479,6 +488,139 @@ BGE zrendra prvo stopnjo v 7 tekstur. Njihovo zgradbo prikazuje slika \ref{slika
 
 Trenutna implementacija pri izrisu luči izriše celoten pravokotnik za vse luči. Zadevo bi lahko izboljšal tako, da bi izrisal samo tisti del pravokotnika na katerega vpliva določena luč.
 
+\subsection{Rendering modul}
+\begin{figure}
+  \centering
+  \begin{tikzpicture}[node distance = 0.5cm]
+    \node[class] (renderer) {Renderer};
+    
+    \node[class] (stage) [left = of renderer] {Stage};
+    \node[class] (lighting) [below = of stage] {LightingStage};
+    \node[class] (bloom) [below = of lighting] {BloomStage};
+    \node[class] (output) [below = of bloom] {OutputStage};
+    
+    \draw[inherits] (lighting.north) -| (stage);
+    \draw[line] (bloom.west) -- ++ (-2mm, 0) |- ([yshift = 2mm] lighting.north);
+    \draw[line] (output.west) -| ([xshift = -2mm] bloom.west);
+  \end{tikzpicture}
+  
+  \label{graf:class_rendering}
+  \caption{Razredni diagram Rendering razredov}
+\end{figure}
+Tukaj so razredi povezani z višje nivojskim izrisovanjem. Razred \emph{Renderer} ima izrisevalno vrsto, ki pa še ni urejena. Če bi jo uredil po modelih ter teksturah, bi lahko izboljšal učinkovitost izrisa, saj nebi bilo potrebno večkrat „bindat“ istega modela oz. teksture.
+
+Vsebuje pa tudi abstrakcijo izrisovalnih stopenj (\emph{Rendering stages}), ki so uporabljeni za senčenje. BGE vsebuje nekaj osnovnih (poglej razredni diagram na sliki \ref{graf:class_rendering}), lahko pa uporabnik doda svoje, če želi. Seveda mora pri temu napisati še \emph{Vertex} in \emph{Fragment shader}.
+
+Delo s shaderji je malo poenostavljeno, saj sem določil shader program (.sp), kjer določiš oba shaderja. Določil sem pa tudi shader module (.fsm in .vsm), ki jih lahko vključi v program z ukazom \emph{include /vfs/pot;}, ki se mora nahajati med \emph{[Vertex]} oz. \emph{[Fragment]} ključnima besedama ter samo kodo. Skladiščni upravljalnik (Storage manager) nato sam poskrbi za zahteve posameznih programov in modulov.
+
+\subsection{BGE modul}
+\begin{figure}
+  \centering
+  \begin{tikzpicture}[node distance = 0.5cm]
+    \node[class] (canvas) {Canvas};
+    \node[class] (overlay) [below = of canvas] {AbstractOverlay};
+    \node[class] [left = of overlay] {AbstractController};
+    \node[class] [right = of overlay] {MotionState};
+    \node[class] [left = of canvas] {Gamestate};
+    \node[class] [right = of canvas] {Recorder};
+  \end{tikzpicture}
+  
+  \label{graf:class_bge}
+  \caption{Razredni diagram BGE razredov}
+\end{figure}
+
+Glavni modul pogona. Tukaj so vsi bolj splošni razredi (katerih nisem mogel dati drugam). Ene par jih bom posebej izpostavil.
+
+\subsubsection{Snemalnik}
+Za potrebe predstavitev, saj moja grafična kartica v prenosnem računalniku ni dovolj zmogljiva, sem naredil še snemalnik (\emph{Recorder}).
+
+Zadeva deluje tako, da približno vsakih 40 ms zajame sliko, ter jo da v vrsto. Samo shranjevanje slik pa poteka v ločeni niti. Shranjujem v tiff formatu, saj sem presodil, da shranjevanje v ta format vzame najmanj procesorskega časa.
+
+Snemanje lahko izvede uporabnik z zagonom aplikacije, ki je bila zgrajena z BGE, z argumentom \emph{record=/pot/do/direktorija} v ukazni vrstici.
+
+\subsubsection{„Vhod/Izhod“}
+Za 2D izris po ekranu sem uporabil Qt-jev 2D izrisovalni API. Uporabnik BGE-ja lahko riše po ekranu tako, da implementira \emph{AbstractOverlay} in znotraj metode \emph{paint} izrisuje svojo željeno 2D vsebino.
+
+Podobno je z \emph{AbstractController}, le da je za drugo smer. Torej, beleženje tipk na tipkovnici in dejavnost miške se opravi z implementacijo tega razreda.
+
+\subsubsection{Stanje igre}
+Vsaka igra ima tudi stanja. Recimo meni, pavza, sama igra itd. Za lažje upravljanje s temi stanji sem naredil nek preprost \emph{GameState} API, ki ga uporabnik lahko uporabi za določanje svojih stanj.
+
+API deluje na principu sklada. Ko dodaš novo stanje na sklad, bo BGE samodejno preklopil v to stanje. Če daš pa s sklada dol, se bo pa prejšne stanje naložilo in nadaljevalo.
+
+\subsubsection{Culling}
+Culling se izvaja ob vsakem izrisovanju 3D scene. In deluje tako, da gre s korena navzdol po osmiškem drevesu.
+
+Za vsako particijo posebej najprej preveri oklepajočo kroglo\footnote{Bounding sphere}. Če je ta v celoti v prisekani piramidi pogleda\footnote{View-frustrum}, se vse scenske objekte, ki so v tej particiji ali v otrokih, da v izrisevalno vrsto. V primeru, če je oklepajoča v celoti zunaj, ignorira celotno particijo.
+
+Ko je oklepajoča krogla delno v pogledu, preveri najprej še oklepajočo škatlo\footnote{Bounding box}. Če je škatla v celoti v pogledu, doda vse objekte v vrsto, če je v celoti zunaj, jo ignorira. Če je pa spet delno vidna, mora pa vsak objekt posebej preveriti, če je notri. In tako podobno gre potem za vse otroke particije.
+
 \section{UFB}
+UFB je nekakšne vrste letalska streljačina. Ker je streljanje asteroidov dokaj nezanimivo, sem poskusil narediti enostaven AI, ki ti sledi in strelja nate ter se izmika asteroidom. Sposoben je tudi bežanja :) .
+
+\subsection{Vodenje letala}
+Letalo se vodi s pomočjo miške in dveh tipk na tipkovnici (+ in -). Z oddaljenostjo miške od sredine ekrana se določi velikost kotne hitrosti v določeno smer. S tipkama + in - se pa določi velikost sile, ki potiska letalo naprej. Vse ostalo prevzame fizikalni pogon, in sem na tak način naredil dokaj enostaven sistem krmiljenja.
+
+Z miškinim levim klikom se izstrelita dva laserska „izstrelka“, ki potujeta v ravni linji.
+
+\subsection{HUD}
+Na HUD projeciram položaje vidnih asteroidov ter letal z enačbo
+\begin{eqnarray*}
+V_s =& P \cdot C \cdot V_o\\
+x =& \frac{w \cdot (V_s[1] + 1)}{2} \\
+y =& h - \frac{h \cdot (V_s[2] + 1)}{2}
+\end{eqnarray*},
+pri čemer so:
+\begin{description}
+  \item[$V_s$] \dots projeciran položaj objekta,
+  \item[$P$] \dots projekcijska matrika,
+  \item[$C$] \dots matrika kamere,
+  \item[$V_o$] \dots globalni položaj objekta,
+  \item[$x$] \dots x koordinata ekrana,
+  \item[$y$] \dots y koordinata ekrana,
+  \item[$w$] \dots širina ekrana,
+  \item[$h$] \dots višina ekrana.
+\end{description}
+
+Omenim samo še to, da sem opazil, da projekcijska matrika projecira y koordinato na klasični koordinatni sistem (y 0 je spodaj), medtem ko Qt-jev 2D API ima obrnjeno y os (y 0 je zgoraj).
+
+Da je iskanje objektov najbolj optimalno, sem naredil zadevo tako, da vsak objekt, ki je zanimiva igralcu, osveži svoj položaj v vrsti (položaj je že projeciran). In ko pride čas za izris HUD, se najprej uredi seznam, nato se pa sprehodi po seznamu in izrisuje relevantne podatke, dokler ne pride do objekta, ki ga ni več na ekranu.
+
+Prikaz najbližjega asteroida ter letala je narejen podobno kot prikaz podatkov, le s to razliko, da se ob ažuriranju podatkov položaja, preveri če je določen objekt prišel bližje igralcu. Tako si zapomni najbližji objekt, ki ga nato HUD izriše.
+
+\subsection{Računalniško vodeno letalo}
+Računalniška „inteligenca“ je zelo preprosta. Svoje letalo vodi na enak način kot igralec (z določanjem kotne hitrosti ter pogonske sile).
+
+\subsubsection{Sledenje igralcu}
+Igralcu sledi tako, da izračuna kot, ki je med njem in tarčo. In to naredi za rotacijo po z (\emph{roll}) ter x (\emph{pitch}) osi. Te kote nato vzame kot kotno hitrost. Če je tarča oddaljena za neko določeno vrednost, vklopi motorje in se tako približa tarči. Isto je s streljanjem, le da je ta razdalja daljša.
+
+Kot izračuna tako, da najprej pretvori položaj tarče v svoj „očesni prostor“. Nato izračuna kota\\
+\begin{minipage}{0.5\textwidth}
+\begin{eqnarray*}
+  \overrightarrow{V_{tz}} =& \left[\begin{array}{c}\overrightarrow{V_t}[1]\\\overrightarrow{V_t}[2]\\0\end{array}\right]\\
+  \overrightarrow{V_y} =& \left[\begin{array}{c}0\\1\\0\end{array}\right]\\
+  z =& (\widehat{V_{tz}} \times \overrightarrow{V_y})[3] \cdot -1\\
+  \alpha_z =& acos\left(\widehat{V_{tz}} \cdot \overrightarrow{V_y}\right) \cdot \frac{z}{|z|}
+\end{eqnarray*}
+\end{minipage}
+\begin{minipage}{0.5\textwidth}
+\begin{eqnarray*}
+  \overrightarrow{V_{tx}} =& \left[\begin{array}{c}0\\\overrightarrow{V_t}[2]\\\overrightarrow{V_t}[3]\end{array}\right]\\
+  \overrightarrow{V_z} =& \left[\begin{array}{c}0\\0\\-1\end{array}\right]\\
+  x =& (\widehat{V_{tx}} \times \overrightarrow{V_z})[3] \cdot -1\\
+  \alpha_x =& acos\left(\widehat{V_{tx}} \cdot \overrightarrow{V_z}\right) \cdot \frac{x}{|x|}
+\end{eqnarray*}
+\end{minipage}
+, kjer so:
+\begin{description}
+  \item[$\alpha_x$ in $\alpha_z$] \dots iskana kota,
+  \item[$x$ in $z$] \dots predznak\footnote{Skalarni produkt izračuna najbližji kot, zato rabim še predznak},
+  \item[$\overrightarrow{V_{tz}}$] \dots Vektor položaja tarče.
+\end{description}
+
+Te dva kota potem določi kot kotno hitrost ($\alpha_z$ po osi z ter $\alpha_x$ po osi x). Seveda je potrebno še omeniti, da ima letalo zgorno omejitev določeno na 1 enoto, tako da ne pride do prehitrih rotacij.
+
+\subsubsection{Bežanje}
+V primeru, ko se tarča približa letalu, poskuša preleteti tarčo in jo ponovno napasti od zadaj. Če pa letalu padejo ščiti pod 20\%, pa poskusi pobegniti tako, da si izbere naključno lokacijo na mapi ter nato vsake toliko časa izbere novo. Ko si obnovi ščite nazaj nad 80\% ponovno napade tarčo.
 
 \end{document}
