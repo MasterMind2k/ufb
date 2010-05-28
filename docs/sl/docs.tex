@@ -1,0 +1,484 @@
+\documentclass[a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[slovene]{babel}
+\usepackage[pdftex,unicode,pdfdisplaydoctitle]{hyperref}
+\usepackage[pdftex]{graphicx}
+\usepackage{listings}
+\usepackage[all]{hypcap}
+\usepackage[final]{pdfpages}
+
+\lstset{showstringspaces=false,frame=single,numbers=left,language=Python,breaklines=true,extendedchars=false,escapeinside=`~}
+\renewcommand{\lstlistingname}{Psevdokoda}
+
+\usepackage{tikz}
+\usetikzlibrary{positioning,shadows,arrows,shapes}
+
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{3mm}
+
+\author{Gregor Kališnik\\63070041}
+\title{Računalniška grafika\\\ \\Ultimate Flying Bastards\\s pogonom\\Besterd Game Engine}
+\hypersetup{pdfauthor={Gregor Kališnik},pdftitle={Računalniška grafika, Ultimate Flying Bastards s pogonom Besterd Game Engine},plainpages=false,colorlinks,citecolor=black,filecolor=black,linkcolor=black,urlcolor=blue}
+
+\begin{document}
+\tikzstyle{contains} = [
+  ->,
+  >=open triangle 90,
+  thick
+]
+\tikzstyle{inherits} = [
+  ->,
+  >=open triangle 90,
+  thick
+]
+\tikzstyle{line} = [
+  -,
+  thick
+]
+\tikzstyle{class} = [
+  draw = black,
+  rectangle,
+  rounded corners,
+  drop shadow,
+  top color = blue!50,
+  bottom color = white,
+  minimum width = 2cm,
+  minimum height = 6mm
+]
+\tikzstyle{module} = [
+  minimum width = 2cm,
+  minimum height = 8mm,
+  draw=black,
+  top color=white,
+  bottom color=yellow!70,
+  drop shadow,
+  inner sep=7pt,
+  rounded corners
+]
+
+\maketitle
+\pagebreak
+\tableofcontents
+\pagebreak
+\listoffigures
+\pagebreak
+
+\section{Uvod}
+Seminarsko sem se lotil tako, da sem najprej razvil pogon, Besterd Game Engine (BGE), ter nato igro Ultimate Flying Bastards(UFB). Zaradi tega sem to poročilo razdelil na dva sklopa.
+
+\section{BGE}
+Sam pogon BGE je razdeljen na podmodule:
+\begin{description}
+  \item[BGE] sam pogon,
+  \item[Driver] abstrakcija OpenGL-a,
+  \item[Rendering] tukaj je celoten rendering ter stopnje senčenja,
+  \item[Scene] scenski API,
+  \item[Storage] API za delo z multimedijo (modeli, teksture, itd.),
+  \item[Loader] nalagalniki za nalaganje multimedijske vsebine.
+\end{description}
+
+Za lažjo predstavitev kako so si moduli povezani si poglej sliko \ref{graf:moduli}.
+\begin{figure}
+\centering
+\begin{tikzpicture}[node distance=1.5cm,
+  every path/.style={
+    draw = black,
+    shorten >=3pt,
+    shorten <=3pt,
+    thick
+  }
+]
+
+  \node[module] (bge) {BGE};
+  \node[module] (driver) [below=of bge] {Driver};
+  \node[module] (rendering) [left=of driver] {Rendering};
+  \node[module] (scene) [right=of driver] {Scene};
+  \node[module] (storage) [right=of bge] {Storage};
+  \node[module] (loader) [above=of storage] {Loader};
+  
+  \draw[->] (bge) -- (rendering);
+  \draw[->] (rendering) -- (driver);
+  \draw[->] (bge) -- (driver);
+  \draw[<->] (bge) -- (scene);
+  \draw[->] (bge) -- (storage);
+  \draw[->] (scene) -- (driver);
+  \draw[->] (storage) -- (scene);
+  \draw[->] (loader) -- (storage);
+\end{tikzpicture}
+
+\label{graf:moduli}
+\caption{Medsebojna uporaba med moduli}
+\end{figure}
+
+Vsak modul je v svojem „namespace“. V diagramu \ref{graf:bge_diagram} lahko vidiš kako so porazdeljeni.
+\begin{figure}
+  \centering
+  \begin{tikzpicture}[node distance=0.5cm]
+    \node[module] (bge) {BGE};
+    \node[module] (storage) [below = of bge] {Storage};
+    \node[module] (scene) [below = of storage] {Scene};
+    \node[module] (rendering) [below = of scene] {Rendering};
+    \node[module] (driver) [below = of rendering] {Driver};
+    
+    \node[module] (loader) [right = of storage] {Loader};
+    
+    \draw[contains] (storage.north) -| (bge.south);
+    \draw[line] (scene.west) -- ++ (-2mm, 0) -- ([xshift = -2mm, yshift = 2mm] storage.north west) -- ([yshift = 2mm] storage.north);
+    \draw[line] (rendering.west) -- ++ (-1.7mm, 0) -- ([xshift = -2mm] scene.west);
+    \draw[line] (driver.west) -- ++ (-2mm, 0) -- ([xshift = -1.7mm] rendering.west);
+    
+    \draw[contains] (loader.south) -- ++ (0, -3mm) -| (storage.south);
+  \end{tikzpicture}
+  
+  \label{graf:bge_diagram}
+  \caption{Diagram BGE modulov}
+\end{figure}
+
+\subsection{Storage in Loader modula}
+Oba modula sem dal v isti sklop, saj sta zelo možno medsebojno povezana. Z njima sem pa tudi začel, ker se sama igra dejansko začne pri njima, saj brez modelov res ne moreš imeti igre :) .
+
+Skladiščni API je organiziran kot VFS. Torej do podatkov dostopamo z get metodo ter potjo do želenega predmeta. Sama struktura datotečnega sistema je preslikana iz Qt-jevega sistema virov\footnote{Resource system, \href{http://doc.trolltech.com/4.6/resources.html}{http://doc.trolltech.com/4.6/resources.html}}. Nalaganje virov je pa narejeno tako, da se pokliče metodo \emph{loadResources} objekta Canvas (glej BGE modul). Laho se tej metodi doda pot do .rcc datoteke, če pa ne damo poti, pa naloži iz internih (vgrajenih) virov. Kako točno naložiti vire si poglejte v dokumentaciji.
+
+Na sliki \ref{graf:class_storage_loader} imamo razredni diagram obeh modulov. Levo od razreda \emph{Manager} so razredi modula Loader, na desni (in vključno z) Managerja so pa razredi modula Storage.
+
+\begin{figure}
+\centering
+\begin{tikzpicture}[node distance=0.5cm]
+  \node[class] (item) {Item};
+  \node[class] (material) [below=of item] {Material};
+  \node[class] (mesh) [below=of material] {Mesh};
+  \node[class] (shader) [below=of mesh] {Shader};
+  \node[class] (shaderprogram) [below=of shader, xshift = 3.1mm] {ShaderProgram};
+  \node[class] (texture) [below=of shaderprogram, xshift = -3.1mm] {Texture};
+
+  \node[class] (manager) [left=of item] {Manager};
+
+  \node[class] (abstractloader) [left=of manager] {AbstractLoader};
+  \node[class] (obj) [below = of abstractloader] {Obj};
+  \node[class] (shaderloader) [below = of obj] {Shader};
+  \node[class] (textureloader) [below = of shaderloader] {Texture};
+  \node[class] (threeds) [below = of textureloader] {ThreeDS};
+
+  \draw[inherits] (material.north) -| (item);
+  \draw[line] (mesh.west) -- ++ (-0.2, 0) -- ([xshift = -2mm, yshift = 2mm] material.north west) -- ([yshift = 2mm] material.north);
+  \draw[line] (shader.west) -- ++ (-0.2, 0) -- ([xshift = -2mm] mesh.west);
+  \draw[line] (shaderprogram.west) -- ++ (-0.2, 0) -- ([xshift = -2mm] shader.west);
+  \draw[line] (texture.west) -- ++ (-0.2, 0) -- ([xshift = -2mm] shaderprogram.west);
+
+  \draw[inherits] (obj.north) -| (abstractloader);
+  \draw[line] (shaderloader.west) -- ++ (-0.2, 0) -- ([xshift = -2mm, yshift = 2mm] obj.north west) -- ([yshift = 2mm] obj.north);
+  \draw[line] (textureloader.west) -- ++ (-0.2, 0) -- ([xshift = -2mm, yshift = 2mm] shaderloader.north west);
+  \draw[line] (threeds.west) -- ++ (-0.2, 0) -- ([xshift = -2mm, yshift = 2mm] textureloader.north west);
+\end{tikzpicture}
+
+\label{graf:class_storage_loader}
+\caption{Razredn diagram Storage in Loader modula}
+\end{figure}
+
+\subsubsection{Nalaganje modelov}
+Od tega modula bom izpostavil le nalaganje modelov.
+
+Pri nalaganju obj modelov preberem samo oglišča (vertices), ploskve (faces) ter normale. Ker so v obj obliki ploskve poligoni, torej imajo lahko poljubno število oglišč, sem moral dodati triangulacijo.
+
+\begin{lstlisting}[caption={Algoritm za triangulacijo}]
+temp = vertices.sorted()
+stack.push(temp.take_first())
+stack.push(temp.take_first())
+
+for `$v_i$~ in temp:
+  `$v_s$~ = stack.pop()
+  list << vertices.indexOf(`$v_i$~) << vertices.indexOf(`$v_s$~) << vertices.indexOf(stack.top())
+  list.sort()
+  
+  if `$v_i$~ is not neibhour `$v_s$~:
+    stack.pop()
+    stack.push(`$v_s$~)
+  
+  stack.push(`$v_i$~)
+  
+  for idx in list:
+    face << vertices.at(idx)
+
+return face
+\end{lstlisting}
+
+Nalaganje 3DS oblike modelov pa naloži tudi materiale. Animirani modeli niso podprti v BGE.
+
+\subsection{Scene Modul}
+V tem modulu so vsi razredi kar se tiče same scene igre. Najbolj pomembni so \emph{Object} in njegove izpeljave.
+
+\begin{figure}
+  \centering
+  \begin{tikzpicture}[node distance=0.5cm]
+    \node[class] (object) {Object};
+    \node[class] (camera) [below = of object] {Camera};
+    \node[class] (light) [below = of camera] {Light};
+    \node[class] (particle) [xshift = 3.1mm,below = of light] {ParticleEmitter};
+  
+    \draw[inherits] (camera.north) -| (object);
+    \draw[line] (light.west) -- ++ (-2mm, 0) -- ([xshift = -2mm, yshift = 2mm] camera.north west) -- ([yshift = 2mm] camera.north);
+    \draw[line] (particle.west) -- ++ (-2mm, 0) -- ([xshift = -2mm] light.west);
+  \end{tikzpicture}
+
+  \label{graf:class_scene_object}
+  \caption{Razredni diagram scenskih objektov}
+\end{figure}
+Same objekte na sceni uporabimo razrede na sliki \ref{graf:class_scene_object}.
+
+Za dodajanje objektov na sceno je priporočljivo narediti izpeljavo \emph{Object} razreda. Za bolj natančno uporabo, si poglej dokumentacijo.
+
+Objekti so v sceni porazdeljeni hierarhično v scenski graf.
+
+\subsubsection{Sledenje}
+Pogled objekta lahko sledi drugemu objektu. To nastavimo z metodo \emph{observe}.
+
+To je narejeno tako, da se zgradi $3 \times 3$ rotacijsko matriko s pomočjo treh vektorjev: $\overrightarrow{V_f}$, $\overrightarrow{V_u}$ in $\overrightarrow{V_s}$. Sama matrika zgleda pa tako:
+$$
+\left[ \begin{array}{ccc}
+\overrightarrow{V_s} & \overrightarrow{V_u} & - \overrightarrow{V_f}
+\end{array} \right]
+$$
+To matriko nato dam v Quaternion in z njo določim novo orientacijo objekta.
+
+Vektor $\overrightarrow{V_f}$ izračunam z
+\begin{eqnarray*}
+\overrightarrow{P_{ol}} =& O_p^{-1} * (\overrightarrow{P_o} - \overrightarrow{P_p}) + \overrightarrow{P_p} \\
+\overrightarrow{V_f} =& \frac{\overrightarrow{P_{ol}} - \overrightarrow{P}}{\left| \overrightarrow{P_{ol}} - \overrightarrow{P} \right|} \\
+\end{eqnarray*},
+kjer so
+\begin{description}
+  \item[$\overrightarrow{P_{ol}}$] \dots pozicija \emph{opazovanca} v lokalni prostor \emph{gledalca},
+  \item[$O_p$] \dots globalna orientacija očeta \emph{gledalca} (quaternion),
+  \item[$\overrightarrow{P_o}$] \dots globalna pozicija \emph{opazovanca},
+  \item[$\overrightarrow{P_p}$] \dots globalna pozicija očeta \emph{gledalca},
+  \item[$\overrightarrow{P}$] \dots globalna pozicija \emph{gledalca},
+  \item[$\overrightarrow{V_f}$] \dots normalni vektor, ki kaže od \emph{gledalca} proti \emph{opazovancu}.
+\end{description}
+
+Vektorja $\overrightarrow{V_s}$ in $\overrightarrow{V_u}$ se pa izračunata
+\begin{eqnarray*}
+\overrightarrow{V_s} =& \overrightarrow{V_f} \times \left[\begin{array}{c}0\\1\\ 0\end{array}\right] \\
+\overrightarrow{V_u} =& \overrightarrow{V_s} \times \overrightarrow{V_f}
+\end{eqnarray*},
+kjer sta:
+\begin{description}
+  \item[$\overrightarrow{V_s}$] \dots normiran vektor, ki kaže v stran,
+  \item[$\overrightarrow{V_u}$] \dots normiran vektor, ki kaže gor.
+\end{description}
+
+\subsubsection{Kamera}
+Kamero se naredi preko Canvas-a, in jo je potrebno aktivirati. Kamero lahko premikamo, lahko jo pripnemo nekemu drugemu objektu ipd. Vse ostalo potem dela pogon.
+
+\subsubsection{Luči}
+Podobno kot kamere, se jih naredi preko Canvas-a. Lučem lahko nastavimo parametre, ki so uporabljeni v \emph{Phong} modelu osvetljevanja. Ker je izpeljan iz razreda \emph{Object}, ga lahko pripnemo katerekoli objektu, in mu tako dodamo luč.
+
+\subsubsection{Delci}
+Pogon delcev je zelo preprost. Z izpeljevanjem razreda \emph{ParticleEmitter} se določi potek animacije. V izrisovalniku se potem vsak delec posebej „zrendra“.
+
+Vir delcev je lahko kontinuiran, torej obstaja dalj časa in konstantno oddaja delce, ali je pa enkraten. Ob kreiranju ustvari vse delce, jih „zanimira“ in nato, ko so vsi delci nevidni, se sam odstrani s scenskega grafa in zbriše.
+
+\subsubsection{Prostorska delitev}
+\begin{figure}
+  \centering
+  \begin{tikzpicture}[node distance=0.5cm]
+    \node[class] (partition) {Partition};
+    \node[class] (bv) [right = of partition] {BoundingVolume};
+  \end{tikzpicture}
+  
+  \caption{Razredni diagram razredov povezanih s prostorsko delitvijo}
+  \label{graf:scene_partitioning}
+\end{figure}
+
+Za hitrejši „culling“ sem prostor razdelil v osem delov in nato vsak del v nadaljnjih 8 delov, če je bilo potrebno. Slika \ref{graf:scene_partitioning} prikazuje razredni diagram razredov povezanih s prostorsko delitvijo.
+
+Osmiško drevo je realizirano z „loose octree“\footnote{\href{http://anteru.net/2008/11/14/315/}{http://anteru.net/2008/11/14/315/}}. To je kot navadno osmiško drevo, le s to razliko, da za pripadnost gleda sredino objekta, in ne celotnega objekta.
+
+\subsection{Driver modul}
+\begin{figure}
+  \centering
+  \begin{tikzpicture}[node distance=0.5cm]
+    \node[class] (texture) {TextureManager};
+    
+    \node[class] (abstract) [left = of texture] {AbstractDriver};
+    \node[class] (gl1) [below = of abstract] {GL1};
+    \node[class] (gl3) [below = of gl1] {GL3};
+    
+    \draw[inherits] (gl1.north) -| (abstract.south);
+    \draw[line] (gl3.west) -- ++ (-2mm, 0) -- ([xshift = -2mm, yshift = 2mm] gl1.north west) -- ([yshift = 2mm] gl1.north);
+  \end{tikzpicture}
+  
+  \label{graf:class_driver}
+  \caption{Razredni diagram razredov v driver modulu}
+\end{figure}
+
+Modul driver vsebuje dve implementaciji izrisovalnikov. En je za OpenGL 1 (\emph{GL1}) in drugi za OpenGL 3 (\emph{GL3}). Abstraktni razred \emph{AbstractDriver} izbere implementacijo glede na verzijo sistemskega OpenGL API.
+
+GL1 gonilnik je zelo preprost in ni nič kaj posebnega. V GL3 sem pa uporabil \emph{Deferred shading} tehniko izrisovanja.
+
+\subsubsection{Izris modelov v GL3}
+V GL3 gonilniku se uporabljajo VBO\footnote{Vertex Buffer Object}-ji za izris modelov. Oglišča modela so dani v seznam struktur. Zaradi tega, ker pri modelu uporabljam tudi materiale, je potrebno izris VBO-ja razbit na izris posameznih materialov, drugače rečeno, funkcijo \emph{glDrawElements} je potrebno tolikokrat poklicat, kolikor je materialov.
+
+\begin{lstlisting}[caption={Struktura posameznega oglišča}]
+struct BufferElement {
+  float position[3];
+  GLfloat normal[3];
+  GLfloat uvMap[2];
+  GLubyte padding[32]; /* Potrebno zaradi 64-bit `„alignmenta“~ */
+};
+\end{lstlisting}
+
+Zaradi teh problemov sem se odločil, da naredim plan izrisa. Vsak del plana nosi informacijo o zamiku (offset), številu ploskev ter ime materiala. Vrstni red oglišč se prilagodi tako, da so materiali na kupu. S tem sem si zmanjšal število klicev funkcije glDrawElements.
+
+\subsubsection{Deferred shading}
+\begin{figure}
+  \centering
+  \begin{tikzpicture}[node distance = 0mm,
+    every node/.style = {
+      rectangle,
+      draw = black,
+      minimum height = 0.6cm,
+      minimum width = 2.8cm
+    },
+    red/.style = {
+      fill = red,
+      text = black,
+    },
+    green/.style = {
+      fill = green,
+      text = black
+    },
+    blue/.style = {
+      fill = blue,
+      text = white
+    },
+    alpha/.style = {
+      top color = black,
+      text = white
+    }
+  ]
+    
+    \node[red] (posx) {Position x};
+    \node[green] (posy) [right = of posx] {Position y};
+    \node[blue] (posz) [right = of posy] {Position z};
+    \node[alpha] (spec) [right = of posz] {Specular (\%)};
+    
+    \node[red] (norx) [below = of posx] {Normal x};
+    \node[green] (nory) [right = of norx] {Normal y};
+    \node[blue] (norz) [right = of nory] {Normal z};
+    \node[alpha] (ligh) [right = of norz] {Lighting (1/0)};
+    
+    \node[red] (colr) [below = of norx] {Texture red};
+    \node[green] (colg) [right = of colr] {Texture green};
+    \node[blue] (colb) [right = of colg] {Texture blue};
+    \node[alpha] (cola) [right = of colb] {Texture alpha};
+    
+    \node[red] (ambr) [below = of colr] {Ambient red};
+    \node[green] (ambg) [right = of ambr] {Ambient green};
+    \node[blue] (ambb) [right = of ambg] {Ambient blue};
+    \node[alpha] (amba) [right = of ambb] {Ambient alpha};
+    
+    \node[red] (difr) [below = of ambr] {Diffuse red};
+    \node[green] (difg) [right = of difr] {Diffuse green};
+    \node[blue] (difb) [right = of difg] {Diffuse blue};
+    \node[alpha] (difa) [right = of difb] {Diffuse alpha};
+    
+    \node[red] (specr) [below = of difr] {Specular red};
+    \node[green] (specg) [right = of specr] {Specular green};
+    \node[blue] (specb) [right = of specg] {Specular blue};
+    \node[alpha] (speca) [right = of specb] {Specular alpha};
+    
+    \node[red] (emir) [below = of specr] {Emission red};
+    \node[green] (emig) [right = of emir] {Emission green};
+    \node[blue] (emib) [right = of emig] {Emission blue};
+    \node[alpha] (emia) [right = of emib] {Emission alpha};
+  \end{tikzpicture}
+  
+  \label{slika:struktura_tekstur}
+  \caption{Struktura podatkovnih tekstur}
+\end{figure}
+\begin{figure}
+  \centering
+  \begin{tikzpicture}[
+    stage/.style = {
+      rectangle,
+      draw = black,
+      top color = green,
+      drop shadow,
+      rounded corners,
+      minimum width = 5cm
+    },
+    config/.style = {
+      rectangle,
+      draw = black,
+      top color = blue!40,
+      drop shadow,
+      rounded corners,
+      minimum width = 5cm
+    },
+    texture/.style = {
+      rectangle,
+      draw = black,
+      top color = red!40,
+      bottom color = blue!40,
+      drop shadow,
+      rounded corners
+    }
+  ]
+    
+    \node[stage] (first) {Prva stopnja (Geometry stage)};
+    \node[texture] (data) [right = of first] {Podatkovne teksture};
+    
+    \draw[->] (first) -- (data);
+    
+    \node[config] (setup) [below = of first] {Priprava luči, itd.};
+    \node[stage] (rendering) [below = of setup] {Izris stopnje};
+    \node[config] (commit) [below = of rendering] {Zaključevanje stopnje};
+    
+    \node[texture] (middle) [right = of rendering] {Vmesne teksture};
+    
+    \node[stage] (finish) [below = of ]
+    
+    \draw[->] (first) -- (setup);
+    
+    % From setup to rendering
+    \draw[->] ([xshift = -20mm] setup.south) -- ([xshift = -20mm] rendering.north);
+    \draw[->] ([xshift = -10mm] setup.south) -- ([xshift = -10mm] rendering.north);
+    \draw[->] (setup.south) -- (rendering.north);
+    \draw[->] ([xshift = 10mm] setup.south) -- ([xshift = 10mm] rendering.north);
+    \draw[->] ([xshift = 20mm] setup.south) -- ([xshift = 20mm] rendering.north);
+    
+    \draw[->] (data) -- (setup);
+    \draw[->] (middle.north) -- (setup.east);
+    
+    % From rendering to commit
+    \draw[->] ([xshift = -20mm] rendering.south) -- ([xshift = -20mm] commit.north);
+    \draw[->] ([xshift = -10mm] rendering.south) -- ([xshift = -10mm] commit.north);
+    \draw[->] (rendering.south) -- (commit.north);
+    \draw[->] ([xshift = 10mm] rendering.south) -- ([xshift = 10mm] commit.north);
+    \draw[->] ([xshift = 20mm] rendering.south) -- ([xshift = 20mm] commit.north);
+    
+    \draw[->] (commit.east) -- (middle.south);
+    
+    % Loop
+    \draw[->, dotted] (commit.west) .. controls +(-2, 2) .. (setup.west);
+    
+    
+  
+  \end{tikzpicture}
+  
+  \label{slika:rendering}
+  \caption{Izrisovanje z deferred shading tehniko v BGE}
+\end{figure}
+
+Deferred shading deluje tako, da najprej izriše geometrijo (\emph{Geometry stage}) v FBO\footnote{Frame Buffer Object} in shrani vse potrebne podatke v teksture. Nato pa se izrisuje v korakih, vsak korak naloži svoj shader. Rezultate teh izrisov se nato aditivno zblenda na ekran. S tem postopkom je izrisovanje raznoraznih efektov poenostavljeno. So pa tudi slabosti. Vsaka stopnja izrisuje na kvadrat velikosti 1, tako da je število transformacij oglišč najmanjše.
+
+Glavna slabost deferred shading tehnike je, da potrebuje razmeroma močno grafično, saj je potrebno hraniti velike teksture v pomnilniku. Še ena slabost je, da je „alpha blending“ zelo otežen, saj ko začnemo izrisovati efekte, nimamo več informacij kaj je za določenim objektom.
+
+BGE zrendra prvo stopnjo v 7 tekstur. Njihovo zgradbo prikazuje slika \ref{slika:struktura_tekstur}. Te 7 tekstur posreduje stopnjam izrisa\footnote{Ki so določeni v Rendering modulu, ter lahko programer spiše tudi svojega.} in vsaka stopnja izriše v končno tekstura. Zadnja stopnja, pa preriše to teksturo na ekran. V zadnjo stopnjo se da dodati še poljubne efekte, ki spreminjajo končno sliko.
+
+Trenutna implementacija pri izrisu luči izriše celoten pravokotnik za vse luči. Zadevo bi lahko izboljšal tako, da bi izrisal samo tisti del pravokotnika na katerega vpliva določena luč.
+
+\section{UFB}
+
+\end{document}
