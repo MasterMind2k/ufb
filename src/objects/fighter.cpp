@@ -12,16 +12,22 @@
  ***************************************************************************/
 #include "fighter.h"
 
+#include "BulletDynamics/Dynamics/btDynamicsWorld.h"
 #include "BulletDynamics/Dynamics/btRigidBody.h"
+
+#include "canvas.h"
 
 #include "storage/manager.h"
 #include "storage/mesh.h"
 #include "storage/texture.h"
 
+#include "scene/boundingvolume.h"
+
 #include "util/ai.h"
 
 #include "bullet.h"
 #include "exhaust.h"
+#include "explosion.h"
 
 using namespace Objects;
 
@@ -33,7 +39,11 @@ float Fighter::ShieldsRechargeTick = 10.0f;
 Fighter::Fighter(Util::Ai *ai)
   : m_ai(ai),
     m_hullIntegrity(100),
-    m_shields(100)
+    m_shields(100),
+    m_dyingElapsedTime(0),
+    m_previousExplosion(0),
+    m_exploded(false),
+    m_lockedTarget(0l)
 {
   setMesh(BGE::Storage::Manager::self()->get<BGE::Storage::Mesh*>("/fighters/models/fighter"));
   loadMaterialsFromMesh();
@@ -77,11 +87,13 @@ void Fighter::fire()
   bullet->setOrientation(globalOrientation());
   bullet->move(globalPosition() + globalOrientation() * Vector3f(150, 0, -450));
 
+  lockLaser(bullet, false);
+
   parent()->addChild(bullet);
   bullet->initBody();
 
   Vector3f velocity(0, 0, -Bullet::Velocity);
-  velocity = globalOrientation() * velocity + this->velocity();
+  velocity = bullet->orientation() * velocity + this->velocity();
   bullet->body()->setLinearVelocity(btVector3(velocity.x(), velocity.y(), velocity.z()));
   bullet->body()->activate();
 
@@ -90,30 +102,65 @@ void Fighter::fire()
   bullet->setOrientation(globalOrientation());
   bullet->move(globalPosition() + globalOrientation() * Vector3f(-150, 0, -450));
 
+  lockLaser(bullet, true);
+
   parent()->addChild(bullet);
   bullet->initBody();
 
+  velocity = Vector3f(0, 0, -Bullet::Velocity);
+  velocity = bullet->orientation() * velocity + this->velocity();
   bullet->body()->setLinearVelocity(btVector3(velocity.x(), velocity.y(), velocity.z()));
   bullet->body()->activate();
 }
 
 void Fighter::calculateTransforms(qint32 timeDiff)
 {
-  Q_UNUSED(timeDiff);
+  if (m_hullIntegrity <= 0.0) {
+    // Let's remove ourselves from the list
+    setRegistered(false);
 
-  if (m_shields < 100.0f && m_shieldsRecharge.elapsed() > ShieldsRechargeTime) {
-    m_shields += ShieldsRechargeTick;
-    m_shields = qMin(m_shields, 100.0f);
-    m_shieldsRecharge.restart();
+    // Dying animation :)
+    m_dyingElapsedTime += timeDiff;
+    qreal distance = boundingVolume()->radius();
+    if (m_dyingElapsedTime < 4000.0) {
+      if (m_previousExplosion > 500) {
+        qreal pos = distance - qrand() % (int) (distance / 2.0);
+        BGE::Canvas::canvas()->addSceneObject(new Explosion(globalPosition() + pos * Vector3f(qrand() % 60 - 30, qrand() % 60 - 30, qrand() % 60 - 30).normalized(), Explosion::Small));
+        m_previousExplosion = 0;
+      } else {
+        m_previousExplosion += timeDiff;
+      }
+    } else if (!m_exploded) {
+      qreal pos = distance / 2.0;
+      BGE::Canvas::canvas()->addSceneObject(new Explosion(globalPosition() + pos * Vector3f(qrand() % 60 - 30, qrand() % 60 - 30, qrand() % 60 - 30).normalized(), Explosion::Large));
+      m_exploded = true;
+
+      // Remove itself from physics world
+      BGE::Canvas::canvas()->dynamicsWorld()->removeRigidBody(body());
+
+    } else if (m_dyingElapsedTime < 5000.0) {
+      scale(1 - (m_dyingElapsedTime - 4000.0) / 1000.0);
+    } else {
+      // Remove itself
+      setRenderable(false);
+      parent()->removeChild(this);
+      BGE::Canvas::canvas()->deleteSceneObject(this);
+    }
+  } else {
+    if (m_shields < 100.0f && m_shieldsRecharge.elapsed() > ShieldsRechargeTime) {
+      m_shields += ShieldsRechargeTick;
+      m_shields = qMin(m_shields, 100.0f);
+      m_shieldsRecharge.restart();
+    }
+
+    if (m_ai)
+      m_ai->calculateAngularVelocity();
+
+    Vector3f enginePower = globalOrientation() * Vector3f(0, 0, -m_enginePower);
+    body()->applyCentralForce(btVector3(enginePower.x(), enginePower.y(), enginePower.z()));
+    Vector3f angularVelocity = globalOrientation() * m_angularVelocity;
+    body()->setAngularVelocity(btVector3(angularVelocity.x(), angularVelocity.y(), angularVelocity.z()));
   }
-
-  if (m_ai)
-    m_ai->calculateAngularVelocity();
-
-  Vector3f enginePower = globalOrientation() * Vector3f(0, 0, -m_enginePower);
-  body()->applyCentralForce(btVector3(enginePower.x(), enginePower.y(), enginePower.z()));
-  Vector3f angularVelocity = globalOrientation() * m_angularVelocity;
-  body()->setAngularVelocity(btVector3(angularVelocity.x(), angularVelocity.y(), angularVelocity.z()));
 }
 
 void Fighter::collision(BGE::Scene::Object *object)
@@ -143,4 +190,32 @@ void Fighter::collision(BGE::Scene::Object *object)
     m_shields = 0;
     m_hullIntegrity = 0;
   }
+}
+
+void Fighter::lockLaser(Bullet *bullet, bool isLeft) const
+{
+  if (!m_lockedTarget)
+    return;
+
+  qreal velocitySize = velocity().norm();
+
+  Quaternionf rotation = bullet->orientation();
+
+  Vector3f target = rotation.inverse() * (m_lockedTarget->globalPosition() - bullet->position());
+  qreal distance = target.norm();
+
+  // Take it into account that bullet needs time, and the target is moving
+  qreal time = distance / (Bullet::Velocity + velocitySize);
+  target += rotation.inverse() * m_lockedTarget->velocity() * time;
+
+  // Adjust the target for a small amount (so lasers won't hit each other)
+  if (isLeft)
+    target += rotation * Vector3f(-100, 0, 0);
+  else
+    target += rotation * Vector3f(100, 0, 0);
+
+  // Calculate the angles
+  Quaternionf angle;
+  angle.setFromTwoVectors(-Vector3f::UnitZ(), target);
+  bullet->rotate(angle);
 }

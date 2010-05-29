@@ -45,20 +45,18 @@ Asteroid::Asteroid(Sizes size)
   scale(radius() / boundingVolume()->radius());
 
   setTexture(BGE::Storage::Manager::self()->get<BGE::Storage::Texture*>("/asteroids/textures/" + mesh()->name()));
+  m_structuralIntegrity = maxStructuralIntegrity();
   switch (m_size) {
     case Large:
       setMass(2000);
-      m_structuralIntegrity = 400;
       break;
 
     case Medium:
       setMass(1500);
-      m_structuralIntegrity = 200;
       break;
 
     case Small:
       setMass(1000);
-      m_structuralIntegrity = 150;
       break;
   }
 
@@ -77,6 +75,20 @@ qreal Asteroid::radius() const
 
     case Small:
       return 500;
+  }
+}
+
+qreal Asteroid::maxStructuralIntegrity() const
+{
+  switch (m_size) {
+    case Large:
+      return 400;
+
+    case Medium:
+      return 200;
+
+    case Small:
+      return 150;
   }
 }
 
@@ -99,7 +111,7 @@ void Asteroid::postTransformCalculations(qint32 timeDiff)
     // Dying animation :)
     m_dyingElapsedTime += timeDiff;
     qreal distance = boundingVolume()->radius();
-    if (m_dyingElapsedTime < 4000.0) {
+    if (m_dyingElapsedTime < 2000.0) {
       if (m_previousExplosion > 200) {
         qreal pos = distance - qrand() % (int) (distance / 2.0);
         BGE::Canvas::canvas()->addSceneObject(new Explosion(globalPosition() + pos * Vector3f(qrand() % 60 - 30, qrand() % 60 - 30, qrand() % 60 - 30).normalized(), Explosion::Medium));
@@ -122,8 +134,8 @@ void Asteroid::postTransformCalculations(qint32 timeDiff)
       // Create new asteroids
       spawn();
 
-    } else if (m_dyingElapsedTime < 5000.0) {
-      scale(1 - (m_dyingElapsedTime - 4000.0) / 1000.0);
+    } else if (m_dyingElapsedTime < 3000.0) {
+      scale(1 - (m_dyingElapsedTime - 2000.0) / 1000.0);
     } else {
       // Remove itself
       setRenderable(false);

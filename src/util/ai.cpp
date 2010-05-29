@@ -18,6 +18,7 @@
 
 #include "scene/boundingvolume.h"
 #include "scene/partition.h"
+#include "scene/camera.h"
 
 #include "objectlist.h"
 
@@ -35,9 +36,7 @@ void Ai::calculateAngularVelocity()
   if (m_running && m_controlled->shields() >= 80.0f || !m_running && m_controlled->shields() > 10.0f) {
     // Attack
     m_running = false;
-    target = m_controlled->globalOrientation().inverse() * ((m_target->globalPosition() + (m_target->velocity())
-                                                             * distance / (Objects::Bullet::Velocity + m_controlled->velocity().norm()))
-                                                            - m_controlled->globalPosition());
+    target = m_controlled->globalOrientation().inverse() * (m_target->globalPosition() - m_controlled->globalPosition());
   } else{
     // Flee
     m_running = true;
@@ -120,9 +119,26 @@ void Ai::calculateAngularVelocity()
     }
   }
 
+  // Do we have a lock?
+  if (isInFront) {
+    QSizeF size = BGE::Canvas::canvas()->size();
+    Vector3f position = BGE::Scene::Camera::projection() * target;
+    Vector2f pos(size.width() * ((position.x() + 1.0) / 2.0), size.height() - size.height() * ((position.y() + 1.0) / 2.0));
+    pos.x() -= size.width() / 2.0;
+    pos.y() -= size.height() / 2.0;
+
+    if (pos.norm() < 20.0)
+      // We have a lock!
+      m_controlled->setWeaponsLock(m_target);
+    else
+      m_controlled->setWeaponsLock(0l);
+  } else {
+    m_controlled->setWeaponsLock(0l);
+  }
+
   // Some actions
   float absPitch = qAbs(pitch);
-  if (isInFront && distance < 25000 && absPitch < 5.0 * M_PI / 180.0)
+  if (m_controlled->hasWeaponsLock())
     m_controlled->fire();
 
   if (isInFront) {

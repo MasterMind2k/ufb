@@ -22,6 +22,7 @@ class Ai;
 }
 
 namespace Objects {
+class Bullet;
 
 class Fighter : public Object
 {
@@ -73,6 +74,16 @@ class Fighter : public Object
       return m_shields;
     }
 
+    inline bool hasWeaponsLock() const
+    {
+      return m_lockedTarget != 0l;
+    }
+
+    inline void setWeaponsLock(Object *target)
+    {
+      m_lockedTarget = target;
+    }
+
   private:
     qreal m_enginePower;
     Vector3f m_angularVelocity;
@@ -81,9 +92,14 @@ class Fighter : public Object
     Util::Ai *m_ai;
     float m_shields;
     float m_hullIntegrity;
+    qint32 m_dyingElapsedTime;
+    qint32 m_previousExplosion;
+    bool m_exploded;
+    Object *m_lockedTarget;
 
     void calculateTransforms(qint32 timeDiff);
     void collision(BGE::Scene::Object *object);
+    void lockLaser(Bullet *bullet, bool isLeft) const;
 };
 
 }

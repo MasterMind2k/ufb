@@ -35,6 +35,13 @@ class Asteroid : public Object
       return m_size;
     }
 
+    inline qreal structuralIntegrity() const
+    {
+      return m_structuralIntegrity;
+    }
+
+    qreal maxStructuralIntegrity() const;
+
   private:
     Sizes m_size;
     qreal m_structuralIntegrity;
