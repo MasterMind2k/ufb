@@ -82,11 +82,13 @@ class Fighter : public Object
 
     inline bool hasWeaponsLock() const
     {
-      return m_lockedTarget != 0l;
+      return m_lockedTarget != 0l && m_acquiringTarget.elapsed() > 500;
     }
 
     inline void setWeaponsLock(Object *target)
     {
+      if (m_lockedTarget != target)
+        m_acquiringTarget.restart();
       m_lockedTarget = target;
     }
 
@@ -95,6 +97,7 @@ class Fighter : public Object
     Vector3f m_angularVelocity;
     QTime m_previousShot;
     QTime m_shieldsRecharge;
+    QTime m_acquiringTarget;
     Util::Ai *m_ai;
     float m_shields;
     float m_hullIntegrity;

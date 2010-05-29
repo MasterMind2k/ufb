@@ -195,7 +195,7 @@ void Fighter::collision(BGE::Scene::Object *object)
 
 void Fighter::lockLaser(Bullet *bullet, bool isLeft) const
 {
-  if (!m_lockedTarget)
+  if (!m_lockedTarget || m_acquiringTarget.elapsed() < 500)
     return;
 
   Quaternionf rotation = bullet->orientation();

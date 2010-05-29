@@ -60,6 +60,7 @@ void HUD::paint(QPainter *painter, qint32 elapsed)
   QSizeF size = BGE::Canvas::canvas()->size();
   QColor bluePen(0, 0, 255, 150);
   QColor greenPen(0, 255, 0, 150);
+  QColor greenBar(0, 255, 0, 100);
   QColor green(0, 255, 0, 40);
   QColor redPen(255, 0, 0, 150);
   QColor red(255, 0, 0, 40);
@@ -67,13 +68,10 @@ void HUD::paint(QPainter *painter, qint32 elapsed)
   painter->setBrush(Qt::NoBrush);
   qreal lockRadius = 20;
   bool isLocked = false;
+  QRectF panel(size.width() - 180, size.height() - 50, 180, 50);
 
   // Center cross
   if (BGE::Canvas::canvas()->activeCamera()->name() == "First person camera") {
-    QPointF center(size.width() / 2.0, size.height() / 2.0);
-    painter->drawLine(center + QPointF(-lockRadius, 0), center + QPointF(lockRadius, 0));
-    painter->drawLine(center + QPointF(0, -lockRadius), center + QPointF(0, lockRadius));
-
     // Weapon's lock area
     painter->drawEllipse(size.width() / 2.0 - lockRadius, size.height() / 2.0 - lockRadius, 2.0 * lockRadius, 2.0 * lockRadius);
   }
@@ -87,7 +85,7 @@ void HUD::paint(QPainter *painter, qint32 elapsed)
   rect.moveTo(rect.left(), 160 - rect.height());
   painter->save();
   painter->setPen(Qt::NoPen);
-  painter->setBrush(green);
+  painter->setBrush(greenBar);
   painter->drawRect(rect);
   painter->restore();
 
@@ -112,20 +110,23 @@ void HUD::paint(QPainter *painter, qint32 elapsed)
     pos.x() = size.width() * ((pos.x() + 1.0) / 2.0);
     pos.y() = size.height() - size.height() * ((pos.y() + 1.0) / 2.0);
 
+    // Don't draw under hud
+    if (pos.x() + 100.0 >= panel.left() && pos.y() >= panel.top())
+      continue;
+
     // Set color (Red - Fighter, green - other)
     if (object->name() == "Fighter") {
       painter->setPen(redPen);
 
       // Let's paint shields and hull integrity
       Objects::Fighter *fighter = static_cast<Objects::Fighter*> (object);
-      painter->drawText(pos.x() + 5, pos.y() + 15, "Hull integrity: " + QString::number(fighter->hullIntegrity(), 'f', 2) + "%");
-      painter->drawText(pos.x() + 5, pos.y() + 25, "Shields: " + QString::number(fighter->shields(), 'f', 2) + "%");
+      painter->drawText(pos.x() + 5, pos.y() + 15, QString::number(fighter->hullIntegrity(), 'f', 2) + "%/" + QString::number(fighter->shields(), 'f', 2) + "%");
     } else {
       painter->setPen(greenPen);
 
       // Let's paint structural integrity
       Objects::Asteroid *asteroid = static_cast<Objects::Asteroid*> (object);
-      painter->drawText(pos.x() + 5, pos.y() + 15, "Structural integrity: " + QString::number(asteroid->structuralIntegrity() / asteroid->maxStructuralIntegrity() * 100.0, 'f', 2) + "%");
+      painter->drawText(pos.x() + 5, pos.y() + 15, QString::number(asteroid->structuralIntegrity() / asteroid->maxStructuralIntegrity() * 100.0, 'f', 2) + "%");
     }
     painter->drawPoint(pos.x(), pos.y());
 
@@ -141,18 +142,20 @@ void HUD::paint(QPainter *painter, qint32 elapsed)
         m_fighter->setWeaponsLock(object);
         isLocked = true;
 
-        // Left top corner
-        painter->drawLine(pos.x() - 15, pos.y() - 15, pos.x() - 10, pos.y() - 15);
-        painter->drawLine(pos.x() - 15, pos.y() - 15, pos.x() - 15, pos.y() - 10);
-        // Left bottom corner
-        painter->drawLine(pos.x() - 15, pos.y() + 15, pos.x() - 10, pos.y() + 15);
-        painter->drawLine(pos.x() - 15, pos.y() + 15, pos.x() - 15, pos.y() + 10);
-        // Right top corner
-        painter->drawLine(pos.x() + 15, pos.y() - 15, pos.x() + 10, pos.y() - 15);
-        painter->drawLine(pos.x() + 15, pos.y() - 15, pos.x() + 15, pos.y() - 10);
-        // Right bottom corner
-        painter->drawLine(pos.x() + 15, pos.y() + 15, pos.x() + 10, pos.y() + 15);
-        painter->drawLine(pos.x() + 15, pos.y() + 15, pos.x() + 15, pos.y() + 10);
+        if (m_fighter->hasWeaponsLock()) {
+          // Left top corner
+          painter->drawLine(pos.x() - 15, pos.y() - 15, pos.x() - 10, pos.y() - 15);
+          painter->drawLine(pos.x() - 15, pos.y() - 15, pos.x() - 15, pos.y() - 10);
+          // Left bottom corner
+          painter->drawLine(pos.x() - 15, pos.y() + 15, pos.x() - 10, pos.y() + 15);
+          painter->drawLine(pos.x() - 15, pos.y() + 15, pos.x() - 15, pos.y() + 10);
+          // Right top corner
+          painter->drawLine(pos.x() + 15, pos.y() - 15, pos.x() + 10, pos.y() - 15);
+          painter->drawLine(pos.x() + 15, pos.y() - 15, pos.x() + 15, pos.y() - 10);
+          // Right bottom corner
+          painter->drawLine(pos.x() + 15, pos.y() + 15, pos.x() + 10, pos.y() + 15);
+          painter->drawLine(pos.x() + 15, pos.y() + 15, pos.x() + 15, pos.y() + 10);
+        }
       }
     }
   }
@@ -161,6 +164,8 @@ void HUD::paint(QPainter *painter, qint32 elapsed)
   // If we don't have any lock, remove the locked target
   if (!isLocked || BGE::Canvas::canvas()->activeCamera()->name() != "First person camera")
     m_fighter->setWeaponsLock(0l);
+
+  // Are we getting a lock?
 
   // Direction to nearest asteroid
   painter->save();
@@ -178,16 +183,33 @@ void HUD::paint(QPainter *painter, qint32 elapsed)
   painter->restore();
 
   // Shields power, hull integrity and weapon's lock
-  QFont font;
-  font.setPointSize(20);
-  painter->setFont(font);
-  painter->setPen(bluePen);
-  paintStatus(painter, QRectF(0, 0, 500, 50), "Shields: " + QString::number(m_fighter->shields()) + "%");
-  painter->setPen(redPen);
-  paintStatus(painter, QRectF(0, 50, 500, 50), "Hull: " + QString::number(m_fighter->hullIntegrity()) + "%");
-  if (m_fighter->hasWeaponsLock()) {
+  // Draw background
+  painter->save();
+  painter->setPen(Qt::NoPen);
+  painter->setBrush(green);
+  painter->drawRect(panel);
+  painter->restore();
+
+  paintStatus(painter, panel, "Shields: " + QString::number(m_fighter->shields()) + "%");
+  panel.setTop(panel.top() + 15);
+  paintStatus(painter, panel, "Hull: " + QString::number(m_fighter->hullIntegrity()) + "%");
+  panel.setTop(panel.top() + 15);
+  if (isLocked && !m_fighter->hasWeaponsLock()) {
+    // Make a more visual change
+    QPointF center(size.width() / 2.0, size.height() / 2.0);
+    painter->drawLine(center + QPointF(-lockRadius, 0), center + QPointF(lockRadius, 0));
+    painter->drawLine(center + QPointF(0, -lockRadius), center + QPointF(0, lockRadius));
+
+    // Write status
+    painter->setPen(redPen);
+    paintStatus(painter, panel, "Locking target...");
+  } if (m_fighter->hasWeaponsLock()) {
+    QPointF center(size.width() / 2.0, size.height() / 2.0);
+    painter->drawLine(center + QPointF(-lockRadius, 0), center + QPointF(lockRadius, 0));
+    painter->drawLine(center + QPointF(0, -lockRadius), center + QPointF(0, lockRadius));
+
     painter->setPen(greenPen);
-    paintStatus(painter, QRectF(0, 100, 800, 50), "Weapons locked!");
+    paintStatus(painter, panel, "Target locked!");
   }
 }
 
@@ -266,6 +288,6 @@ void HUD::paintNearestArrow(QPainter *painter, Objects::Object *nearest, const Q
 void HUD::paintStatus(QPainter *painter, const QRectF &geometry, const QString &text)
 {
   // Draw text
-  QRectF textRect = painter->boundingRect(geometry, Qt::AlignLeft | Qt::AlignVCenter, text);
+  QRectF textRect = painter->boundingRect(geometry, Qt::AlignLeft, text);
   painter->drawText(textRect, text);
 }
