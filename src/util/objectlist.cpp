@@ -42,6 +42,7 @@ bool lessThen(Objects::Object *a1, Objects::Object *a2)
 ObjectList::ObjectList()
 {
   m_nearestAsteroid = 0l;
+  m_nearestFighter = 0l;
 }
 
 void ObjectList::setPosition(Objects::Object *object, const Vector3f &position)

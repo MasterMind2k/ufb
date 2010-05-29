@@ -78,7 +78,7 @@ void StateHandler::play()
   BGE::Canvas::canvas()->camera("Front camera")->rotateY(180);
   BGE::Canvas::canvas()->camera("Front camera")->rotateX(15);
   fighter->addChild(BGE::Canvas::canvas()->createCamera("Side camera"));
-  BGE::Canvas::canvas()->camera("Side camera")->move(600, 0, 0);
+  BGE::Canvas::canvas()->camera("Side camera")->move(2500, 0, 0);
   BGE::Canvas::canvas()->camera("Side camera")->rotateY(90);
 
   BGE::Canvas::canvas()->addSceneObject(BGE::Canvas::canvas()->createLight("Global light"));

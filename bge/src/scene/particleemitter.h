@@ -30,11 +30,19 @@ namespace Scene {
  */
 struct Particle {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+  Particle()
+  {
+    size = 1.0;
+    alpha = 1.0;
+    lifetime = 0;
+  }
+
   Vector3f position;
   Vector3f velocity;
   Vector3f initialVelocity;
   qreal colorWeight;
   qreal alpha;
+  qreal size;
   quint32 lifetime;
   QVariant custom;
 };

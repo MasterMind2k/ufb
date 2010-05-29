@@ -36,8 +36,8 @@ Controller::Controller()
 
 void Controller::keyPressed(QKeyEvent *event)
 {
-  if (!m_fighter)
-    return;
+  if (m_fighter && !m_fighter->hullIntegrity())
+    m_fighter = 0l;
 
   switch (event->key()) {
     case Qt::Key_R : {
@@ -47,11 +47,15 @@ void Controller::keyPressed(QKeyEvent *event)
     }
 
     case Qt::Key_Plus: {
+      if (!m_fighter)
+        return;
       m_fighter->setEnginePower(m_fighter->enginePower() + 50000);
       break;
     }
 
     case Qt::Key_Minus: {
+      if (!m_fighter)
+        return;
       m_fighter->setEnginePower(m_fighter->enginePower() - 50000);
       break;
     }
@@ -63,27 +67,37 @@ void Controller::keyPressed(QKeyEvent *event)
 
     // Camera controls
     case Qt::Key_1: {
+      if (!m_fighter)
+        return;
       BGE::Canvas::canvas()->activateCamera("First person camera");
       break;
     }
     case Qt::Key_2: {
+      if (!m_fighter)
+        return;
       BGE::Canvas::canvas()->activateCamera("Third person camera");
       break;
     }
     case Qt::Key_3: {
+      if (!m_fighter)
+        return;
       BGE::Canvas::canvas()->activateCamera("Front camera");
       break;
     }
     case Qt::Key_4: {
+      if (!m_fighter)
+        return;
       BGE::Canvas::canvas()->activateCamera("Side camera");
       break;
     }
   }
-  m_fighter->body()->activate();
 }
 
 void Controller::mouseMoved(QMouseEvent *event)
 {
+  if (m_fighter && !m_fighter->hullIntegrity())
+    m_fighter = 0l;
+
   if (!m_fighter)
     return;
 
@@ -95,6 +109,9 @@ void Controller::mouseMoved(QMouseEvent *event)
 
 void Controller::mouseButtonPressed(QMouseEvent *event)
 {
+  if (m_fighter && !m_fighter->hullIntegrity())
+    m_fighter = 0l;
+
   if (!m_fighter)
     return;
 
@@ -108,6 +125,9 @@ void Controller::mouseButtonPressed(QMouseEvent *event)
 
 void Controller::mouseButtonReleased(QMouseEvent *event)
 {
+  if (m_fighter && !m_fighter->hullIntegrity())
+    m_fighter = 0l;
+
   if (!m_fighter)
     return;
 

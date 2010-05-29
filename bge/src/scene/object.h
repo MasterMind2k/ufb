@@ -225,11 +225,7 @@ class Object
      *
      * @see addChild
      */
-    inline void removeChild(Object* child)
-    {
-      if (m_children.removeOne(child))
-        child->setParent(0l);
-    }
+    void removeChild(Object* child);
     /**
      * Returns a child.
      *
@@ -410,6 +406,14 @@ class Object
     {
       return m_name;
     }
+
+    /**
+     * Deattaches from parent and adjust it's local position to match global
+     * positions.
+     *
+     * @warning Object is parentless after this operation!
+     */
+    void deattach();
 
   protected:
     /**

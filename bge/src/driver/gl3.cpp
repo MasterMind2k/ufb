@@ -419,7 +419,6 @@ void GL3::draw(Scene::ParticleEmitter *emitter)
     indicesSize += 24;
   }
 
-  const qreal size = 1;
   QList<ParticlePlan> plans;
   ParticlePlan plan;
   plan.index = 0;
@@ -442,7 +441,7 @@ void GL3::draw(Scene::ParticleEmitter *emitter)
       plan.count = 0;
       plan.weights[0] = particle.colorWeight, plan.weights[1] = particle.alpha;
     }
-    qreal scaledSize = size * particle.alpha;
+    qreal scaledSize = particle.size * particle.alpha;
 
     // Firstly we transform position
     Vector3f position = m_transform * particle.position;

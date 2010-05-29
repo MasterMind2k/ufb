@@ -123,7 +123,7 @@ void Fighter::calculateTransforms(qint32 timeDiff)
     m_dyingElapsedTime += timeDiff;
     qreal distance = boundingVolume()->radius();
     if (m_dyingElapsedTime < 4000.0) {
-      if (m_previousExplosion > 500) {
+      if (m_previousExplosion > 300) {
         qreal pos = distance - qrand() % (int) (distance / 2.0);
         BGE::Canvas::canvas()->addSceneObject(new Explosion(globalPosition() + pos * Vector3f(qrand() % 60 - 30, qrand() % 60 - 30, qrand() % 60 - 30).normalized(), Explosion::Small));
         m_previousExplosion = 0;

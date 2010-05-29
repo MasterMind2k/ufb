@@ -111,6 +111,15 @@ void Object::addChild(Object *child)
     BGE::Canvas::canvas()->partition()->addObject(child);
 }
 
+void Object::removeChild(Object *child)
+{
+  if (m_children.removeOne(child)) {
+    child->setParent(0l);
+    if (m_partition)
+      m_partition->removeObject(child);
+  }
+}
+
 void Object::setMesh(Storage::Mesh *mesh)
 {
   m_mesh = mesh;
@@ -186,6 +195,17 @@ void Object::loadMaterialsFromMesh()
     if (material)
       addMaterial(material);
   }
+}
+
+void Object::deattach()
+{
+  if (!m_parent)
+    return;
+
+  m_position = m_globalPosition;
+  m_orientation = m_globalOrientation;
+  m_transform = m_globalTransform;
+  parent()->removeChild(this);
 }
 
 void Object::prepareTransforms(qint32 timeDiff)
