@@ -30,7 +30,7 @@ using namespace Util;
 
 void Ai::calculateAngularVelocity()
 {
-  if (!m_target->hullIntegrity())
+  if (m_target && !m_target->hullIntegrity())
     m_target = 0l;
 
   if (!m_target)

@@ -55,7 +55,7 @@ Explosion::Explosion(const Vector3f &position, Sizes size)
 
   for (quint16 i = 0; i < particles; i++) {
     BGE::Scene::Particle particle;
-    particle.alpha = m_particleSize;
+    particle.size = m_particleSize;
     particle.colorWeight = 0;
     particle.lifetime = 0;
     particle.position = position;
@@ -97,5 +97,5 @@ void Explosion::calculateParticle(BGE::Scene::Particle &particle, qint32 timeDif
   particle.position += particle.velocity * timeDiff / 1000.0;
   particle.velocity = particle.initialVelocity * (1.0 - (qreal) particle.lifetime / m_lifetime);
   if (particle.alpha > 0.0)
-    particle.alpha = m_particleSize - (m_particleSize * (qreal) particle.lifetime / m_lifetime);
+    particle.alpha = 1.0 - ((qreal) particle.lifetime / m_lifetime);
 }

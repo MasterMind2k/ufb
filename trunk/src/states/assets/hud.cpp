@@ -36,8 +36,16 @@ HUD::HUD()
 
 void HUD::paint(QPainter *painter, qint32 elapsed)
 {
-  if (!m_fighter)
+  if (m_fighter && !m_fighter->hullIntegrity()) {
+    BGE::Canvas::canvas()->camera("Side camera")->deattach();
+    BGE::Canvas::canvas()->addSceneObject(BGE::Canvas::canvas()->camera("Side camera"));
+    BGE::Canvas::canvas()->activateCamera("Side camera");
+    m_fighter = 0l;
+  }
+
+  if (!m_fighter) {
     return;
+  }
 
   QSizeF size = BGE::Canvas::canvas()->size();
   QColor bluePen(0, 0, 255, 150);
@@ -82,6 +90,7 @@ void HUD::paint(QPainter *painter, qint32 elapsed)
   Util::ObjectList::self()->sort();
   foreach (Objects::Object *object, Util::ObjectList::self()->objects()) {
     Vector3f pos = Util::ObjectList::self()->transformedPositions().value(object);
+
     if (pos.z() < -1 || pos.z() > 1)
       break;
 
@@ -119,7 +128,7 @@ void HUD::paint(QPainter *painter, qint32 elapsed)
       Vector2f position(pos.x() - size.width() / 2.0, pos.y() - size.height() / 2.0);
       if (position.norm() < lockRadius) {
         // We've got a lock!
-        //m_fighter->setWeaponsLock(object);
+        m_fighter->setWeaponsLock(object);
         isLocked = true;
 
         // Left top corner
@@ -140,7 +149,7 @@ void HUD::paint(QPainter *painter, qint32 elapsed)
   painter->restore();
 
   // If we don't have any lock, remove the locked target
-  if (!isLocked && BGE::Canvas::canvas()->activeCamera()->name() != "First person camera")
+  if (!isLocked || BGE::Canvas::canvas()->activeCamera()->name() != "First person camera")
     m_fighter->setWeaponsLock(0l);
 
   // Direction to nearest asteroid
@@ -174,6 +183,9 @@ void HUD::paint(QPainter *painter, qint32 elapsed)
 
 void HUD::paintNearestArrow(QPainter *painter, Objects::Object *nearest, const QSizeF &drawingSize)
 {
+  if (!nearest)
+    return;
+
   Vector3f pos = Util::ObjectList::self()->transformedPositions().value(nearest);
 
   // Project to the screen
