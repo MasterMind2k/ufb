@@ -21,6 +21,7 @@
 #include "storage/material.h"
 
 #include "scene/light.h"
+#include "scene/boundingvolume.h"
 
 #include "explosion.h"
 
@@ -64,7 +65,7 @@ void Bullet::postTransformCalculations(qint32 timeDiff)
 void Bullet::collision(BGE::Scene::Object *object)
 {
   // Explode
-  parent()->addChild(new Explosion(globalPosition(), Explosion::Small));
+  parent()->addChild(new Explosion(globalPosition() + globalOrientation() * Vector3f(0, 0, -boundingVolume()->radius()), Explosion::Small));
 
   // Die :)
   BGE::Canvas::canvas()->removeLight(static_cast<BGE::Scene::Light*> (child(0))->name());

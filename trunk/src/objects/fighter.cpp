@@ -160,6 +160,7 @@ void Fighter::calculateTransforms(qint32 timeDiff)
     body()->applyCentralForce(btVector3(enginePower.x(), enginePower.y(), enginePower.z()));
     Vector3f angularVelocity = globalOrientation() * m_angularVelocity;
     body()->setAngularVelocity(btVector3(angularVelocity.x(), angularVelocity.y(), angularVelocity.z()));
+    body()->activate();
   }
 }
 
@@ -205,17 +206,13 @@ void Fighter::lockLaser(Bullet *bullet, bool isLeft) const
   qreal distance = target.norm();
 
   // Take it into account that bullet needs time, and the target is moving
-  qreal time = distance / (Bullet::Velocity + velocitySize);
-  target += rotation.inverse() * m_lockedTarget->velocity() * time;
+  qreal time = distance / (Bullet::Velocity + velocitySize * 2.0);
+  target += rotation.inverse() * m_lockedTarget->velocity() * time + velocity() * time;
 
-  // Adjust the target for a small amount (so lasers won't hit each other)
-  if (isLeft)
-    target += rotation * Vector3f(-100, 0, 0);
-  else
-    target += rotation * Vector3f(100, 0, 0);
+  target += Vector3f(0, 0, -bullet->boundingVolume()->radius());
 
   // Calculate the angles
   Quaternionf angle;
-  angle.setFromTwoVectors(-Vector3f::UnitZ(), target);
+  angle.setFromTwoVectors(-Vector3f::UnitZ(), target.normalized());
   bullet->rotate(angle);
 }

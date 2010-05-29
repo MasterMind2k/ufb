@@ -30,6 +30,12 @@ using namespace Util;
 
 void Ai::calculateAngularVelocity()
 {
+  if (!m_target->hullIntegrity())
+    m_target = 0l;
+
+  if (!m_target)
+    return;
+
   // Transform target's position to controlled eye space
   Vector3f target;
   float distance = m_controlled->distance(m_target);
@@ -39,12 +45,16 @@ void Ai::calculateAngularVelocity()
     target = m_controlled->globalOrientation().inverse() * (m_target->globalPosition() - m_controlled->globalPosition());
   } else{
     // Flee
-    m_running = true;
-    if (m_locationChange.elapsed() > 20000) {
-      int range = BGE::Canvas::SceneSize.x() / 2;
-      m_fleeLocation = Vector3f(qrand() % range * 2 - range, qrand() % range * 2 - range, qrand() % range * 2 - range);
+    if (m_locationChange.elapsed() > 2000) {
       m_locationChange.restart();
+      if (!m_running) {
+        int range = BGE::Canvas::SceneSize.x() / 2;
+        m_fleeLocation = Vector3f(qrand() % range * 2 - range, qrand() % range * 2 - range, qrand() % range * 2 - range);
+      } else {
+        m_fleeLocation *= -1;
+      }
     }
+    m_running = true;
     target = m_controlled->globalOrientation().inverse() * (m_fleeLocation - m_controlled->globalPosition());
   }
   float engine = distance * 1000;
@@ -137,23 +147,23 @@ void Ai::calculateAngularVelocity()
   }
 
   // Some actions
-  float absPitch = qAbs(pitch);
   if (m_controlled->hasWeaponsLock())
     m_controlled->fire();
-
-  if (isInFront) {
-    if (absPitch > 0.04)
-      pitch /= absPitch;
-
-    float absRoll = qAbs(roll);
-    if (absRoll > 0.04)
-      roll /= absRoll;
-  }
 
   if (!pitch && isInFront)
     roll = this->roll(m_target->globalOrientation() * Vector3f::UnitY());
   else if (!pitch && m_running)
     roll = this->roll(m_target->globalOrientation() * -Vector3f::UnitY());
+
+  if (isInFront) {
+    float absPitch = qAbs(pitch);
+    if (absPitch > 0.5)
+      pitch /= absPitch;
+
+    float absRoll = qAbs(roll);
+    if (absRoll > 0.5)
+      roll /= absRoll;
+  }
 
   m_controlled->setAngularVelocity(Vector3f(pitch, 0, roll));
   m_controlled->setEnginePower(engine);
