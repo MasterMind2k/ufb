@@ -40,10 +40,20 @@ void HUD::paint(QPainter *painter, qint32 elapsed)
     BGE::Canvas::canvas()->camera("Side camera")->deattach();
     BGE::Canvas::canvas()->addSceneObject(BGE::Canvas::canvas()->camera("Side camera"));
     BGE::Canvas::canvas()->activateCamera("Side camera");
+    BGE::Canvas::canvas()->activeCamera()->observe(m_fighter);
     m_fighter = 0l;
   }
 
   if (!m_fighter) {
+    // Draw Game Over sign :)
+
+    painter->setPen(Qt::red);
+    QFont font;
+    font.setPointSize(80);
+    painter->setFont(font);
+
+    painter->drawText(QRectF(QPointF(0, 0), BGE::Canvas::canvas()->size()), Qt::AlignCenter, "Game over");
+
     return;
   }
 
