@@ -31,6 +31,9 @@ class Fighter : public Object
 
     inline void setEnginePower(qreal enginePower)
     {
+      if (m_hullIntegrity <= 0.0)
+        return;
+
       m_enginePower = enginePower;
       if (m_enginePower > MaxPower)
         m_enginePower = MaxPower;
@@ -43,6 +46,9 @@ class Fighter : public Object
     }
     inline void setAngularVelocity(const Vector3f &velocity)
     {
+      if (m_hullIntegrity <= 0.0)
+        return;
+
       m_angularVelocity = velocity;
       if (m_angularVelocity.x() > 1)
         m_angularVelocity.x() = 1;

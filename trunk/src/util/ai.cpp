@@ -88,7 +88,7 @@ void Ai::calculateAngularVelocity()
     engine = 0;
 
   // Make it avoid evil asteroids!
-  Objects::Object *nearest = ObjectList::self()->nearest(m_controlled, "Asteroid", 15000); // 15000 is considered safe distance
+  Objects::Object *nearest = ObjectList::self()->nearest(m_controlled, "", 15000); // 15000 is considered safe distance
 
   if (m_running || m_makeSpace) {
     if (!nearest || m_controlled->distance(nearest) > distance)
