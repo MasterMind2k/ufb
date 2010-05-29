@@ -155,13 +155,13 @@ void Fighter::calculateTransforms(qint32 timeDiff)
 
     if (m_ai)
       m_ai->calculateAngularVelocity();
-
-    Vector3f enginePower = globalOrientation() * Vector3f(0, 0, -m_enginePower);
-    body()->applyCentralForce(btVector3(enginePower.x(), enginePower.y(), enginePower.z()));
-    Vector3f angularVelocity = globalOrientation() * m_angularVelocity;
-    body()->setAngularVelocity(btVector3(angularVelocity.x(), angularVelocity.y(), angularVelocity.z()));
-    body()->activate();
   }
+
+  Vector3f enginePower = globalOrientation() * Vector3f(0, 0, -m_enginePower);
+  body()->applyCentralForce(btVector3(enginePower.x(), enginePower.y(), enginePower.z()));
+  Vector3f angularVelocity = globalOrientation() * m_angularVelocity;
+  body()->setAngularVelocity(btVector3(angularVelocity.x(), angularVelocity.y(), angularVelocity.z()));
+  body()->activate();
 }
 
 void Fighter::collision(BGE::Scene::Object *object)
@@ -198,18 +198,14 @@ void Fighter::lockLaser(Bullet *bullet, bool isLeft) const
   if (!m_lockedTarget)
     return;
 
-  qreal velocitySize = velocity().norm();
-
   Quaternionf rotation = bullet->orientation();
 
-  Vector3f target = rotation.inverse() * (m_lockedTarget->globalPosition() - bullet->position());
+  Vector3f target = rotation.inverse() * (m_lockedTarget->globalPosition() - (bullet->position() + rotation * Vector3f(0, 0, 2 * bullet->boundingVolume()->radius())));
   qreal distance = target.norm();
 
-  // Take it into account that bullet needs time, and the target is moving
-  qreal time = distance / (Bullet::Velocity + velocitySize * 2.0);
-  target += rotation.inverse() * m_lockedTarget->velocity() * time + velocity() * time;
-
-  target += Vector3f(0, 0, -bullet->boundingVolume()->radius());
+  // Take it into account that bullet needs time, and the target is moving (so are we)
+  qreal time = distance / (Bullet::Velocity + velocity().norm() - m_lockedTarget->velocity().norm());
+  target += rotation.inverse() * m_lockedTarget->velocity() * time - rotation.inverse() * velocity() * time;
 
   // Calculate the angles
   Quaternionf angle;
