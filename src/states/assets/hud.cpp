@@ -58,7 +58,6 @@ void HUD::paint(QPainter *painter, qint32 elapsed)
   }
 
   QSizeF size = BGE::Canvas::canvas()->size();
-  QColor bluePen(0, 0, 255, 150);
   QColor greenPen(0, 255, 0, 150);
   QColor greenBar(0, 255, 0, 100);
   QColor green(0, 255, 0, 40);

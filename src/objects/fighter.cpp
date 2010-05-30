@@ -21,6 +21,7 @@
 #include "storage/mesh.h"
 #include "storage/texture.h"
 
+#include "scene/camera.h"
 #include "scene/boundingvolume.h"
 
 #include "util/ai.h"
@@ -35,6 +36,7 @@ qreal Fighter::MaxPower = 1000000.0;
 qreal Fighter::MaxVelocity = 1435.0;
 quint16 Fighter::ShieldsRechargeTime = 2000;
 float Fighter::ShieldsRechargeTick = 10.0f;
+qint32 Fighter::MaxShakeTime = 300;
 
 Fighter::Fighter(Util::Ai *ai)
   : m_ai(ai),
@@ -43,7 +45,9 @@ Fighter::Fighter(Util::Ai *ai)
     m_dyingElapsedTime(0),
     m_previousExplosion(0),
     m_exploded(false),
-    m_lockedTarget(0l)
+    m_lockedTarget(0l),
+    m_shake(false),
+    m_shakeTime(0)
 {
   setMesh(BGE::Storage::Manager::self()->get<BGE::Storage::Mesh*>("/fighters/models/fighter"));
   loadMaterialsFromMesh();
@@ -67,6 +71,12 @@ Fighter::Fighter(Util::Ai *ai)
   // Register only ai controlled fighters
   if (ai)
     setRegistered(true);
+}
+
+Fighter::~Fighter()
+{
+  if (!m_ai)
+    BGE::Canvas::canvas()->activeCamera()->observe(0l);
 }
 
 void Fighter::initBody()
@@ -147,6 +157,20 @@ void Fighter::calculateTransforms(qint32 timeDiff)
       BGE::Canvas::canvas()->deleteSceneObject(this);
     }
   } else {
+    // Animate camera shake
+    if (m_shake) {
+      m_shakeTime += timeDiff;
+      qreal angle = (qreal) m_shakeTime / (qreal) MaxShakeTime * 2.0 * M_PI;
+      BGE::Canvas::canvas()->camera("First person camera")->rotateX((qrand() % 3 - 1) * sin(angle));
+      BGE::Canvas::canvas()->camera("First person camera")->rotateY((qrand() % 3 - 1) * sin(angle));
+
+      if (m_shakeTime >= MaxShakeTime) {
+        m_shakeTime = MaxShakeTime;
+        m_shake = false;
+        BGE::Canvas::canvas()->camera("First person camera")->setOrientation(Quaternionf::Identity());
+      }
+    }
+
     if (m_shields < 100.0f && m_shieldsRecharge.elapsed() > ShieldsRechargeTime) {
       m_shields += ShieldsRechargeTick;
       m_shields = qMin(m_shields, 100.0f);
@@ -173,6 +197,12 @@ void Fighter::collision(BGE::Scene::Object *object)
   if (object->name() == "Laser") {
     // Divert power to shields!
     m_shieldsRecharge.start();
+
+    // Shake the camera
+    if (!m_ai) {
+      m_shake = true;
+      m_shakeTime = 0;
+    }
 
     if (m_shields > 0.0) {
       // We have shields!

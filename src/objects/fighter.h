@@ -28,6 +28,7 @@ class Fighter : public Object
 {
   public:
     Fighter(Util::Ai *ai = 0l);
+    ~Fighter();
 
     inline void setEnginePower(qreal enginePower)
     {
@@ -70,6 +71,7 @@ class Fighter : public Object
     static qreal MaxVelocity;
     static quint16 ShieldsRechargeTime;
     static float ShieldsRechargeTick;
+    static qint32 MaxShakeTime;
 
     inline float hullIntegrity() const
     {
@@ -105,6 +107,8 @@ class Fighter : public Object
     qint32 m_previousExplosion;
     bool m_exploded;
     Object *m_lockedTarget;
+    bool m_shake;
+    qint32 m_shakeTime;
 
     void calculateTransforms(qint32 timeDiff);
     void collision(BGE::Scene::Object *object);
