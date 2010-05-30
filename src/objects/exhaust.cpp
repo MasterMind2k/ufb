@@ -60,7 +60,7 @@ void Exhaust::calculateParticle(BGE::Scene::Particle &particle, qint32 timeDiff)
   particle.lifetime += timeDiff;
   particle.position += particle.velocity * timeDiff / 1000.0;
 
-  particle.alpha = qMax(3.0 - 3.0 * particle.lifetime / 150.0, 0.0);
+  particle.alpha = qMax(1.0 - particle.lifetime / 150.0, 0.0);
 }
 
 void Exhaust::spawnParticles(qint32 timeDiff)
@@ -68,7 +68,7 @@ void Exhaust::spawnParticles(qint32 timeDiff)
   qreal usage = m_fighter->enginePower() / Fighter::MaxPower;
 
   Vector3f currentPosition = globalTransform() * Vector3f(0, 0, 0);
-  float previousAlpha = (3.0 - 3.0 * timeDiff / 150.0);
+  float previousAlpha = (1.0 - timeDiff / 150.0);
 
   quint16 particles = 300 * usage;
   if (!particles) {
@@ -83,7 +83,8 @@ void Exhaust::spawnParticles(qint32 timeDiff)
   qreal n = 1.0 / particles;
   for (quint16 i = 0; i < particles; i++) {
     BGE::Scene::Particle particle;
-    particle.alpha = 3.0 - i * n * (3.0 - previousAlpha);
+    particle.size = 3.0;
+    particle.alpha = 1.0 - i * n * (1.0 - previousAlpha);
     particle.colorWeight = 0;
     particle.lifetime = i * n * timeDiff;
 

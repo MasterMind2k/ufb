@@ -81,6 +81,8 @@ void Renderer::drawScene()
     else
       Driver::AbstractDriver::self()->disableLighting();
 
+    Driver::AbstractDriver::self()->bind(object->materials());
+
     if (currentMesh != object->mesh()) {
       if (currentMesh)
         currentMesh->unbind();
@@ -101,12 +103,10 @@ void Renderer::drawScene()
 
     if (object->mesh()) {
       Driver::AbstractDriver::self()->setTransformMatrix(worldTransform * object->globalTransform());
-      Driver::AbstractDriver::self()->bind(object->materials());
 
       Driver::AbstractDriver::self()->draw();
     } else {
       Driver::AbstractDriver::self()->setTransformMatrix(worldTransform);
-      Driver::AbstractDriver::self()->bind(object->materials());
 
       Driver::AbstractDriver::self()->draw(static_cast<Scene::ParticleEmitter*> (object));
     }
