@@ -293,32 +293,14 @@ void GL1::draw()
   else
     meshId = m_boundMesh->bindId();
 
-  bool isFirstPass = true;
-  bool isBlending = false;
-
   if (!hasLighting())
     glDisable(GL_LIGHTING);
 
-  while (m_renderedLights < (quint32) m_lights.size()) {
-    if (!isFirstPass)
-      loadLights();
+  loadLights();
 
-    glCallList(meshId);
+  glCallList(meshId);
 
-    if (!isFirstPass)
-      unloadLights();
-
-    if (!hasLighting())
-      break;
-
-    if (isFirstPass && !isBlending) {
-      glDepthFunc(GL_LEQUAL);
-      glEnable(GL_BLEND);
-      glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_COLOR);
-      isFirstPass = false;
-      isBlending = true;
-    }
-  }
+   unloadLights();
 
   if (!hasLighting())
     glEnable(GL_LIGHTING);
