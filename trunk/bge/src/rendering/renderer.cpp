@@ -84,7 +84,7 @@ void Renderer::drawScene()
     Transform3f worldTransform = Canvas::canvas()->activeCamera()->cameraTransform();
 
     // Toggle lighting
-    if (object->isCulled())
+    if (!object->hasDisabledLighting())
       Driver::AbstractDriver::self()->enableLighting();
     else
       Driver::AbstractDriver::self()->disableLighting();

@@ -73,6 +73,13 @@ class Object
     /**
      * \overload
      */
+    inline void setScale(float scale)
+    {
+      setScale(Scaling3f(scale, scale, scale));
+    }
+    /**
+     * \overload
+     */
     inline void scale(float sx, float sy, float sz)
     {
       scale(Scaling3f(sx, sz, sy));
@@ -382,6 +389,7 @@ class Object
     inline void disableCulling()
     {
       m_isCulled = false;
+      m_ignoreLights = true;
     }
     /**
      * Returns culling status.
@@ -389,6 +397,21 @@ class Object
     inline bool isCulled() const
     {
       return m_isCulled;
+    }
+
+    /**
+     * Disables lighting for this object.
+     */
+    inline void disableLighting()
+    {
+      m_ignoreLights = true;
+    }
+    /**
+     * Has disabled lighting?
+     */
+    inline bool hasDisabledLighting() const
+    {
+      return m_ignoreLights;
     }
 
     /**
@@ -485,6 +508,7 @@ class Object
     bool m_transformModified;
     bool m_isRenderable;
     bool m_isCulled;
+    bool m_ignoreLights;
     QString m_name;
 
     Storage::Mesh* m_mesh;
