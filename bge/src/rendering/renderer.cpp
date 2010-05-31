@@ -29,6 +29,11 @@
 using namespace BGE;
 using namespace BGE::Rendering;
 
+bool objectComperator(Scene::Object *object1, Scene::Object *object2)
+{
+  return object2->mesh() < object1->mesh();
+}
+
 void Renderer::enqueueObject(Scene::Object *object)
 {
   m_renderQueue.enqueue(object);
@@ -36,6 +41,9 @@ void Renderer::enqueueObject(Scene::Object *object)
 
 void Renderer::renderScene()
 {
+  // Sort the list
+  qSort(m_renderQueue.begin(), m_renderQueue.end(), objectComperator);
+
   // Let's use the active camera
   if (!Canvas::canvas()->activeCamera())
     qFatal("BGE::Rendering::Renderer::renderScene(): No active camera defined!");
