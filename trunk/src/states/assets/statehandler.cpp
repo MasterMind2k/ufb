@@ -170,7 +170,7 @@ void StateHandler::resume()
 
 void StateHandler::populateAsteroids()
 {
-  int max = BGE::Canvas::canvas()->SceneSize.x() - 2000;
+  int max = (BGE::Canvas::canvas()->SceneSize.x()) - 2000 / 2.0;
   int min = max / 2 + 4000;
   qsrand(time(0l));
   for (quint16 i = 0; i < 30; i++) {
@@ -179,11 +179,8 @@ void StateHandler::populateAsteroids()
     BGE::Canvas::canvas()->addSceneObject(asteroid);
 
     asteroid->initBody();
-    Vector3f velocity(qrand() % 60 - 30, qrand() % 60 - 30, qrand() % 60 - 30);
-    velocity = velocity.normalized() * (qrand() % 1000 + 800);
-    asteroid->body()->setLinearVelocity(btVector3(velocity.x(), velocity.y(), velocity.z()));
 
-    velocity = Vector3f(qrand() % 60 - 30, qrand() % 60 - 30, qrand() % 60 - 30).normalized();
+    Vector3f velocity = Vector3f(qrand() % 60 - 30, qrand() % 60 - 30, qrand() % 60 - 30).normalized();
     asteroid->body()->setAngularVelocity(btVector3(velocity.x(), velocity.y(), velocity.z()));
   }
 }

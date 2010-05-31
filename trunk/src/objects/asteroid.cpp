@@ -78,6 +78,12 @@ qreal Asteroid::radius() const
   }
 }
 
+void Asteroid::initBody()
+{
+  Object::initBody();
+  body()->setDamping(0.4, 0);
+}
+
 qreal Asteroid::maxStructuralIntegrity() const
 {
   switch (m_size) {
