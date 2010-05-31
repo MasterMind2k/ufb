@@ -85,6 +85,9 @@ void Exhaust::spawnParticles(qint32 timeDiff)
     BGE::Scene::Particle particle;
     particle.size = 3.0;
     particle.alpha = 1.0 - i * n * (1.0 - previousAlpha);
+    if (particle.alpha < 0.0)
+      continue;
+
     particle.colorWeight = 0;
     particle.lifetime = i * n * timeDiff;
 

@@ -351,7 +351,6 @@ void GL1::draw(Scene::ParticleEmitter *emitter)
                           material->emission().alpha() * particle.alpha));
     setMaterial(material);
 
-    // Each particle is a small quad
     glBegin(GL_POINTS);
     glVertex3fv(particle.position.data());
     glEnd();
