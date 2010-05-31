@@ -27,7 +27,7 @@ class Ai
 {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-    inline Ai(Objects::Fighter *target) : m_target(target), m_running(false), m_makeSpace(false)
+    inline Ai(Objects::Fighter *target) : m_target(target), m_running(false)
     {
       m_locationChange.start();
     }
@@ -50,7 +50,6 @@ class Ai
     Objects::Fighter *m_controlled;
     QTime m_locationChange;
     bool m_running;
-    bool m_makeSpace;
 
     inline static float roll(const Vector3f &target)
     {
