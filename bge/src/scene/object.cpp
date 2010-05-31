@@ -28,7 +28,8 @@ using namespace BGE::Scene;
 
 Object::Object()
   : m_isRenderable(false),
-    m_isCulled(true)
+    m_isCulled(true),
+    m_ignoreLights(false)
 {
   // Set the default transforms
   m_transform.setIdentity();
