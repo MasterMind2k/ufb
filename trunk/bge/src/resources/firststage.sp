@@ -2,6 +2,7 @@
 in vec3 in_Vertex;
 in vec3 in_Normal;
 in vec2 in_TexCoord;
+in float in_PointSize;
 
 uniform mat4 ProjectionMatrix;
 uniform mat4 ModelViewMatrix;
@@ -16,6 +17,9 @@ void main(void)
 
   gl_Position = ProjectionMatrix * ModelViewMatrix * vec4(in_Vertex, 1.0);
   ex_TexCoord = in_TexCoord;
+
+  if (in_PointSize > 0.0)
+    gl_PointSize = in_PointSize;
 }
 [fragment]
 in vec3 position, normal;

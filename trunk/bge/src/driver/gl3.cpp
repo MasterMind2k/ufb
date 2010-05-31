@@ -12,8 +12,6 @@
  ***************************************************************************/
 #include "gl3.h"
 
-#include <QtOpenGL/QGLFramebufferObject>
-
 #include "canvas.h"
 
 #include "driver/texturemanager.h"
@@ -40,12 +38,14 @@ struct BufferElement {
   GLfloat vertex[3];
   GLfloat normal[3];
   GLfloat uvMap[2];
-  GLubyte padding[32];
+  GLfloat size;
+  GLubyte padding[28];
 };
 
 #define VERTEX_OFFSET 0
 #define NORMAL_OFFSET (3 * sizeof(GLfloat))
 #define UV_OFFSET (6 * sizeof(GLfloat))
+#define SIZE_OFFSET (8 * sizeof(GLfloat))
 
 struct ParticlePlan {
   GLushort index;
@@ -245,6 +245,7 @@ void GL3::bind(Storage::Mesh *mesh)
   bindAttribute("Vertex", 3, GL_FLOAT, sizeof(BufferElement), VERTEX_OFFSET);
   bindAttribute("Normal", 3, GL_FLOAT, sizeof(BufferElement), NORMAL_OFFSET);
   bindAttribute("TexCoord", 2, GL_FLOAT, sizeof(BufferElement), UV_OFFSET);
+  bindAttribute("PointSize", 1, GL_FLOAT, sizeof(BufferElement), SIZE_OFFSET);
   m_boundMesh = mesh;
 }
 
@@ -284,6 +285,7 @@ void GL3::bind(Storage::ShaderProgram *shaderProgram)
     bindUniformAttribute("ModelViewMatrix", m_transform.matrix());
     bindAttribute("Vertex", 3, GL_FLOAT, sizeof(BufferElement), VERTEX_OFFSET);
     bindAttribute("TexCoord", 2, GL_FLOAT, sizeof(BufferElement), UV_OFFSET);
+    bindAttribute("PointSize", 1, GL_FLOAT, sizeof(BufferElement), SIZE_OFFSET);
   }
 }
 
@@ -295,6 +297,7 @@ void GL3::unbind(Storage::Mesh *mesh)
   unbindAttribute("Vertex");
   unbindAttribute("Normal");
   unbindAttribute("TexCoord");
+  unbindAttribute("PointSize");
 
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -412,7 +415,7 @@ void GL3::draw()
 
 void GL3::draw(Scene::ParticleEmitter *emitter)
 {
-  quint16 indicesSize, verticesSize = 4 * emitter->particles().size();
+  quint16 indicesSize, verticesSize = emitter->particles().size();
   indicesSize = verticesSize;
   if (Canvas::canvas()->drawBoundingVolumes()) {
     verticesSize += emitter->boundingVolume()->corners().size();
@@ -441,38 +444,20 @@ void GL3::draw(Scene::ParticleEmitter *emitter)
       plan.count = 0;
       plan.weights[0] = particle.colorWeight, plan.weights[1] = particle.alpha;
     }
-    qreal scaledSize = particle.size * particle.alpha;
 
     // Firstly we transform position
-    Vector3f position = m_transform * particle.position;
+    Vector3f position = particle.position;
     Vector3f corner;
 
     // Each particle is a small quad
-    corner = Vector3f(position.x() - scaledSize, position.y() - scaledSize, position.z());
+    corner = Vector3f(position.x(), position.y(), position.z());
     memcpy(temp.vertex, corner.data(), 3 * sizeof(GLfloat));
     memcpy(temp.uvMap, Vector2f(0, 0).data(), 2 * sizeof(GLfloat));
     memcpy(verticesPtr++, &temp, sizeof(BufferElement));
+    temp.size = particle.size * particle.alpha;
     *indicesPtr++ = i++;
 
-    corner = Vector3f(position.x() + scaledSize, position.y() - scaledSize, position.z());
-    memcpy(temp.vertex, corner.data(), 3 * sizeof(GLfloat));
-    memcpy(temp.uvMap, Vector2f(1, 0).data(), 2 * sizeof(GLfloat));
-    memcpy(verticesPtr++, &temp, sizeof(BufferElement));
-    *indicesPtr++ = i++;
-
-    corner = Vector3f(position.x() + scaledSize, position.y() + scaledSize, position.z());
-    memcpy(temp.vertex, corner.data(), 3 * sizeof(GLfloat));
-    memcpy(temp.uvMap, Vector2f(1, 1).data(), 2 * sizeof(GLfloat));
-    memcpy(verticesPtr++, &temp, sizeof(BufferElement));
-    *indicesPtr++ = i++;
-
-    corner = Vector3f(position.x() - scaledSize, position.y() + scaledSize, position.z());
-    memcpy(temp.vertex, corner.data(), 3 * sizeof(GLfloat));
-    memcpy(temp.uvMap, Vector2f(0, 1).data(), 2 * sizeof(GLfloat));
-    memcpy(verticesPtr++, &temp, sizeof(BufferElement));
-    *indicesPtr++ = i++;
-
-    plan.count += 4;
+    plan.count++;
   }
 
   // Add last plan
@@ -534,12 +519,11 @@ void GL3::draw(Scene::ParticleEmitter *emitter)
   bindAttribute("Vertex", 3, GL_FLOAT, sizeof(BufferElement), VERTEX_OFFSET);
   bindAttribute("Normal", 3, GL_FLOAT, sizeof(BufferElement), NORMAL_OFFSET);
   bindAttribute("TexCoord", 2, GL_FLOAT, sizeof(BufferElement), UV_OFFSET);
+  bindAttribute("PointSize", 1, GL_FLOAT, sizeof(BufferElement), SIZE_OFFSET);
 
-  Transform3f backup = m_transform;
-  setTransformMatrix(Transform3f(Transform3f::Identity()));
-  // Do the actual drawing :)
   Storage::Material *particleMaterial = m_materials.value("Particles");
   foreach (ParticlePlan plan, plans) {
+
     qreal emissionWeight = 1 - plan.weights[0];
     Storage::Material *material = new Storage::Material("Particles",
                                                         particleMaterial->ambient(),
@@ -549,13 +533,13 @@ void GL3::draw(Scene::ParticleEmitter *emitter)
                                                         particleMaterial->shininess());
     material->setDiffuse(QColor(0, 0, 0));
     material->setSpecular(QColor(0, 0, 0));
-    material->setEmission(QColor(material->emission().red() * emissionWeight + material->ambient().red() * plan.weights[0],
-                                 material->emission().green() * emissionWeight + material->ambient().green() * plan.weights[0],
-                                 material->emission().blue() * emissionWeight + material->ambient().blue() * plan.weights[0]));
+    material->setEmission(QColor((material->emission().red() * emissionWeight + material->ambient().red() * plan.weights[0]) * plan.weights[1],
+                                 (material->emission().green() * emissionWeight + material->ambient().green() * plan.weights[0]) * plan.weights[1],
+                                 (material->emission().blue() * emissionWeight + material->ambient().blue() * plan.weights[0]) * plan.weights[1]));
     material->setAmbient(QColor(0, 0, 0));
     setMaterial(material);
 
-    glDrawElements(GL_QUADS, plan.count, GL_UNSIGNED_SHORT, (GLushort*)0 + plan.index);
+    glDrawElements(GL_POINTS, plan.count, GL_UNSIGNED_SHORT, (GLushort*)0 + plan.index);
 
     delete material;
   }
@@ -565,13 +549,13 @@ void GL3::draw(Scene::ParticleEmitter *emitter)
     setMaterial(m_materials.value("BGE::BoundingVolume"));
     glDrawElements(GL_LINES, 24, GL_UNSIGNED_SHORT, (GLushort*)0 + indicesSize - 24);
   }
-  setTransformMatrix(backup);
   setMaterial(0l);
 
   // Unbind
   unbindAttribute("Vertex");
   unbindAttribute("Normal");
   unbindAttribute("TexCoord");
+  unbindAttribute("PointSize");
 
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -820,6 +804,7 @@ void GL3::load(Storage::Mesh *mesh)
 
     BufferElement* buffer = (BufferElement*) malloc(size * sizeof(BufferElement));
     BufferElement* bufferPtr = buffer;
+    buffer->size = 0.0;
     QList<Vector3f>::const_iterator i = vertices.constBegin();
     QList<Vector3f>::const_iterator j = normals.constBegin();
     QList<Vector2f>::const_iterator k = textureMaps.constBegin();
