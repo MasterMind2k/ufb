@@ -70,6 +70,7 @@ class ParticleEmitter : public Object
     {
       m_verticesBufferId = m_indicesBufferId = 0;
     }
+    virtual ~ParticleEmitter();
 
     /**
      * Returns the autoremove property.
