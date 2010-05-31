@@ -40,6 +40,8 @@ class Asteroid : public Object
       return m_structuralIntegrity;
     }
 
+    void initBody();
+
     qreal maxStructuralIntegrity() const;
 
   private:
