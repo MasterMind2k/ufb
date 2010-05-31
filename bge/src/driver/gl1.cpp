@@ -316,12 +316,17 @@ void GL1::draw()
 
 void GL1::draw(Scene::ParticleEmitter *emitter)
 {
+  glEnable(GL_POINT_SMOOTH);
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   Storage::Material *particleMaterial = m_materials.value("Particles");
   foreach (Scene::Particle particle, emitter->particles()) {
     // Set material
     qreal emissionWeight = 1 - particle.colorWeight;
+    if (particle.alpha < 0)
+      continue;
+    glPointSize(particle.alpha * particle.size);
+
     Storage::Material *material = new Storage::Material("Particles",
                                                         particleMaterial->ambient(),
                                                         particleMaterial->diffuse(),
@@ -359,6 +364,7 @@ void GL1::draw(Scene::ParticleEmitter *emitter)
     draw(emitter->boundingVolume());
 
   glDisable(GL_BLEND);
+  glDisable(GL_POINT_SMOOTH);
 }
 
 void GL1::init()

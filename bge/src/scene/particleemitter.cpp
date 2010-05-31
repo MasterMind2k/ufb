@@ -12,12 +12,19 @@
  ***************************************************************************/
 #include "particleemitter.h"
 
+#include "driver/abstractdriver.h"
+
 #include "canvas.h"
 
 #include "partition.h"
 
 using namespace BGE;
 using namespace BGE::Scene;
+
+ParticleEmitter::~ParticleEmitter()
+{
+  Driver::AbstractDriver::self()->unload(mesh());
+}
 
 void ParticleEmitter::postTransformCalculations(qint32 timeDiff)
 {
