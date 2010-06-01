@@ -16,8 +16,6 @@ in vec2 ex_TexCoord;
 
 uniform sampler2D BlurredEmission;
 
-/*out vec4 out_Color;*/
-
 float gauss(in int x);
 float step();
 

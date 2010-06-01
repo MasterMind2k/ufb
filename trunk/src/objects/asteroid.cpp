@@ -27,6 +27,7 @@
 #include "util/objectlist.h"
 
 #include "explosion.h"
+#include "powerup.h"
 
 using namespace Objects;
 
@@ -81,7 +82,6 @@ qreal Asteroid::radius() const
 void Asteroid::initBody()
 {
   Object::initBody();
-  body()->setDamping(0.4, 0);
 }
 
 qreal Asteroid::maxStructuralIntegrity() const
@@ -103,10 +103,10 @@ void Asteroid::postTransformCalculations(qint32 timeDiff)
   // Check if we are too fast
   if (!m_stabilized) {
     if (velocity().norm() > 2000.0) {
-      body()->setDamping(0.2, 0);
+      body()->setDamping(0.5, 0);
     } else {
       m_stabilized = true;
-      body()->setDamping(0, 0);
+      body()->setDamping(0.1, 0);
     }
   }
 
@@ -143,6 +143,11 @@ void Asteroid::postTransformCalculations(qint32 timeDiff)
     } else if (m_dyingElapsedTime < 3000.0) {
       scale(1 - (m_dyingElapsedTime - 2000.0) / 1000.0);
     } else {
+      // Spawn a powerup
+      PowerUp *powerup = new PowerUp;
+      powerup->move(globalPosition());
+      BGE::Canvas::canvas()->addSceneObject(powerup);
+
       // Remove itself
       setRenderable(false);
       parent()->removeChild(this);
@@ -155,6 +160,10 @@ void Asteroid::postTransformCalculations(qint32 timeDiff)
 
 void Asteroid::collision(BGE::Scene::Object *object)
 {
+  // Powerups don't destroy the asteroid
+  if (object->name() == "PowerUp")
+    return;
+
   // We are already dead
   if (m_structuralIntegrity < 0.0)
     return;

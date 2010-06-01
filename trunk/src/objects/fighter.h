@@ -75,11 +75,11 @@ class Fighter : public Object
 
     inline float hullIntegrity() const
     {
-      return m_hullIntegrity;
+      return m_hullIntegrity / m_maxHullIntegrity * 100.0;
     }
     inline float shields() const
     {
-      return m_shields;
+      return m_shields / m_maxShields * 100.0;
     }
 
     inline bool hasWeaponsLock() const
@@ -102,7 +102,10 @@ class Fighter : public Object
     QTime m_acquiringTarget;
     Util::Ai *m_ai;
     float m_shields;
+    float m_maxShields;
     float m_hullIntegrity;
+    float m_maxHullIntegrity;
+    float m_firepower;
     qint32 m_dyingElapsedTime;
     qint32 m_previousExplosion;
     bool m_exploded;

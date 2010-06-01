@@ -170,7 +170,7 @@ void StateHandler::resume()
 
 void StateHandler::populateAsteroids()
 {
-  int max = (BGE::Canvas::canvas()->SceneSize.x()) - 2000 / 2.0;
+  int max = BGE::Canvas::canvas()->SceneSize.x() / 5.0 - 2000;
   int min = max / 2 + 4000;
   qsrand(time(0l));
   for (quint16 i = 0; i < 30; i++) {
