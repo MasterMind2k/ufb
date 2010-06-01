@@ -244,7 +244,7 @@ void Fighter::collision(BGE::Scene::Object *object)
         break;
 
       case PowerUp::HullRepair:
-        m_hullIntegrity = qMin(m_maxHullIntegrity, m_hullIntegrity + 10);
+        m_hullIntegrity = qMin(m_maxHullIntegrity, m_hullIntegrity + 50);
         break;
 
       case PowerUp::ShieldsBatteries:
