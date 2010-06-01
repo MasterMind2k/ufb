@@ -347,13 +347,6 @@ class Canvas : public QGLWidget
     void mousePressEvent(QMouseEvent* event);
     void mouseReleaseEvent(QMouseEvent *event);
 
-    // To ensure the QGLWidgets gets the mouse events
-    inline void showEvent(QShowEvent *event)
-    {
-      QWidget::grabMouse();
-      QGLWidget::showEvent(event);
-    }
-
     void setupDynamicsWorld();
 
   private slots:
