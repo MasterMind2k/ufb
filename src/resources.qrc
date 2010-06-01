@@ -60,6 +60,13 @@
   <file alias="Galaxy_UP.png">resources/skybox/space_up.png</file>
 </qresource>
 
+<qresource prefix="/powerups">
+  <file alias="laser.png">resources/powerups/laser.png</file>
+  <file alias="repair.png">resources/powerups/repair.png</file>
+  <file alias="shields.png">resources/powerups/shields.png</file>
+  <file alias="hull.png">resources/powerups/hull.png</file>
+</qresource>
+
 <qresource prefix="/sounds/">
   <file alias="laser.mp3">resources/sounds/laser.mp3</file>
 </qresource>

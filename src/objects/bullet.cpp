@@ -30,6 +30,7 @@ using namespace Objects;
 qreal Bullet::Velocity = 10000;
 
 Bullet::Bullet()
+  : m_damage(10)
 {
   setMesh(BGE::Storage::Manager::self()->get<BGE::Storage::Mesh*>("/projectiles/bullet"));
   BGE::Storage::Material *material = BGE::Storage::Manager::self()->get<BGE::Storage::Material*>("/projectiles/bullet/Material");
@@ -65,7 +66,7 @@ void Bullet::postTransformCalculations(qint32 timeDiff)
 void Bullet::collision(BGE::Scene::Object *object)
 {
   // Explode
-  parent()->addChild(new Explosion(globalPosition() + globalOrientation() * Vector3f(0, 0, -boundingVolume()->radius()), Explosion::Small));
+  parent()->addChild(new Explosion(globalPosition(), Explosion::Small));
 
   // Die :)
   BGE::Canvas::canvas()->removeLight(static_cast<BGE::Scene::Light*> (child(0))->name());

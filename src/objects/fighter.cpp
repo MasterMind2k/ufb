@@ -29,6 +29,7 @@
 #include "bullet.h"
 #include "exhaust.h"
 #include "explosion.h"
+#include "powerup.h"
 
 using namespace Objects;
 
@@ -41,7 +42,10 @@ qint32 Fighter::MaxShakeTime = 300;
 Fighter::Fighter(Util::Ai *ai)
   : m_ai(ai),
     m_hullIntegrity(100),
+    m_maxHullIntegrity(100),
     m_shields(100),
+    m_maxShields(100),
+    m_firepower(10),
     m_dyingElapsedTime(0),
     m_previousExplosion(0),
     m_exploded(false),
@@ -83,6 +87,7 @@ void Fighter::initBody()
 {
   Object::initBody();
   body()->setDamping(0.5, 0);
+  body()->setActivationState(DISABLE_DEACTIVATION);
 }
 
 void Fighter::fire()
@@ -151,6 +156,13 @@ void Fighter::calculateTransforms(qint32 timeDiff)
     } else if (m_dyingElapsedTime < 5000.0) {
       scale(1 - (m_dyingElapsedTime - 4000.0) / 1000.0);
     } else {
+      // Spawn a powerup
+      if (m_ai) {
+        PowerUp *powerup = new PowerUp;
+        powerup->move(globalPosition());
+        BGE::Canvas::canvas()->addSceneObject(powerup);
+      }
+
       // Remove itself
       setRenderable(false);
       parent()->removeChild(this);
@@ -171,9 +183,9 @@ void Fighter::calculateTransforms(qint32 timeDiff)
       }
     }
 
-    if (m_shields < 100.0f && m_shieldsRecharge.elapsed() > ShieldsRechargeTime) {
+    if (m_shields < m_maxShields && m_shieldsRecharge.elapsed() > ShieldsRechargeTime) {
       m_shields += ShieldsRechargeTick;
-      m_shields = qMin(m_shields, 100.0f);
+      m_shields = qMin(m_shields, m_maxShields);
       m_shieldsRecharge.restart();
     }
 
@@ -185,7 +197,6 @@ void Fighter::calculateTransforms(qint32 timeDiff)
   body()->applyCentralForce(btVector3(enginePower.x(), enginePower.y(), enginePower.z()));
   Vector3f angularVelocity = globalOrientation() * m_angularVelocity;
   body()->setAngularVelocity(btVector3(angularVelocity.x(), angularVelocity.y(), angularVelocity.z()));
-  body()->activate();
 }
 
 void Fighter::collision(BGE::Scene::Object *object)
@@ -220,6 +231,26 @@ void Fighter::collision(BGE::Scene::Object *object)
     // We are done for!
     m_shields = 0;
     m_hullIntegrity = 0;
+  } else if (object->name() == "PowerUp") {
+    // We got a cookie :)
+    switch (static_cast<PowerUp*> (object)->type()) {
+      case PowerUp::LaserEnhancement:
+        m_firepower += 5;
+        break;
+
+      case PowerUp::HullEnhancement:
+        m_maxHullIntegrity += 10;
+        m_hullIntegrity += 10;
+        break;
+
+      case PowerUp::HullRepair:
+        m_hullIntegrity = qMin(m_maxHullIntegrity, m_hullIntegrity + 10);
+        break;
+
+      case PowerUp::ShieldsBatteries:
+        m_maxShields += 10;
+        break;
+    }
   }
 }
 

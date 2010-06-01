@@ -5,6 +5,7 @@ set(objects_SRCS
   asteroid.cpp
   bullet.cpp
   explosion.cpp
+  powerup.cpp
 )
 
 add_library(objects ${objects_SRCS})

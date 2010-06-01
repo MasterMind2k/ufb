@@ -10,36 +10,50 @@
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
  ***************************************************************************/
-#ifndef OBJECTS_BULLET_H
-#define OBJECTS_BULLET_H
+#ifndef OBJECTS_POWERUP_H
+#define OBJECTS_POWERUP_H
 
-#include "object.h"
+#include "objects/object.h"
+
+namespace BGE {
+namespace Storage {
+class Material;
+}
+}
 
 namespace Objects {
 
-class Bullet : public Objects::Object
+class PowerUp : public Objects::Object
 {
   public:
-    Bullet();
+    enum Type {
+      LaserEnhancement,
+      HullRepair,
+      HullEnhancement,
+      ShieldsBatteries
+    };
 
-    static const quint16 MaxLifetime = 3000;
-    static qreal Velocity;
+    PowerUp();
+    ~PowerUp();
 
-    inline float damage() const
+    inline Type type() const
     {
-      return m_damage;
+      return m_type;
     }
-    inline void setDamage(float damage)
-    {
-      m_damage = damage;
-    }
+
+    void initBody();
 
   private:
-    quint16 m_lifetime;
-    float m_damage;
+    Type m_type;
+    qint32 m_spawnAnimation;
+    static const qint32 SpawnTime = 1000;
+    bool m_initialized;
+    BGE::Storage::Material *m_glow;
+    QColor m_color;
 
-    void postTransformCalculations(qint32 timeDiff);
     void collision(BGE::Scene::Object *object);
+    void calculateTransforms(qint32 timeDiff);
+    void postTransformCalculations(qint32 timeDiff);
 };
 
 }

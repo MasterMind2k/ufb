@@ -77,8 +77,6 @@ vec4 positionalLight(in vec3 ecPos, in vec3 n, in MaterialStruct Material, in Li
       NdotHV = max(dot(n, halfVector), 0.0);
       color += att * Material.specular * Light.specular * pow(NdotHV, Material.shininess);
     }
-  } else {
-    discard;
   }
   
   return color;
@@ -105,8 +103,6 @@ vec4 directionalLight(in vec3 ecPos, in vec3 n, in MaterialStruct Material, in L
     color += Material.specular *
              Light.specular *
              pow(NdotHV, Material.shininess);
-  } else {
-    discard;
   }
   
   return color;
@@ -149,11 +145,15 @@ void main(void)
     } else if (!lightingOnly) {
       color = vec4(1.0);
     }
+    
+    if (colorMap.a > 0.0)
+      color *= colorMap;
+  } else if (colorMap.a > 0.0) {
+    color = colorMap;
   } else {
     discard;
   }
-  if (colorMap.r + colorMap.g + colorMap.b > 0.0)
-    color *= colorMap;
+
   gl_FragData[0] = color;
 }
 

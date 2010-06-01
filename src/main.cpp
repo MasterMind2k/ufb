@@ -26,6 +26,59 @@
 
 #include "states/menu.h"
 
+void createCube()
+{
+  BGE::Storage::Mesh* mesh = new BGE::Storage::Mesh("cube");
+  float half = 200;
+  // Prepare our vertices
+  Vector3f bottomFrontLeft(-half, -half, half);
+  Vector3f bottomFrontRight(half, -half, half);
+  Vector3f topFrontLeft(-half, half, half);
+  Vector3f topFrontRight(half, half, half);
+
+  Vector3f bottomBehindLeft(-half, -half, -half);
+  Vector3f bottomBehindRight(half, -half, -half);
+  Vector3f topBehindLeft(-half, half, -half);
+  Vector3f topBehindRight(half, half, -half);
+  QVector<Vector2f> uvMapping;
+  uvMapping << Vector2f(0, 0) << Vector2f(1, 0) << Vector2f(0, 1) << Vector2f(1, 1);
+  // And draw the cube
+  // Front side
+  mesh->addRectangle("front", bottomFrontLeft, bottomFrontRight, topFrontLeft, topFrontRight);
+  mesh->addTextureMaps("front", uvMapping);
+  // Right side
+  mesh->addRectangle("right", bottomFrontRight, bottomBehindRight, topFrontRight, topBehindRight);
+  mesh->addTextureMaps("right", uvMapping);
+  // Left side
+  mesh->addRectangle("left", bottomBehindLeft, bottomFrontLeft, topBehindLeft, topFrontLeft);
+  mesh->addTextureMaps("left", uvMapping);
+  // Bottom side
+  mesh->addRectangle("bottom", bottomBehindLeft, bottomBehindRight, bottomFrontLeft, bottomFrontRight);
+  mesh->addTextureMaps("bottom", uvMapping);
+  // Behind side
+  mesh->addRectangle("behind", topBehindLeft, topBehindRight, bottomBehindLeft, bottomBehindRight);
+  mesh->addTextureMaps("behind", uvMapping);
+  // Top side
+  mesh->addRectangle("top", topFrontLeft, topFrontRight, topBehindLeft, topBehindRight);
+  mesh->addTextureMaps("top", uvMapping);
+
+  mesh->calculateNormals("front");
+  mesh->calculateNormals("right");
+  mesh->calculateNormals("left");
+  mesh->calculateNormals("bottom");
+  mesh->calculateNormals("behind");
+  mesh->calculateNormals("top");
+
+  mesh->addFaceMaterial("front", 0, "material");
+  mesh->addFaceMaterial("right", 0, "material");
+  mesh->addFaceMaterial("left", 0, "material");
+  mesh->addFaceMaterial("bottom", 0, "material");
+  mesh->addFaceMaterial("behind", 0, "material");
+  mesh->addFaceMaterial("top", 0, "material");
+
+  BGE::Storage::Manager::self()->set(mesh, "/powerups/");
+}
+
 void createSkyboxQuad()
 {
   BGE::Storage::Mesh *skybox = new BGE::Storage::Mesh("model");
@@ -53,8 +106,9 @@ int main(int argc, char **argv)
   // Load data
   BGE::Canvas::canvas()->loadResource("./resources.rcc");
 
-  // Create sky box quad
+  // Create sky box quad and cube
   createSkyboxQuad();
+  createCube();
 
   // Itensify ambient light
   BGE::Scene::Light::setGlobalAmbient(QColor(120, 120, 120));
