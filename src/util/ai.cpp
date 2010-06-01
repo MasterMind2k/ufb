@@ -59,7 +59,25 @@ void Ai::calculateAngularVelocity()
   }
   float engine = distance * 1000;
 
-  bool isInFront = !m_running && target.z() < 0;
+  // Are we too close to target? (if we are not running)
+    if (!m_running && !m_makeSpace && distance < 5000) {
+      // Let's "overfly" the bastard and shoot him from behind!
+      // Recalculate target position
+      target = m_controlled->globalOrientation().inverse() * (m_target->globalPosition() - m_controlled->globalPosition());
+      target.z() -= 16000;
+      m_fleeLocation = m_controlled->globalOrientation() * target + m_controlled->globalPosition();
+      m_makeSpace = true;
+      engine = Objects::Fighter::MaxPower;
+    } else if (m_makeSpace && distance > 5000) {
+      // Turn and start shootin'!
+      m_makeSpace = false;
+    } else if (m_makeSpace) {
+      // Still too close
+      target = m_controlled->globalOrientation().inverse() * (m_fleeLocation - m_controlled->globalPosition());
+      engine = Objects::Fighter::MaxPower;
+    }
+
+  bool isInFront = !m_running && !m_makeSpace && target.z() < 0;
 
   // Calculate needed roll, pitch nad engine power to get to the target
   float roll = this->roll(target);
@@ -72,7 +90,7 @@ void Ai::calculateAngularVelocity()
   // Make it avoid evil asteroids!
   Objects::Object *nearest = ObjectList::self()->nearest(m_controlled, "", 15000); // 15000 is considered safe distance
 
-  if (m_running) {
+  if (m_running || m_makeSpace) {
     if (!nearest || m_controlled->distance(nearest) > distance)
       nearest = m_target;
   }
