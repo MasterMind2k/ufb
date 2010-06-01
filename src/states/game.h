@@ -13,6 +13,8 @@
 #ifndef STATES_GAME_H
 #define STATES_GAME_H
 
+#include <QtCore/QTime>
+
 #include "gamestate.h"
 
 namespace Objects {
@@ -36,11 +38,17 @@ class Game : public BGE::GameState
       return m_fighter;
     }
 
+    inline const QTime &time() const
+    {
+      return m_time;
+    }
+
   private:
     /* Only for setting fighter */
     Assets::Controller *m_controller;
     Assets::HUD *m_hud;
     Objects::Fighter *m_fighter;
+    QTime m_time;
 };
 
 }

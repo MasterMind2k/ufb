@@ -17,15 +17,12 @@
 #include <QtCore/QTimer>
 #include <QtCore/QList>
 
-namespace BGE {
-class GameState;
-}
-
 namespace Util {
 class Ai;
 }
 
 namespace States {
+class Game;
 namespace Assets {
 
   class StateHandler : public QObject
@@ -46,6 +43,10 @@ namespace Assets {
     {
       return m_game != 0l;
     }
+    inline const Game *game() const
+    {
+      return m_game;
+    }
 
     inline quint8 wave() const
     {
@@ -58,7 +59,7 @@ namespace Assets {
 
   private:
     static StateHandler *m_self;
-    BGE::GameState *m_game;
+    Game *m_game;
     QList<Util::Ai*> m_ais;
     quint8 m_wave;
     qint32 m_previousTime;

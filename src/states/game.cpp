@@ -26,6 +26,7 @@ Game::Game()
   setController(m_controller);
   m_hud = new Assets::HUD;
   setOverlay(m_hud);
+  m_time.start();
 }
 
 void Game::setFighter(Objects::Fighter *fighter)
