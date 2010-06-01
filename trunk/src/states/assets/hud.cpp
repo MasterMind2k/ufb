@@ -12,6 +12,8 @@
  ***************************************************************************/
 #include "hud.h"
 
+#include <QtCore/QSettings>
+
 #include <QtGui/QPainter>
 
 #include "canvas.h"
@@ -26,6 +28,8 @@
 #include "objects/asteroid.h"
 
 #include "statehandler.h"
+
+#include "states/game.h"
 
 using namespace States;
 using namespace States::Assets;
@@ -44,6 +48,20 @@ void HUD::paint(QPainter *painter, qint32 elapsed)
     BGE::Canvas::canvas()->activateCamera("Side camera");
     BGE::Canvas::canvas()->activeCamera()->observe(m_fighter);
     m_fighter = 0l;
+
+    // Update time
+    QSettings settings;
+    quint32 time = settings.value("Hours", 0).toInt() * 3600 + settings.value("Minutes", 0).toInt() * 60 + settings.value("Seconds", 0).toInt();
+    qint32 current = floor(StateHandler::self()->game()->time().elapsed() / 1000.0);
+
+    if (current > time) {
+      qint32 hours = floor(current / 3600.0);
+      qint32 minutes = floor(current / 60.0) - hours * 60;
+      qint32 seconds = current - hours * 3600 - minutes * 60;
+      settings.setValue("Hours", hours);
+      settings.setValue("Minutes", minutes);
+      settings.setValue("Seconds", seconds);
+    }
   }
 
   if (!m_fighter) {
@@ -69,7 +87,7 @@ void HUD::paint(QPainter *painter, qint32 elapsed)
   painter->setBrush(Qt::NoBrush);
   qreal lockRadius = 20;
   bool isLocked = false;
-  QRectF panel(size.width() - 180, size.height() - 80, 180, 80);
+  QRectF panel(size.width() - 180, size.height() - 95, 180, 95);
 
   // Center cross
   if (BGE::Canvas::canvas()->activeCamera()->name() == "First person camera") {
@@ -223,6 +241,17 @@ void HUD::paint(QPainter *painter, qint32 elapsed)
     panel.setLeft(panel.left() + 50);
     paintStatus(painter, panel, QString(" / Next wave in: %0").arg(30 - qRound(StateHandler::self()->nextWaveIn() / 1000.0)));
   }
+
+  // Draw timings
+  panel.setTop(panel.top() + 15);
+  QSettings settings;
+  paintStatus(painter, panel, QString("Previous time: %0:%1:%2").arg(settings.value("Hours", 0).toInt()).arg(settings.value("Minutes", 0).toInt()).arg(settings.value("Seconds", 0).toInt()));
+  panel.setTop(panel.top() + 15);
+  qint32 current = floor(StateHandler::self()->game()->time().elapsed() / 1000.0);
+  qint32 hours = floor(current / 3600.0);
+  qint32 minutes = floor(current / 60.0) - hours * 60;
+  qint32 seconds = current - hours *3600 - minutes * 60;
+  paintStatus(painter, panel, QString("Current time: %0:%1:%2").arg(hours).arg(minutes).arg(seconds));
 }
 
 void HUD::paintNearestArrow(QPainter *painter, Objects::Object *nearest, const QSizeF &drawingSize)
