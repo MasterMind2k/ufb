@@ -31,11 +31,16 @@ class Game : public BGE::GameState
     Game();
 
     void setFighter(Objects::Fighter *fighter);
+    inline Objects::Fighter *fighter() const
+    {
+      return m_fighter;
+    }
 
   private:
     /* Only for setting fighter */
     Assets::Controller *m_controller;
     Assets::HUD *m_hud;
+    Objects::Fighter *m_fighter;
 };
 
 }

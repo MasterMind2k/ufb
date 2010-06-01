@@ -25,8 +25,10 @@
 #include "objects/bullet.h"
 #include "objects/asteroid.h"
 
+#include "statehandler.h"
+
 using namespace States;
-using namespace Assets;
+using namespace States::Assets;
 
 HUD::HUD()
   : BGE::AbstractOverlay(),
@@ -67,7 +69,7 @@ void HUD::paint(QPainter *painter, qint32 elapsed)
   painter->setBrush(Qt::NoBrush);
   qreal lockRadius = 20;
   bool isLocked = false;
-  QRectF panel(size.width() - 180, size.height() - 50, 180, 50);
+  QRectF panel(size.width() - 180, size.height() - 80, 180, 80);
 
   // Center cross
   if (BGE::Canvas::canvas()->activeCamera()->name() == "First person camera") {
@@ -189,6 +191,7 @@ void HUD::paint(QPainter *painter, qint32 elapsed)
   painter->drawRect(panel);
   painter->restore();
 
+  painter->save();
   paintStatus(painter, panel, "Shields: " + QString::number(m_fighter->shields()) + "%");
   panel.setTop(panel.top() + 15);
   paintStatus(painter, panel, "Hull: " + QString::number(m_fighter->hullIntegrity()) + "%");
@@ -209,6 +212,16 @@ void HUD::paint(QPainter *painter, qint32 elapsed)
 
     painter->setPen(greenPen);
     paintStatus(painter, panel, "Target locked!");
+  }
+  painter->restore();
+
+  // Wave status
+  panel.setTop(panel.top() + 15);
+  paintStatus(painter, panel, QString("Wave: %0").arg(StateHandler::self()->wave()));
+  if (StateHandler::self()->nextWaveIn() > 0) {
+    // paint timer
+    panel.setLeft(panel.left() + 50);
+    paintStatus(painter, panel, QString(" / Next wave in: %0").arg(30 - qRound(StateHandler::self()->nextWaveIn() / 1000.0)));
   }
 }
 

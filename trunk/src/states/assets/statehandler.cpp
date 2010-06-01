@@ -42,8 +42,13 @@ using namespace Assets;
 StateHandler *StateHandler::m_self = 0l;
 
 StateHandler::StateHandler()
-  : m_game(0l)
+  : m_game(0l),
+    m_waitingWave(false),
+    m_wave(0)
 {
+  m_checkTimer = new QTimer(this);
+  m_checkTimer->setInterval(500);
+  connect(m_checkTimer, SIGNAL(timeout()), SLOT(checkAis()));
 }
 
 void StateHandler::play()
@@ -51,6 +56,8 @@ void StateHandler::play()
   // Cleanup previous game
   if (m_game) {
     Util::ObjectList::self()->clear();
+    qDeleteAll(m_ais);
+    m_ais.clear();
     delete m_game;
   }
 
@@ -90,6 +97,7 @@ void StateHandler::play()
 
   // Add Ai fighter
   Util::Ai *ai = new Util::Ai(fighter);
+  m_ais << ai;
   fighter = new Objects::Fighter(ai);
   ai->setControlled(fighter);
   fighter->move(0, -10000, 0);
@@ -147,6 +155,11 @@ void StateHandler::play()
 
   // Remember that we have an ongoing game :)
   m_game = game;
+  disconnect(this, SLOT(nextWave()));
+  disconnect(this, SLOT(checkAis()));
+  m_checkTimer->start();
+  m_checkTimer->setInterval(500);
+  connect(m_checkTimer, SIGNAL(timeout()), SLOT(checkAis()));
 }
 
 void StateHandler::unload()
@@ -157,6 +170,9 @@ void StateHandler::unload()
 
   // We already remembered the game state
   BGE::Canvas::canvas()->popGameState();
+  m_checkTimer->stop();
+  if (m_waitingWave)
+    m_previousTime = m_nextWave.elapsed();
 }
 
 void StateHandler::resume()
@@ -166,6 +182,15 @@ void StateHandler::resume()
     return;
 
   BGE::Canvas::canvas()->pushGameState(m_game);
+  if (m_waitingWave) {
+    m_nextWave.start();
+    m_nextWave.addMSecs(m_previousTime);
+    m_checkTimer->setInterval(m_previousTime);
+    m_checkTimer->start();
+  } else {
+    m_checkTimer->setInterval(500);
+    m_checkTimer->start();
+  }
 }
 
 void StateHandler::populateAsteroids()
@@ -240,4 +265,45 @@ void StateHandler::setRestraints()
   boundry = new btRigidBody(info);
   BGE::Canvas::canvas()->dynamicsWorld()->addRigidBody(boundry);
   boundry->setRestitution(1.0);
+}
+
+void StateHandler::checkAis()
+{
+  bool haveAis = false;
+  foreach (Util::Ai *ai, m_ais) {
+    if (ai->controlled()) {
+      haveAis = true;
+      break;
+    }
+  }
+
+  if (!haveAis) {
+    disconnect(this, SLOT(checkAis()));
+    m_checkTimer->stop();
+    connect(m_checkTimer, SIGNAL(timeout()), SLOT(nextWave()));
+    m_checkTimer->setInterval(30000); // 30 secs between eac wave
+    m_checkTimer->start();
+    m_nextWave.restart();
+    m_waitingWave = true;
+  }
+}
+
+void StateHandler::nextWave()
+{
+  // Create a new AI :D
+  Objects::Fighter *fighter = new Objects::Fighter(m_ais.first());
+  m_ais.first()->setTarget(static_cast<Game*> (m_game)->fighter());
+  m_ais.first()->setControlled(fighter);
+
+  float range = BGE::Canvas::canvas()->SceneSize.x() / 10.0 - 6000;
+  fighter->move(Vector3f((qrand() % 3 - 1) * range, (qrand() % 3 - 1) * range, (qrand() % 3 - 1) * range));
+  fighter->initBody();
+  BGE::Canvas::canvas()->addSceneObject(fighter);
+
+  m_waitingWave = false;
+  disconnect(m_checkTimer, SIGNAL(timeout()), this, SLOT(nextWave()));
+  m_checkTimer->setInterval(500);
+  connect(m_checkTimer, SIGNAL(timeout()), SLOT(checkAis()));
+  m_checkTimer->start();
+  m_wave++;
 }

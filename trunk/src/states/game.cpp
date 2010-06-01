@@ -20,6 +20,7 @@
 using namespace States;
 
 Game::Game()
+  : m_fighter(0l)
 {
   m_controller = new Assets::Controller;
   setController(m_controller);
@@ -31,4 +32,5 @@ void Game::setFighter(Objects::Fighter *fighter)
 {
   m_controller->setFighter(fighter);
   m_hud->setFighter(fighter);
+  m_fighter = fighter;
 }
