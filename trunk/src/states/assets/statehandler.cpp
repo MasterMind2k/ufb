@@ -58,6 +58,7 @@ void StateHandler::play()
     Util::ObjectList::self()->clear();
     qDeleteAll(m_ais);
     m_ais.clear();
+    m_wave = 0;
     delete m_game;
   }
 

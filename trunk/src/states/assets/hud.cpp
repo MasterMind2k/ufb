@@ -53,14 +53,16 @@ void HUD::paint(QPainter *painter, qint32 elapsed)
     QSettings settings;
     quint32 time = settings.value("Hours", 0).toInt() * 3600 + settings.value("Minutes", 0).toInt() * 60 + settings.value("Seconds", 0).toInt();
     qint32 current = floor(StateHandler::self()->game()->time().elapsed() / 1000.0);
+    quint8 waves = settings.value("Waves", 0).toUInt();
 
-    if (current > time) {
+    if (current < time && waves == StateHandler::self()->wave() || StateHandler::self()->wave() > waves) {
       qint32 hours = floor(current / 3600.0);
       qint32 minutes = floor(current / 60.0) - hours * 60;
       qint32 seconds = current - hours * 3600 - minutes * 60;
       settings.setValue("Hours", hours);
       settings.setValue("Minutes", minutes);
       settings.setValue("Seconds", seconds);
+      settings.setValue("Waves", StateHandler::self()->wave());
     }
   }
 
@@ -234,18 +236,19 @@ void HUD::paint(QPainter *painter, qint32 elapsed)
   painter->restore();
 
   // Wave status
+  QSettings settings;
   panel.setTop(panel.top() + 15);
-  paintStatus(painter, panel, QString("Wave: %0").arg(StateHandler::self()->wave()));
+  paintStatus(painter, panel, QString("Wave: %0 Best: %1").arg(StateHandler::self()->wave()).arg(settings.value("Waves", 0).toInt()));
+  panel.setLeft(panel.left() + 70);
   if (StateHandler::self()->nextWaveIn() > 0) {
     // paint timer
-    panel.setLeft(panel.left() + 50);
     paintStatus(painter, panel, QString(" / Next wave in: %0").arg(30 - qRound(StateHandler::self()->nextWaveIn() / 1000.0)));
   }
 
   // Draw timings
+  panel.setLeft(panel.left() - 70);
   panel.setTop(panel.top() + 15);
-  QSettings settings;
-  paintStatus(painter, panel, QString("Previous time: %0:%1:%2").arg(settings.value("Hours", 0).toInt()).arg(settings.value("Minutes", 0).toInt()).arg(settings.value("Seconds", 0).toInt()));
+  paintStatus(painter, panel, QString("Best time: %0:%1:%2").arg(settings.value("Hours", 0).toInt()).arg(settings.value("Minutes", 0).toInt()).arg(settings.value("Seconds", 0).toInt()));
   panel.setTop(panel.top() + 15);
   qint32 current = floor(StateHandler::self()->game()->time().elapsed() / 1000.0);
   qint32 hours = floor(current / 3600.0);
