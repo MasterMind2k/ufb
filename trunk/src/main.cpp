@@ -12,6 +12,8 @@
  ***************************************************************************/
 #include <QtGui/QApplication>
 
+#include <QtGui/QSplashScreen>
+
 #include "BulletDynamics/Dynamics/btDynamicsWorld.h"
 
 #include "canvas.h"
@@ -95,19 +97,25 @@ void createSkyboxQuad()
 
 int main(int argc, char **argv)
 {
-  Q_INIT_RESOURCE(bge_resources);
-
   QApplication app(argc, argv);
   QApplication::setApplicationName("UFB");
   QApplication::setOrganizationName("UFB");
+
+  QSplashScreen splash(QPixmap(":/ufb.png"));
+  splash.showMessage("Initializing...", Qt::AlignLeft | Qt::AlignBottom);
+  splash.show();
+
+  Q_INIT_RESOURCE(bge_resources);
 
   // Set the scene size
   BGE::Canvas::SceneSize = Vector3f(500000, 500000, 500000);
 
   // Load data
+  splash.showMessage("Loading resources...", Qt::AlignLeft | Qt::AlignBottom);
   BGE::Canvas::canvas()->loadResource("./resources.rcc");
 
   // Create sky box quad and cube
+  splash.showMessage("Preparing menu...", Qt::AlignLeft | Qt::AlignBottom);
   createSkyboxQuad();
   createCube();
 
@@ -177,7 +185,10 @@ int main(int argc, char **argv)
   BGE::Canvas::canvas()->light("Global light")->setPositional(false);
   BGE::Canvas::canvas()->addSceneObject(BGE::Canvas::canvas()->light("Global light"));
 
+  splash.showMessage("Finished. Have fun!", Qt::AlignLeft | Qt::AlignBottom);
+
   BGE::Canvas::canvas()->show();
+  splash.finish(BGE::Canvas::canvas());
 
   return app.exec();
 }
