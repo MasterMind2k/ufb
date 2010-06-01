@@ -238,15 +238,13 @@ void HUD::paint(QPainter *painter, qint32 elapsed)
   // Wave status
   QSettings settings;
   panel.setTop(panel.top() + 15);
-  paintStatus(painter, panel, QString("Wave: %0 Best: %1").arg(StateHandler::self()->wave()).arg(settings.value("Waves", 0).toInt()));
-  panel.setLeft(panel.left() + 70);
-  if (StateHandler::self()->nextWaveIn() > 0) {
-    // paint timer
-    paintStatus(painter, panel, QString(" / Next wave in: %0").arg(30 - qRound(StateHandler::self()->nextWaveIn() / 1000.0)));
-  }
+  QString time;
+  if (StateHandler::self()->nextWaveIn() > 0)
+    time = QString("(%0)").arg(30 - qRound(StateHandler::self()->nextWaveIn() / 1000.0));
+  paintStatus(painter, panel, QString("Wave: %0 Best: %1 ").arg(StateHandler::self()->wave()).arg(settings.value("Waves", 0).toInt()) + time);
+
 
   // Draw timings
-  panel.setLeft(panel.left() - 70);
   panel.setTop(panel.top() + 15);
   paintStatus(painter, panel, QString("Best time: %0:%1:%2").arg(settings.value("Hours", 0).toInt()).arg(settings.value("Minutes", 0).toInt()).arg(settings.value("Seconds", 0).toInt()));
   panel.setTop(panel.top() + 15);
