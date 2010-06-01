@@ -43,6 +43,10 @@ class Ai
     {
       m_controlled = controlled;
     }
+    inline Objects::Fighter *controlled() const
+    {
+      return m_controlled;
+    }
 
   private:
     Vector3f m_fleeLocation;

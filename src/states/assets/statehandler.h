@@ -13,15 +13,24 @@
 #ifndef STATES_ASSETS_STATEHANDLER_H
 #define STATES_ASSETS_STATEHANDLER_H
 
+#include <QtCore/QTime>
+#include <QtCore/QTimer>
+#include <QtCore/QList>
+
 namespace BGE {
 class GameState;
+}
+
+namespace Util {
+class Ai;
 }
 
 namespace States {
 namespace Assets {
 
-class StateHandler
+  class StateHandler : public QObject
 {
+  Q_OBJECT
   public:
     inline static StateHandler *self()
     {
@@ -38,15 +47,34 @@ class StateHandler
       return m_game != 0l;
     }
 
+    inline quint8 wave() const
+    {
+      return m_wave;
+    }
+    inline qint32 nextWaveIn() const
+    {
+      return m_waitingWave ? m_nextWave.elapsed() : 0;
+    }
+
   private:
     static StateHandler *m_self;
     BGE::GameState *m_game;
+    QList<Util::Ai*> m_ais;
+    quint8 m_wave;
+    qint32 m_previousTime;
+    QTime m_nextWave;
+    QTimer *m_checkTimer;
+    bool m_waitingWave;
 
     /* Singleton class */
     StateHandler();
 
     void populateAsteroids();
     void setRestraints();
+
+  private slots:
+    void checkAis();
+    void nextWave();
 };
 
 }

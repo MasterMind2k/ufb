@@ -8,6 +8,7 @@ set(assets_SRCS
 
 set(assets_HDRS
   controller.h
+  statehandler.h
 )
 
 qt4_wrap_cpp(assets_MOCS ${assets_HDRS})

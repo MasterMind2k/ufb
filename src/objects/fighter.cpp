@@ -145,6 +145,7 @@ void Fighter::calculateTransforms(qint32 timeDiff)
       } else {
         m_previousExplosion += timeDiff;
       }
+
     } else if (!m_exploded) {
       qreal pos = distance / 2.0;
       BGE::Canvas::canvas()->addSceneObject(new Explosion(globalPosition() + pos * Vector3f(qrand() % 60 - 30, qrand() % 60 - 30, qrand() % 60 - 30).normalized(), Explosion::Large));
@@ -161,6 +162,9 @@ void Fighter::calculateTransforms(qint32 timeDiff)
         PowerUp *powerup = new PowerUp;
         powerup->move(globalPosition());
         BGE::Canvas::canvas()->addSceneObject(powerup);
+
+        m_ai->setControlled(0l);
+        m_ai = 0l;
       }
 
       // Remove itself
