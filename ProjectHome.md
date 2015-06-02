@@ -1,0 +1,1 @@
+Game made as part of Computer Graphics course at FRI (Fakulteta za Računalništvo in Informatiko).
